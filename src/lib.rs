@@ -1,3 +1,5 @@
+pub mod dataset;
+
 #[cfg(test)]
 mod tests {
     #[test]
