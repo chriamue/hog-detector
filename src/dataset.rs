@@ -205,9 +205,25 @@ impl DataSet {
         props
     }
 
-    pub fn label_id(label: &str, labels: &Vec<String>) -> Vec<f32> {
-        let idx = labels.into_iter().position(|x| x == label).unwrap();
-        vec![idx as f32]
+    pub fn label_id(label: &str, labels: &Vec<String>) -> f32 {
+        labels.into_iter().position(|x| x == label).unwrap() as f32
+    }
+
+    pub fn get(&self) -> (Vec<RgbImage>, Vec<f32>, Vec<RgbImage>, Vec<f32>) {
+        let train_x = self.data.iter().map(|(_, img)| img.clone()).collect();
+        let train_y = self
+            .data
+            .iter()
+            .map(|(label, _)| Self::label_id(label, &self.names))
+            .collect();
+
+        let test_x = self.data.iter().map(|(_, img)| img.clone()).collect();
+        let test_y = self
+            .data
+            .iter()
+            .map(|(label, _)| Self::label_id(label, &self.names))
+            .collect();
+        (train_x, train_y, test_x, test_y)
     }
 
     pub fn samples(&self) -> usize {
