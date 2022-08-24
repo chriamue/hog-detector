@@ -18,7 +18,7 @@ impl Trainable for HogDetector {
         let x_train = self.preprocess_matrix(x_train);
         let y_train = y_train
             .iter()
-            .map(|y| if *y == class { *y } else { -1.0 })
+            .map(|y| if *y == class { *y } else { 0.0 })
             .collect();
         self.train(x_train, y_train);
     }

@@ -4,11 +4,11 @@ use image::{DynamicImage, RgbImage};
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 
 pub trait Predictable {
-    fn predict(&self, image: &RgbImage) -> Vec<f32>;
+    fn predict(&self, image: &RgbImage) -> u32;
 }
 
 impl Predictable for HogDetector {
-    fn predict(&self, image: &RgbImage) -> Vec<f32> {
+    fn predict(&self, image: &RgbImage) -> u32 {
         let image = resize(
             &DynamicImage::ImageRgb8(image.clone()),
             32,
@@ -19,7 +19,7 @@ impl Predictable for HogDetector {
         let x = self.preprocess(&image);
         let x = DenseMatrix::from_vec(1, x.len(), &x);
         let y = self.svc.as_ref().unwrap().predict(&x).unwrap();
-        y
+        *y.first().unwrap() as u32
     }
 }
 #[cfg(test)]
@@ -44,6 +44,6 @@ mod tests {
         let loco03 = image::open("res/loco03.jpg").unwrap().to_rgb8();
 
         let predicted = model.predict(&loco03);
-        assert_eq!(predicted, vec![5.0]);
+        assert_eq!(predicted, 5);
     }
 }
