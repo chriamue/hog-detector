@@ -1,11 +1,9 @@
 pub mod dataset;
-pub mod model;
+pub mod hogdetector;
+pub mod predictable;
+pub mod trainable;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-}
+pub use dataset::DataSet;
+pub use hogdetector::HogDetector;
+pub use predictable::Predictable;
+pub use trainable::Trainable;

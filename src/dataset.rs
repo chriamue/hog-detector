@@ -178,7 +178,7 @@ impl DataSet {
             let y = rng.gen_range(0..=image.height());
             annotations.push((
                 label.to_string(),
-                window_crop(&image, window_size, window_size, (x, y)),
+                window_crop(image, window_size, window_size, (x, y)),
             ));
         }
         annotations
@@ -200,13 +200,13 @@ impl DataSet {
 
     pub fn label_props(label: &str, labels: &Vec<String>) -> Vec<f32> {
         let mut props = vec![0.0; 10];
-        let idx = labels.into_iter().position(|x| x == label).unwrap();
+        let idx = labels.iter().position(|x| x == label).unwrap();
         props[idx] = 1.0;
         props
     }
 
-    pub fn label_id(label: &str, labels: &Vec<String>) -> f32 {
-        labels.into_iter().position(|x| x == label).unwrap() as f32
+    pub fn label_id(label: &str, labels: &[String]) -> f32 {
+        labels.iter().position(|x| x == label).unwrap() as f32
     }
 
     pub fn get(&self) -> (Vec<RgbImage>, Vec<f32>, Vec<RgbImage>, Vec<f32>) {
