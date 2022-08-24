@@ -13,7 +13,7 @@ pub fn window_crop(
     window_height: u32,
     center: (u32, u32),
 ) -> RgbImage {
-    let window = imageops::crop(
+    imageops::crop(
         &mut input_frame.clone(),
         center
             .0
@@ -26,34 +26,24 @@ pub fn window_crop(
         window_width,
         window_height,
     )
-    .to_image();
-    return window;
+    .to_image()
 }
 
 pub fn rotated_frames(frame: &RgbImage) -> impl Iterator<Item = RgbImage> + '_ {
-    let rotated_frames = [
+    [
         0.02, -0.02, 0.05, -0.05, 0.07, -0.07, 0.09, -0.09, 1.1, -1.1, 1.3, -1.3, 1.5, -1.5, 2.0,
         -2.0,
     ]
     .iter()
-    .map(|rad| {
-        let training_frame =
-            rotate_about_center(frame, *rad, Interpolation::Nearest, Rgb([0, 0, 0]));
-
-        return training_frame;
-    });
-    rotated_frames
+    .map(|rad| rotate_about_center(frame, *rad, Interpolation::Nearest, Rgb([0, 0, 0])))
 }
 
 pub fn scaled_frames(frame: &RgbImage) -> impl Iterator<Item = RgbImage> + '_ {
-    let scaled_frames = [0.8, 0.9, 1.1, 1.2].into_iter().map(|scalefactor| {
+    [0.8, 0.9, 1.1, 1.2].into_iter().map(|scalefactor| {
         let scale = Projection::scale(scalefactor, scalefactor);
 
-        let scaled_training_frame = warp(frame, &scale, Interpolation::Nearest, Rgb([0, 0, 0]));
-
-        return scaled_training_frame;
-    });
-    scaled_frames
+        warp(frame, &scale, Interpolation::Nearest, Rgb([0, 0, 0]))
+    })
 }
 
 pub struct DataSet {
@@ -124,7 +114,7 @@ impl DataSet {
             for line in io::BufReader::new(file).lines() {
                 match line {
                     Ok(line) => {
-                        let mut l = line.split(" ");
+                        let mut l = line.split(' ');
                         let label = l.next().unwrap();
                         let x: u32 = l.next().unwrap().parse().unwrap();
                         let y: u32 = l.next().unwrap().parse().unwrap();
@@ -198,7 +188,7 @@ impl DataSet {
         }
     }
 
-    pub fn label_props(label: &str, labels: &Vec<String>) -> Vec<f32> {
+    pub fn label_props(label: &str, labels: &[String]) -> Vec<f32> {
         let mut props = vec![0.0; 10];
         let idx = labels.iter().position(|x| x == label).unwrap();
         props[idx] = 1.0;
