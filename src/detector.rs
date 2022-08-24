@@ -23,8 +23,7 @@ pub fn windows(image: &RgbImage, window_size: u32) -> (u32, u32, Vec<SubImage<&R
             ))
         }
     }
-
-    return (cols, rows, subimages);
+    (cols, rows, subimages)
 }
 
 pub fn detect_objects(
@@ -56,8 +55,7 @@ pub fn detect_objects(
         }
     }
     let detections = merge(detections);
-    let detections = nms_sort(detections);
-    detections
+    nms_sort(detections)
 }
 
 pub trait Detector {
@@ -136,7 +134,7 @@ mod tests {
         );
         dataset.load(false);
 
-        model.train_class(&dataset, 5.0);
+        model.train_class(&dataset, 5);
         assert!(model.svc.is_some());
         let webcam01 = image::open("res/training/webcam01.jpg").unwrap();
         let detections = model.detect_objects(&webcam01);
@@ -153,14 +151,27 @@ mod tests {
             "res/labels.txt".to_string(),
             32,
         );
-        dataset.load(false);
+        dataset.load(true);
 
-        model.train_class(&dataset, 5.0);
+        model.train_class(&dataset, 1);
         assert!(model.svc.is_some());
         let webcam01 = image::open("res/training/webcam01.jpg").unwrap();
         model
             .visualize_detections(&webcam01)
-            .save("out/test_visualize_detections.png")
+            .save("out/test_visualize_detections_1.png")
+            .unwrap();
+
+        model.train_class(&dataset, 2);
+        let webcam06 = image::open("res/training/webcam06.jpg").unwrap();
+        model
+            .visualize_detections(&webcam06)
+            .save("out/test_visualize_detections_2.png")
+            .unwrap();
+        model.train_class(&dataset, 5);
+        let webcam10 = image::open("res/training/webcam10.jpg").unwrap();
+        model
+            .visualize_detections(&webcam10)
+            .save("out/test_visualize_detections_5.png")
             .unwrap();
     }
 }

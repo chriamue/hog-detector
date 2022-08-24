@@ -12,7 +12,7 @@ pub struct HogDetector {
 impl Default for HogDetector {
     fn default() -> Self {
         let options = HogOptions {
-            orientations: 9,
+            orientations: 16,
             signed: false,
             cell_side: 8,
             block_side: 2,
@@ -46,7 +46,7 @@ mod tests {
     #[test]
     fn test_default() {
         let model = HogDetector::default();
-        assert_eq!(model.options.orientations, 9);
+        assert_eq!(model.options.orientations, 16);
     }
 
     #[test]
@@ -55,6 +55,6 @@ mod tests {
         let loco03 = open("res/loco03.jpg").unwrap().to_rgb8();
         let loco03 = resize(&loco03, 32, 32, FilterType::Nearest);
         let descriptor = model.preprocess(&loco03);
-        assert_eq!(descriptor.len(), 144);
+        assert_eq!(descriptor.len(), 256);
     }
 }

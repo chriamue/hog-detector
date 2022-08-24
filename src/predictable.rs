@@ -22,6 +22,7 @@ impl Predictable for HogDetector {
         *y.first().unwrap() as u32
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -39,7 +40,7 @@ mod tests {
         );
         dataset.load(false);
 
-        model.train_class(&dataset, 5.0);
+        model.train_class(&dataset, 5);
         assert!(model.svc.is_some());
         let loco03 = image::open("res/loco03.jpg").unwrap().to_rgb8();
 

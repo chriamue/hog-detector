@@ -195,11 +195,11 @@ impl DataSet {
         props
     }
 
-    pub fn label_id(label: &str, labels: &[String]) -> f32 {
-        labels.iter().position(|x| x == label).unwrap() as f32
+    pub fn label_id(label: &str, labels: &[String]) -> u32 {
+        labels.iter().position(|x| x == label).unwrap() as u32
     }
 
-    pub fn get(&self) -> (Vec<RgbImage>, Vec<f32>, Vec<RgbImage>, Vec<f32>) {
+    pub fn get(&self) -> (Vec<RgbImage>, Vec<u32>, Vec<RgbImage>, Vec<u32>) {
         let train_x = self.data.iter().map(|(_, img)| img.clone()).collect();
         let train_y = self
             .data
@@ -218,6 +218,16 @@ impl DataSet {
 
     pub fn samples(&self) -> usize {
         self.data.len()
+    }
+
+    pub fn export(&self, folder: &str) {
+        self.data
+            .iter()
+            .enumerate()
+            .for_each(|(index, (label, img))| {
+                img.save(format!("{}/{}_{}.jpg", folder, label, index))
+                    .unwrap();
+            });
     }
 }
 
@@ -301,5 +311,16 @@ mod tests {
         assert_eq!(dataset.samples(), LABELS * IMAGES_PER_LABEL);
         dataset.generate_random_annotations(1);
         assert_eq!(dataset.samples(), LABELS * IMAGES_PER_LABEL + 3);
+    }
+
+    #[test]
+    fn test_dataset_export() {
+        let mut dataset = DataSet::new(
+            "res/training/".to_string(),
+            "res/labels.txt".to_string(),
+            28,
+        );
+        dataset.load(true);
+        dataset.export("out/export");
     }
 }
