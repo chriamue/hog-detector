@@ -1,0 +1,21 @@
+{
+  "name": "hog-detector",
+  "collaborators": [
+    "Christian <chriamue@gmail.com>"
+  ],
+  "description": "Histogram of Oriented Gradients and Object Detection",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rusty-rails/hog-detector"
+  },
+  "files": [
+    "hog_detector_bg.wasm",
+    "hog_detector.js",
+    "hog_detector.d.ts"
+  ],
+  "module": "hog_detector.js",
+  "types": "hog_detector.d.ts",
+  "sideEffects": false
+}
