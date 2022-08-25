@@ -235,14 +235,14 @@ impl DataSet {
 mod tests {
     use super::*;
 
-    const LABELS: usize = 18;
+    const ANNOTATIONS: usize = 42;
     const IMAGES_PER_LABEL: usize = 21;
 
     #[test]
     fn test_list_files() {
         let path = "res/training";
         let file_pathes = DataSet::list_pathes(path);
-        assert_eq!(file_pathes.len(), 3);
+        assert_eq!(file_pathes.len(), 4);
     }
 
     #[test]
@@ -252,7 +252,7 @@ mod tests {
             "res/training/webcam01.jpg".to_string(),
         )];
         let annotations = DataSet::load_annotations(pathes, 28, false);
-        assert_eq!(annotations.len(), 6);
+        assert_eq!(annotations.len(), 9);
     }
 
     #[test]
@@ -263,7 +263,7 @@ mod tests {
             28,
         );
         dataset.load(false);
-        assert_eq!(dataset.samples(), 18);
+        assert_eq!(dataset.samples(), ANNOTATIONS);
     }
 
     #[test]
@@ -291,7 +291,7 @@ mod tests {
             28,
         );
         dataset.load(true);
-        assert_eq!(dataset.samples(), LABELS * IMAGES_PER_LABEL);
+        assert_eq!(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL);
     }
 
     #[test]
@@ -308,9 +308,9 @@ mod tests {
             28,
         );
         dataset.load(true);
-        assert_eq!(dataset.samples(), LABELS * IMAGES_PER_LABEL);
+        assert_eq!(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL);
         dataset.generate_random_annotations(1);
-        assert_eq!(dataset.samples(), LABELS * IMAGES_PER_LABEL + 3);
+        assert_eq!(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL + 4);
     }
 
     #[test]

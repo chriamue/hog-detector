@@ -42,8 +42,8 @@ impl Detector for HogDetector {
         let window_size = 32;
         let image = image.to_rgb8();
         let mut windows = sliding_window(&image, step_size, window_size);
+        windows.extend(pyramid(&image, 1.3, step_size, window_size));
         windows.extend(pyramid(&image, 1.5, step_size, window_size));
-        windows.extend(pyramid(&image, 1.8, step_size, window_size));
 
         let predictions: Vec<(u32, u32, u32)> = windows
             .iter()
@@ -119,6 +119,7 @@ mod tests {
             32,
         );
         dataset.load(false);
+        dataset.generate_random_annotations(10);
 
         model.train_class(&dataset, 1);
         assert!(model.svc.is_some());
@@ -135,13 +136,20 @@ mod tests {
             .save("out/test_visualize_detections_2.png")
             .unwrap();
         model.train_class(&dataset, 5);
-        let webcam10 = image::open("res/training/webcam10.jpg").unwrap();
-
-        let detections = model.detect_objects(&webcam10);
-        println!("{:?}", detections);
+        let webcam10 = image::open("res/training/webcam01.jpg").unwrap();
         model
             .visualize_detections(&webcam10)
-            .save("out/test_visualize_detections_5.png")
+            .save("out/test_visualize_detections_5_01.png")
+            .unwrap();
+        let webcam10 = image::open("res/training/webcam06.jpg").unwrap();
+        model
+            .visualize_detections(&webcam10)
+            .save("out/test_visualize_detections_5_06.png")
+            .unwrap();
+        let webcam10 = image::open("res/training/webcam10.jpg").unwrap();
+        model
+            .visualize_detections(&webcam10)
+            .save("out/test_visualize_detections_5_10.png")
             .unwrap();
     }
 }

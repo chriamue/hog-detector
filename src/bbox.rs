@@ -1,4 +1,5 @@
 // source: https://github.com/12101111/yolo-rs/blob/master/src/yolo.rs
+// x, y is the upper left corner
 #[derive(Debug, Clone, Copy)]
 pub struct BBox {
     pub x: f32,
@@ -9,16 +10,16 @@ pub struct BBox {
 
 impl BBox {
     pub fn left(&self) -> f32 {
-        self.x - self.w / 2.0
+        self.x
     }
     pub fn right(&self) -> f32 {
-        self.x + self.w / 2.0
+        self.x + self.w
     }
     pub fn top(&self) -> f32 {
-        self.y - self.h / 2.0
+        self.y
     }
     pub fn bot(&self) -> f32 {
-        self.y + self.h / 2.0
+        self.y + self.h
     }
     pub fn overlay(&self, rhs: &BBox) -> f32 {
         let left = self.left().max(rhs.left());
@@ -58,10 +59,10 @@ mod tests {
             w: 1.0,
             h: 1.0,
         };
-        assert_eq!(b1.left(), 0.0);
-        assert_eq!(b1.right(), 1.0);
-        assert_eq!(b1.top(), 0.0);
-        assert_eq!(b1.bot(), 1.0);
+        assert_eq!(b1.left(), 0.5);
+        assert_eq!(b1.right(), 1.5);
+        assert_eq!(b1.top(), 0.5);
+        assert_eq!(b1.bot(), 1.5);
         assert_eq!(b1.overlay(&b1), 1.0);
         assert_eq!(b1.union(&b1), 1.0);
         assert_eq!(b1.iou(&b1), 1.0);

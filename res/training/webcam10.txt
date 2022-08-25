@@ -1,3 +1,12 @@
+none 330 190
+none 300 450
+none 350 60
+none 560 420
+none 290 435
+none 70 150
+none 470 425
+none 375 280
+none 90 125
 marker1 530 95
 marker2 110 65
 marker3 40 320

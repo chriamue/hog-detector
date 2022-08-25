@@ -1,0 +1,9 @@
+none 330 190
+none 300 450
+none 350 60
+marker1 550 90
+marker2 120 50
+marker3 50 305
+loco5 85 310
+loco5 105 315
+loco5 130 335
