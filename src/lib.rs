@@ -5,6 +5,7 @@ pub mod detector;
 pub mod hogdetector;
 pub mod predictable;
 pub mod trainable;
+pub mod utils;
 
 pub use dataset::DataSet;
 pub use hogdetector::HogDetector;

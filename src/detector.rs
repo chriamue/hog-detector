@@ -1,59 +1,32 @@
 use crate::bbox::BBox;
 use crate::detection::{merge, nms_sort, Detection};
+use crate::utils::sliding_window;
 use crate::HogDetector;
 use crate::Predictable;
-use image::{DynamicImage, RgbImage, Rgba, SubImage};
+use image::{DynamicImage, Rgba};
 use imageproc::drawing::{draw_cross_mut, draw_hollow_rect_mut, draw_text_mut};
 use imageproc::rect::Rect;
 use rusttype::{Font, Scale};
 
-pub fn windows(image: &RgbImage, window_size: u32) -> (u32, u32, Vec<SubImage<&RgbImage>>) {
-    let cols = 2 * (image.width() / window_size);
-    let rows = 2 * (image.height() / window_size);
-    let mut subimages = Vec::new();
-
-    for y in 0..rows - 1 {
-        for x in 0..cols - 1 {
-            subimages.push(SubImage::new(
-                image,
-                x * (window_size / 2),
-                y * (window_size / 2),
-                window_size,
-                window_size,
-            ))
-        }
-    }
-    (cols, rows, subimages)
-}
-
-pub fn detect_objects(
-    cols: u32,
-    rows: u32,
-    predictions: Vec<u32>,
-    window_size: u32,
-) -> Vec<Detection> {
+pub fn detect_objects(predictions: Vec<(u32, u32, u32)>, window_size: u32) -> Vec<Detection> {
     let mut detections: Vec<Detection> = Vec::new();
-    for y in 0..rows - 1 {
-        for x in 0..cols - 1 {
-            let i = (y * (cols - 1) + x) as usize;
-            let class = predictions[i] as usize;
-            if class > 0 {
-                // add 0.1 to generate an overlap on contacting windows.
-                let size = 0.01 + window_size as f32;
-                let bbox = BBox {
-                    x: (x * (window_size / 2)) as f32,
-                    y: (y * (window_size / 2)) as f32,
-                    w: size,
-                    h: size,
-                };
-                detections.push(Detection {
-                    class,
-                    bbox,
-                    confidence: 1.0,
-                });
-            }
+    predictions.iter().for_each(|(x, y, class)| {
+        if *class > 0 {
+            // add 0.1 to generate an overlap on contacting windows.
+            let size = 0.01 + window_size as f32;
+            let bbox = BBox {
+                x: *x as f32,
+                y: *y as f32,
+                w: size,
+                h: size,
+            };
+            detections.push(Detection {
+                class: *class as usize,
+                bbox,
+                confidence: 1.0,
+            });
         }
-    }
+    });
     let detections = merge(detections);
     nms_sort(detections)
 }
@@ -65,14 +38,15 @@ pub trait Detector {
 
 impl Detector for HogDetector {
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
+        let step_size = 16;
         let window_size = 32;
         let image = image.to_rgb8();
-        let (cols, rows, windows) = windows(&image, window_size);
-        let predictions: Vec<u32> = windows
+        let windows = sliding_window(&image, step_size, window_size);
+        let predictions: Vec<(u32, u32, u32)> = windows
             .iter()
-            .map(|window| self.predict(&window.to_image()))
+            .map(|(x, y, window)| (*x, *y, self.predict(&window.to_image())))
             .collect();
-        detect_objects(cols, rows, predictions, window_size)
+        detect_objects(predictions, window_size)
     }
 
     fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
