@@ -1,10 +1,10 @@
 use crate::bbox::BBox;
 use crate::detection::{merge, nms_sort, Detection};
-use crate::utils::sliding_window;
+use crate::utils::{pyramid, sliding_window};
 use crate::HogDetector;
 use crate::Predictable;
 use image::{DynamicImage, Rgba};
-use imageproc::drawing::{draw_cross_mut, draw_hollow_rect_mut, draw_text_mut};
+use imageproc::drawing::{draw_hollow_rect_mut, draw_text_mut};
 use imageproc::rect::Rect;
 use rusttype::{Font, Scale};
 
@@ -38,37 +38,30 @@ pub trait Detector {
 
 impl Detector for HogDetector {
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
-        let step_size = 16;
+        let step_size = 8;
         let window_size = 32;
         let image = image.to_rgb8();
-        let windows = sliding_window(&image, step_size, window_size);
+        let mut windows = sliding_window(&image, step_size, window_size);
+        windows.extend(pyramid(&image, 1.5, step_size, window_size));
+        windows.extend(pyramid(&image, 1.8, step_size, window_size));
+
         let predictions: Vec<(u32, u32, u32)> = windows
             .iter()
-            .map(|(x, y, window)| (*x, *y, self.predict(&window.to_image())))
+            .map(|(x, y, window)| (*x, *y, self.predict(&window)))
             .collect();
         detect_objects(predictions, window_size)
     }
 
     fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
-        let window_size = 32;
         let detections = self.detect_objects(image);
 
         let mut img_copy = image.to_rgba8();
         for detection in detections.iter() {
             let color = Rgba([125u8, 255u8, 0u8, 0u8]);
-            draw_cross_mut(
-                &mut img_copy,
-                Rgba([255u8, 0u8, 0u8, 0u8]),
-                detection.bbox.x as i32,
-                detection.bbox.y as i32,
-            );
             draw_hollow_rect_mut(
                 &mut img_copy,
-                Rect::at(
-                    (detection.bbox.x as u32) as i32,
-                    (detection.bbox.y as u32) as i32,
-                )
-                .of_size(window_size, window_size),
+                Rect::at(detection.bbox.x as i32, detection.bbox.y as i32)
+                    .of_size(detection.bbox.w as u32, detection.bbox.h as u32),
                 color,
             );
 
@@ -125,7 +118,7 @@ mod tests {
             "res/labels.txt".to_string(),
             32,
         );
-        dataset.load(true);
+        dataset.load(false);
 
         model.train_class(&dataset, 1);
         assert!(model.svc.is_some());
@@ -143,6 +136,9 @@ mod tests {
             .unwrap();
         model.train_class(&dataset, 5);
         let webcam10 = image::open("res/training/webcam10.jpg").unwrap();
+
+        let detections = model.detect_objects(&webcam10);
+        println!("{:?}", detections);
         model
             .visualize_detections(&webcam10)
             .save("out/test_visualize_detections_5.png")
