@@ -87,9 +87,8 @@ impl Detector for HogDetector {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::folder_dataset::FolderDataSet;
+    use crate::dataset::{DataSet, FolderDataSet};
     use crate::trainable::Trainable;
-    use crate::DataSet;
 
     #[test]
     fn test_detect() {

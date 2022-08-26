@@ -42,7 +42,7 @@ impl Trainable for HogDetector {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::folder_dataset::FolderDataSet;
+    use crate::dataset::FolderDataSet;
 
     #[test]
     fn test_train() {

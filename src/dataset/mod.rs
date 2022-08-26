@@ -1,6 +1,9 @@
 use image::{imageops, Rgb, RgbImage};
 use imageproc::geometric_transformations::{rotate_about_center, warp, Interpolation, Projection};
 
+mod eye_dataset;
+mod folder_dataset;
+
 pub fn window_crop(
     input_frame: &RgbImage,
     window_width: u32,
@@ -46,3 +49,6 @@ pub trait DataSet {
     fn samples(&self) -> usize;
     fn get(&self) -> (Vec<RgbImage>, Vec<u32>, Vec<RgbImage>, Vec<u32>);
 }
+
+pub use eye_dataset::EyeDataSet;
+pub use folder_dataset::FolderDataSet;

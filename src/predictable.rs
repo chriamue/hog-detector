@@ -26,10 +26,8 @@ impl Predictable for HogDetector {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dataset::window_crop;
-    use crate::folder_dataset::FolderDataSet;
+    use crate::dataset::{window_crop, DataSet, FolderDataSet};
     use crate::trainable::Trainable;
-    use crate::DataSet;
 
     #[test]
     fn test_predict() {
