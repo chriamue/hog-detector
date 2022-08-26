@@ -47,7 +47,7 @@ impl Detector for HogDetector {
 
         let predictions: Vec<(u32, u32, u32)> = windows
             .iter()
-            .map(|(x, y, window)| (*x, *y, self.predict(&window)))
+            .map(|(x, y, window)| (*x, *y, self.predict(window)))
             .collect();
         detect_objects(predictions, window_size)
     }

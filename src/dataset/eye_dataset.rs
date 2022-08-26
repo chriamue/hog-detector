@@ -251,7 +251,7 @@ mod tests {
         assert!(dataset.data.len() > 0);
     }
 
-    #[ignore = "takes more than 200s"]
+    #[ignore = "takes more than 200s in debug mode"]
     #[test]
     fn test_train() {
         let mut model = HogDetector::default();
@@ -260,14 +260,20 @@ mod tests {
         dataset.load(false);
         model.train_class(&dataset, 1);
         assert!(model.svc.is_some());
+
+        std::fs::write(
+            "res/eyes_model.json",
+            serde_json::to_string(&model).unwrap(),
+        )
+        .unwrap();
     }
 
     #[test]
     fn test_detect() {
-        let mut model = HogDetector::default();
-        let mut dataset = EyeDataSet::default();
-        dataset.load(false);
-        model.train_class(&dataset, 1);
+        let model = {
+            let model = std::fs::read_to_string("res/eyes_model.json").unwrap();
+            serde_json::from_str::<HogDetector>(&model).unwrap()
+        };
         assert!(model.svc.is_some());
         let lenna = image::open("res/lenna.png").unwrap();
         model

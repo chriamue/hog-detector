@@ -1,16 +1,24 @@
 use image::{DynamicImage, RgbImage};
 use imageproc::hog::{hog, HogOptions};
+use serde::{Deserialize, Serialize};
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 use smartcore::svm::svc::SVC;
 use smartcore::svm::LinearKernel;
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct HogDetector {
-    pub options: HogOptions,
     pub svc: Option<SVC<f32, DenseMatrix<f32>, LinearKernel>>,
 }
 
 impl Default for HogDetector {
     fn default() -> Self {
+        HogDetector { svc: None }
+    }
+}
+
+impl HogDetector {
+    pub fn preprocess(&self, image: &RgbImage) -> Vec<f32> {
+        let luma = DynamicImage::ImageRgb8(image.clone()).to_luma8();
         let options = HogOptions {
             orientations: 8,
             signed: true,
@@ -18,14 +26,7 @@ impl Default for HogDetector {
             block_side: 2,
             block_stride: 1,
         };
-        HogDetector { options, svc: None }
-    }
-}
-
-impl HogDetector {
-    pub fn preprocess(&self, image: &RgbImage) -> Vec<f32> {
-        let luma = DynamicImage::ImageRgb8(image.clone()).to_luma8();
-        hog(&luma, self.options).unwrap()
+        hog(&luma, options).unwrap()
     }
 
     pub fn preprocess_matrix(&self, images: Vec<RgbImage>) -> DenseMatrix<f32> {
@@ -46,7 +47,7 @@ mod tests {
     #[test]
     fn test_default() {
         let model = HogDetector::default();
-        assert_eq!(model.options.orientations, 8);
+        assert!(model.svc.is_none());
     }
 
     #[test]

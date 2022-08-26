@@ -29,9 +29,7 @@ impl Trainable for HogDetector {
         let (x_train, y_train, _, _) = dataset.get();
         x_train.iter().zip(y_train).for_each(|(img, y)| {
             let pred = self.predict(img);
-            if pred == y && y == class {
-                i += 1;
-            } else if pred == 0 && y != class {
+            if (pred == y && y == class) || (pred == 0 && y != class) {
                 i += 1;
             }
         });

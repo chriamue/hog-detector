@@ -15,11 +15,10 @@ pub fn pyramid(image: &RgbImage, scale: f32, step_size: usize, window_size: u32)
     );
     let image = DynamicImage::ImageRgba8(image).to_rgb8();
     let windows = sliding_window(&image, step_size, window_size);
-    let windows = windows
+    windows
         .into_iter()
         .map(|(x, y, window)| ((x as f32 * scale) as u32, (y as f32 * scale) as u32, window))
-        .collect();
-    windows
+        .collect()
 }
 
 pub fn sliding_window(image: &RgbImage, step_size: usize, window_size: u32) -> Vec<Window> {

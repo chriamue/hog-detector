@@ -23,7 +23,9 @@ ndarray = "0.15.6"
 rand = "0.8.5"
 reqwest = { version = "0.11", features = ["blocking", "json"] }
 rusttype = "0.9.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 smartcore = { version = "0.2.1", features = [
-    "ndarray-bindings",
+    "ndarray-bindings", "serde"
 ], default-features = false }
 zip = "0.6.2"
