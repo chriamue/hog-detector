@@ -1,7 +1,9 @@
 use image::{imageops, Rgb, RgbImage};
 use imageproc::geometric_transformations::{rotate_about_center, warp, Interpolation, Projection};
 
+#[cfg(not(target_arch = "wasm32"))]
 mod eye_dataset;
+#[cfg(not(target_arch = "wasm32"))]
 mod folder_dataset;
 
 pub fn window_crop(
@@ -50,5 +52,7 @@ pub trait DataSet {
     fn get(&self) -> (Vec<RgbImage>, Vec<u32>, Vec<RgbImage>, Vec<u32>);
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 pub use eye_dataset::EyeDataSet;
+#[cfg(not(target_arch = "wasm32"))]
 pub use folder_dataset::FolderDataSet;
