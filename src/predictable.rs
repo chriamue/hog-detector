@@ -27,6 +27,7 @@ impl Predictable for HogDetector {
 mod tests {
     use super::*;
     use crate::dataset::window_crop;
+    use crate::folder_dataset::FolderDataSet;
     use crate::trainable::Trainable;
     use crate::DataSet;
 
@@ -34,7 +35,7 @@ mod tests {
     fn test_predict() {
         let mut model = HogDetector::default();
 
-        let mut dataset = DataSet::new(
+        let mut dataset = FolderDataSet::new(
             "res/training/".to_string(),
             "res/labels.txt".to_string(),
             32,

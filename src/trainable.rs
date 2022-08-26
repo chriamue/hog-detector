@@ -4,8 +4,8 @@ use smartcore::svm::svc::{SVCParameters, SVC};
 
 pub trait Trainable {
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<f32>);
-    fn train_class(&mut self, dataset: &DataSet, class: u32);
-    fn evaluate(&mut self, dataset: &DataSet, class: u32) -> f32;
+    fn train_class(&mut self, dataset: &dyn DataSet, class: u32);
+    fn evaluate(&mut self, dataset: &dyn DataSet, class: u32) -> f32;
 }
 
 impl Trainable for HogDetector {
@@ -14,7 +14,7 @@ impl Trainable for HogDetector {
         self.svc = Some(svc);
     }
 
-    fn train_class(&mut self, dataset: &DataSet, class: u32) {
+    fn train_class(&mut self, dataset: &dyn DataSet, class: u32) {
         let (x_train, y_train, _, _) = dataset.get();
         let x_train = self.preprocess_matrix(x_train);
         let y_train = y_train
@@ -24,7 +24,7 @@ impl Trainable for HogDetector {
         self.train(x_train, y_train);
     }
 
-    fn evaluate(&mut self, dataset: &DataSet, class: u32) -> f32 {
+    fn evaluate(&mut self, dataset: &dyn DataSet, class: u32) -> f32 {
         let mut i = 0;
         let (x_train, y_train, _, _) = dataset.get();
         x_train.iter().zip(y_train).for_each(|(img, y)| {
@@ -42,12 +42,13 @@ impl Trainable for HogDetector {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::folder_dataset::FolderDataSet;
 
     #[test]
     fn test_train() {
         let mut model = HogDetector::default();
 
-        let mut dataset = DataSet::new(
+        let mut dataset = FolderDataSet::new(
             "res/training/".to_string(),
             "res/labels.txt".to_string(),
             32,
@@ -62,7 +63,7 @@ mod tests {
     fn test_evaluate() {
         let mut model = HogDetector::default();
 
-        let mut dataset = DataSet::new(
+        let mut dataset = FolderDataSet::new(
             "res/training/".to_string(),
             "res/labels.txt".to_string(),
             32,

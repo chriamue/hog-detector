@@ -87,6 +87,7 @@ impl Detector for HogDetector {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::folder_dataset::FolderDataSet;
     use crate::trainable::Trainable;
     use crate::DataSet;
 
@@ -94,7 +95,7 @@ mod tests {
     fn test_detect() {
         let mut model = HogDetector::default();
 
-        let mut dataset = DataSet::new(
+        let mut dataset = FolderDataSet::new(
             "res/training/".to_string(),
             "res/labels.txt".to_string(),
             32,
@@ -113,7 +114,7 @@ mod tests {
     fn test_visualize_detections() {
         let mut model = HogDetector::default();
 
-        let mut dataset = DataSet::new(
+        let mut dataset = FolderDataSet::new(
             "res/training/".to_string(),
             "res/labels.txt".to_string(),
             32,

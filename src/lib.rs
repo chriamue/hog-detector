@@ -2,6 +2,7 @@ pub mod bbox;
 pub mod dataset;
 pub mod detection;
 pub mod detector;
+pub mod folder_dataset;
 pub mod hogdetector;
 pub mod predictable;
 pub mod trainable;
