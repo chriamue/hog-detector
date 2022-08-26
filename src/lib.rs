@@ -7,6 +7,9 @@ pub mod predictable;
 pub mod trainable;
 pub mod utils;
 
+#[cfg(target_arch = "wasm32")]
+pub mod wasm;
+
 pub use dataset::DataSet;
 pub use detector::Detector;
 pub use hogdetector::HogDetector;
