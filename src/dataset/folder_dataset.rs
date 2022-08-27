@@ -1,4 +1,6 @@
+use crate::bbox::BBox;
 use crate::dataset::{rotated_frames, scaled_frames, window_crop, DataSet};
+use crate::Detector;
 use image::{open, RgbImage};
 use rand::prelude::ThreadRng;
 use rand::Rng;
@@ -109,6 +111,69 @@ impl FolderDataSet {
         annotations
     }
 
+    pub fn get_negative_samples(
+        &self,
+        detector: &dyn Detector,
+        class: u32,
+    ) -> Vec<(String, RgbImage)> {
+        let mut annotations = Vec::new();
+        let pathes = Self::list_pathes(&self.path);
+        let class_label = self.names[class as usize].clone();
+        for path in pathes {
+            let file = File::open(path.0).unwrap();
+            let mut pos_bboxes = Vec::new();
+            for line in io::BufReader::new(file).lines() {
+                match line {
+                    Ok(line) => {
+                        let mut l = line.split(' ');
+                        let label = l.next().unwrap();
+                        if label == class_label {
+                            let x: u32 = l.next().unwrap().parse().unwrap();
+                            let y: u32 = l.next().unwrap().parse().unwrap();
+
+                            let bbox = BBox {
+                                x: x as f32,
+                                y: y as f32,
+                                w: self.window_size as f32,
+                                h: self.window_size as f32,
+                            };
+                            pos_bboxes.push(bbox);
+                        }
+                    }
+                    _ => (),
+                }
+            }
+
+            let img_path = path.1;
+            let img = open(img_path.clone()).unwrap();
+            let detections = detector.detect_objects(&img);
+
+            detections.iter().for_each(|detection| {
+                let mut false_pos = true;
+                pos_bboxes.iter().for_each(|bbox| {
+                    if bbox.iou(&detection.bbox) > 0.1 {
+                        false_pos = false;
+                    }
+                });
+                if false_pos {
+                    annotations.push(Self::load_annotation(
+                        img_path.clone(),
+                        "none".to_string(),
+                        detection.bbox.x as u32,
+                        detection.bbox.y as u32,
+                        self.window_size,
+                    ));
+                }
+            });
+        }
+        annotations
+    }
+
+    pub fn generate_hard_negative_samples(&mut self, detector: &dyn Detector, class: u32) {
+        let annotations = self.get_negative_samples(detector, class);
+        self.data.extend(annotations);
+    }
+
     pub fn generate_random_annotations_from_image(
         image: &RgbImage,
         label: String,
@@ -197,6 +262,8 @@ impl DataSet for FolderDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::HogDetector;
+    use crate::Trainable;
 
     const ANNOTATIONS: usize = 42;
     const IMAGES_PER_LABEL: usize = 21;
@@ -289,5 +356,22 @@ mod tests {
         );
         dataset.load(true);
         dataset.export("out/export");
+    }
+
+    #[test]
+    fn generate_hard_negative_samples() {
+        let mut model = HogDetector::default();
+
+        let mut dataset = FolderDataSet::new(
+            "res/training/".to_string(),
+            "res/labels.txt".to_string(),
+            32,
+        );
+        dataset.load(true);
+
+        model.train_class(&dataset, 5);
+        assert_eq!(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL);
+        dataset.generate_hard_negative_samples(&model, 5);
+        assert!(dataset.samples() > ANNOTATIONS * IMAGES_PER_LABEL);
     }
 }
