@@ -1,6 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {Element} root
+*/
+export function main(root: Element): void;
+/**
 */
 export class HogDetectorJS {
   free(): void;
@@ -21,10 +25,14 @@ export interface InitOutput {
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
   readonly hogdetectorjs_new: () => number;
   readonly hogdetectorjs_next: (a: number, b: number, c: number, d: number) => void;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
+  readonly main: (a: number) => void;
   readonly __wbindgen_malloc: (a: number) => number;
-  readonly __wbindgen_free: (a: number, b: number) => void;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
+  readonly __wbindgen_export_2: WebAssembly.Table;
+  readonly _dyn_core__ops__function__Fn__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h46388de6df00a64d: (a: number, b: number, c: number) => void;
+  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
+  readonly __wbindgen_free: (a: number, b: number) => void;
+  readonly __wbindgen_exn_store: (a: number) => void;
 }
 
 /**

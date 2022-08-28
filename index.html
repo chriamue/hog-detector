@@ -41,11 +41,12 @@
         var img = document.getElementById('img');
         var detector = null;
 
-        import init, { HogDetectorJS } from "./pkg/hog_detector.js";
+        import init, { HogDetectorJS, main } from "./pkg/hog_detector.js";
         init()
             .then(async () => {
                 let root = document.getElementById("root");
                 try {
+                    main(root);
                 } catch (e) {
                     console.error(e);
                 }
