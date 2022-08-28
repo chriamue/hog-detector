@@ -2,6 +2,8 @@ use crate::Detector;
 use crate::HogDetector;
 use wasm_bindgen::prelude::*;
 
+pub mod gui;
+
 #[wasm_bindgen]
 pub struct HogDetectorJS {
     hog: HogDetector,
@@ -15,7 +17,7 @@ impl HogDetectorJS {
         console_error_panic_hook::set_once();
 
         let hog = {
-            let model = include_str!("../res/eyes_model.json");
+            let model = include_str!("../../res/eyes_model.json");
             serde_json::from_str::<HogDetector>(&model).unwrap()
         };
 
@@ -37,4 +39,9 @@ impl HogDetectorJS {
         .unwrap();
         image_data
     }
+}
+
+#[wasm_bindgen]
+pub fn main(root: web_sys::Element) {
+    yew::start_app_in_element::<gui::App>(root);
 }
