@@ -1,5 +1,6 @@
 use yew::prelude::*;
 
+pub mod editor;
 pub mod header;
 pub mod labels;
 
@@ -38,8 +39,8 @@ impl Component for App {
         html! {
             <>
             <header::Header />
-            { self.current_label.to_string() }
-            <labels::Labels { onchange } {label} />
+            <labels::Labels { onchange } label={ label.clone()} />
+            <editor::Editor {label} />
             </>
         }
     }

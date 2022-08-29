@@ -15,3 +15,8 @@ pub use detector::Detector;
 pub use hogdetector::HogDetector;
 pub use predictable::Predictable;
 pub use trainable::Trainable;
+
+pub mod prelude {
+    pub use crate::bbox::BBox;
+    pub use crate::detection::Detection;
+}
