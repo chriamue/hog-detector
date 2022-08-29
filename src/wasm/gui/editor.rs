@@ -1,6 +1,7 @@
 use crate::prelude::*;
+use crate::wasm::download::download_bytes;
 use yew::{
-    events::{DragEvent, MouseEvent},
+    events::{DragEvent, Event, MouseEvent},
     html, Callback, Component, Context, Html, Properties,
 };
 
@@ -8,6 +9,7 @@ pub enum Msg {
     Dropped(String),
     MouseDown(i32, i32),
     MouseUp(i32, i32),
+    DownloadAnnotations,
     Nothing,
 }
 
@@ -21,6 +23,24 @@ pub struct Editor {
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props {
     pub label: String,
+}
+
+impl Editor {
+    fn format_annotations(&self) -> Vec<String> {
+        self.annotations
+            .iter()
+            .map(|annotation| {
+                format!(
+                    "{} {} {} {} {}",
+                    self.labels[annotation.class],
+                    annotation.bbox.x as i32,
+                    annotation.bbox.y as i32,
+                    annotation.bbox.w as i32,
+                    annotation.bbox.h as i32
+                )
+            })
+            .collect::<Vec<String>>()
+    }
 }
 
 impl Component for Editor {
@@ -65,11 +85,17 @@ impl Component for Editor {
                 });
                 true
             }
+            Msg::DownloadAnnotations => {
+                let file_data = self.format_annotations().join("\n");
+                download_bytes(file_data.as_bytes(), "annotations.txt");
+                true
+            }
             _ => false,
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let onclick = ctx.link().callback(|_| Msg::DownloadAnnotations);
         let ondrop = ctx
             .link()
             .callback(|_: DragEvent| Msg::Dropped("dropped".to_string()));
@@ -87,11 +113,13 @@ impl Component for Editor {
             <div class="flex w-screen bg-gray-100" { ondrop }>
             <img src={self.src.to_string()} {onmousedown} {onmousemove} {onmouseup} />
             <p>
-            { self.annotations.iter().map(|annotation| {
-                    html!{<>{format!("{} {} {} {} {}", self.labels[annotation.class],
-                        annotation.bbox.x as i32, annotation.bbox.y as i32, annotation.bbox.w as i32, annotation.bbox.h as i32)}<br/></>}
+            { self.format_annotations().iter().map(|annotation| {
+                    html!{<>{annotation}<br/></>}
             }).collect::<Html>() }
             </p>
+            <button type="button" class="btn btn-success" {onclick}>
+                { "Download Annotations" }
+            </button>
             </div>
         }
     }

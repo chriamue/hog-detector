@@ -2,6 +2,7 @@ use crate::Detector;
 use crate::HogDetector;
 use wasm_bindgen::prelude::*;
 
+pub mod download;
 pub mod gui;
 
 #[wasm_bindgen]
