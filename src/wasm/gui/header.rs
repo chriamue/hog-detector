@@ -13,7 +13,7 @@ impl Component for Header {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <div class="jumbotron mt-4 p-3 mb-5 bg-light rounded shadow">
-                <h1>{"HOG Detector"}</h1>
+                <h1>{"HOG Detector Annotation Tool"}</h1>
             </div>
         }
     }

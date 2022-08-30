@@ -7,7 +7,7 @@ pub mod header;
 pub mod labels;
 pub mod upload;
 
-fn image_to_base64(img: &DynamicImage) -> String {
+pub fn image_to_base64(img: &DynamicImage) -> String {
     let mut image_data: Vec<u8> = Vec::new();
     img.write_to(&mut Cursor::new(&mut image_data), ImageOutputFormat::Png)
         .unwrap();
