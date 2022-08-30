@@ -108,9 +108,22 @@ impl Component for Editor {
         let onmouseup = ctx
             .link()
             .callback(|e: MouseEvent| Msg::MouseUp(e.offset_x(), e.offset_y()));
+        let mut url = ctx.props().image.to_string();
+        if url.starts_with("data") {
+            let b64img = ctx
+                .props()
+                .image
+                .to_string()
+                .replace("data:image/png;base64,", "");
+            let data = base64::decode(b64img).unwrap();
+            let img = image::load_from_memory(&data).unwrap();
+            let img = crate::detector::visualize_detections(&img, &self.annotations);
+            url = super::image_to_base64(&img);
+        };
+
         html! {
             <div class="flex w-screen bg-gray-100" { ondrop }>
-            <img src={ctx.props().image.to_string()} {onmousedown} {onmousemove} {onmouseup} />
+            <img src={url} {onmousedown} {onmousemove} {onmouseup} />
             <p>
             { self.format_annotations().iter().map(|annotation| {
                     html!{<>{annotation}<br/></>}
