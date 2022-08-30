@@ -15,7 +15,6 @@ pub enum Msg {
 
 pub struct Editor {
     labels: Vec<String>,
-    src: String,
     pos: (i32, i32),
     annotations: Vec<Detection>,
 }
@@ -23,6 +22,7 @@ pub struct Editor {
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props {
     pub label: String,
+    pub image: String,
 }
 
 impl Editor {
@@ -53,7 +53,6 @@ impl Component for Editor {
                 .split("\n")
                 .map(|s| s.to_string())
                 .collect(),
-            src: "https://picsum.photos/640/480/".to_string(),
             pos: (0, 0),
             annotations: Vec::new(),
         }
@@ -111,7 +110,7 @@ impl Component for Editor {
             .callback(|e: MouseEvent| Msg::MouseUp(e.offset_x(), e.offset_y()));
         html! {
             <div class="flex w-screen bg-gray-100" { ondrop }>
-            <img src={self.src.to_string()} {onmousedown} {onmousemove} {onmouseup} />
+            <img src={ctx.props().image.to_string()} {onmousedown} {onmousemove} {onmouseup} />
             <p>
             { self.format_annotations().iter().map(|annotation| {
                     html!{<>{annotation}<br/></>}
