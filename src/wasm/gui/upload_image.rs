@@ -3,7 +3,7 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::{html, Callback, Component, Context, Html, NodeRef, Properties};
 
-pub struct Upload {
+pub struct UploadImage {
     input_ref: NodeRef,
 }
 
@@ -12,7 +12,7 @@ pub struct Props {
     pub onchange: Callback<(String, Vec<u8>)>,
 }
 
-impl Component for Upload {
+impl Component for UploadImage {
     type Message = ();
     type Properties = Props;
 

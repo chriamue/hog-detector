@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use crate::wasm::download::download_bytes;
 use yew::{
-    events::{DragEvent, Event, MouseEvent},
+    events::{DragEvent, MouseEvent},
     html, Callback, Component, Context, Html, Properties,
 };
 
@@ -16,31 +16,31 @@ pub enum Msg {
 pub struct Editor {
     labels: Vec<String>,
     pos: (i32, i32),
-    annotations: Vec<Detection>,
 }
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props {
+    pub filename: String,
     pub label: String,
     pub image: String,
+    pub annotations: Vec<Detection>,
+    pub onchange: Callback<Detection>,
 }
 
-impl Editor {
-    fn format_annotations(&self) -> Vec<String> {
-        self.annotations
-            .iter()
-            .map(|annotation| {
-                format!(
-                    "{} {} {} {} {}",
-                    self.labels[annotation.class],
-                    annotation.bbox.x as i32,
-                    annotation.bbox.y as i32,
-                    annotation.bbox.w as i32,
-                    annotation.bbox.h as i32
-                )
-            })
-            .collect::<Vec<String>>()
-    }
+pub fn format_annotations(annotations: &Vec<Detection>, labels: &Vec<String>) -> Vec<String> {
+    annotations
+        .iter()
+        .map(|annotation| {
+            format!(
+                "{} {} {} {} {}",
+                labels[annotation.class],
+                annotation.bbox.x as i32,
+                annotation.bbox.y as i32,
+                annotation.bbox.w as i32,
+                annotation.bbox.h as i32
+            )
+        })
+        .collect::<Vec<String>>()
 }
 
 impl Component for Editor {
@@ -54,7 +54,6 @@ impl Component for Editor {
                 .map(|s| s.to_string())
                 .collect(),
             pos: (0, 0),
-            annotations: Vec::new(),
         }
     }
 
@@ -72,7 +71,7 @@ impl Component for Editor {
                     .iter()
                     .position(|x| x == &ctx.props().label)
                     .unwrap() as usize;
-                self.annotations.push(Detection {
+                ctx.props().onchange.emit(Detection {
                     class,
                     confidence: 1.0,
                     bbox: BBox {
@@ -85,8 +84,12 @@ impl Component for Editor {
                 true
             }
             Msg::DownloadAnnotations => {
-                let file_data = self.format_annotations().join("\n");
-                download_bytes(file_data.as_bytes(), "annotations.txt");
+                let file_data =
+                    format_annotations(&ctx.props().annotations, &self.labels).join("\n");
+                download_bytes(
+                    file_data.as_bytes(),
+                    &format!("{}.txt", ctx.props().filename),
+                );
                 true
             }
             _ => false,
@@ -117,7 +120,7 @@ impl Component for Editor {
                 .replace("data:image/png;base64,", "");
             let data = base64::decode(b64img).unwrap();
             let img = image::load_from_memory(&data).unwrap();
-            let img = crate::detector::visualize_detections(&img, &self.annotations);
+            let img = crate::detector::visualize_detections(&img, &ctx.props().annotations);
             url = super::image_to_base64(&img);
         };
 
@@ -125,7 +128,7 @@ impl Component for Editor {
             <div class="flex w-screen bg-gray-100" { ondrop }>
             <img src={url} {onmousedown} {onmousemove} {onmouseup} />
             <p>
-            { self.format_annotations().iter().map(|annotation| {
+            { format_annotations(&ctx.props().annotations, &self.labels).iter().map(|annotation| {
                     html!{<>{annotation}<br/></>}
             }).collect::<Html>() }
             </p>

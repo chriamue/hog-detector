@@ -2,7 +2,7 @@
 use crate::bbox::BBox;
 use float_ord::FloatOrd;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Detection {
     pub bbox: BBox,
     pub class: usize,

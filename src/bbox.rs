@@ -1,6 +1,6 @@
 // source: https://github.com/12101111/yolo-rs/blob/master/src/yolo.rs
 // x, y is the upper left corner
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct BBox {
     pub x: f32,
     pub y: f32,
