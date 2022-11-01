@@ -12,6 +12,15 @@ This project contains an algorithm for object detection based on SVM on HOG desc
 4. Using a sliding window, the svm classifier detects bounding boxes.
 5. Applying non-maximum suppression removes some of the bounding boxes.
 
+## run examples
+
+You can find examples in example folder.
+The mnist example loads the mnist dataset and trains hog on the numbers.
+
+```sh
+cargo run --features mnist --example mnist
+```
+
 ## run wasm
 
 ```sh

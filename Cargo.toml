@@ -11,6 +11,10 @@ repository = "https://github.com/rusty-rails/hog-detector"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[features]
+default = []
+mnist = ["dep:mnist"]
+
 [dependencies]
 bytes = "1.2.1"
 float-ord = "0.3.2"
@@ -19,6 +23,7 @@ image = { version = "0.24.3", default-features = false, features = [
     "jpeg",
 ] }
 imageproc = { version = "0.23.0", default-features = false }
+mnist = { version="0.5.0", features=["download"], optional = true }
 ndarray = "0.15.6"
 rand = "0.8.5"
 reqwest = { version = "0.11", features = ["blocking", "json"] }
@@ -29,7 +34,6 @@ smartcore = { version = "0.2.1", features = [
     "ndarray-bindings", "serde"
 ], default-features = false }
 zip = { version = "0.6.2", default-features = false }
-
 
 [target.wasm32-unknown-unknown.dependencies]
 base64 = "0.13.0"
@@ -42,6 +46,3 @@ web-sys = { version="0.3.59", features = [
 ] }
 js-sys = "0.3.55"
 yew = "0.19"
-
-[dev-dependencies]
-mnist = { version="0.5.0", features=["download"] }

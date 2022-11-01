@@ -6,6 +6,9 @@ mod eye_dataset;
 #[cfg(not(target_arch = "wasm32"))]
 mod folder_dataset;
 
+#[cfg(feature = "mnist")]
+mod mnist_dataset;
+
 pub fn window_crop(
     input_frame: &RgbImage,
     window_width: u32,
@@ -56,3 +59,5 @@ pub trait DataSet {
 pub use eye_dataset::EyeDataSet;
 #[cfg(not(target_arch = "wasm32"))]
 pub use folder_dataset::FolderDataSet;
+#[cfg(feature = "mnist")]
+pub use mnist_dataset::MnistDataSet;

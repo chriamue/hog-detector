@@ -61,8 +61,10 @@ impl Component for App {
                 let img = image::load_from_memory(&data.clone()).unwrap();
                 self.current_image = image_to_base64(&img);
                 self.annotations.clear();
-                self.current_filename =
-                    format!("{}", Path::new(&filename).with_extension("").to_str().unwrap());
+                self.current_filename = format!(
+                    "{}",
+                    Path::new(&filename).with_extension("").to_str().unwrap()
+                );
                 true
             }
             Msg::AnnotationsChanged((_, data)) => {

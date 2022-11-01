@@ -1,42 +1,29 @@
-use mnist::*;
-use ndarray::prelude::*;
-
+#[cfg(not(feature = "mnist"))]
 fn main() {
+    eprintln!("mnist example needs mnist feature: cargo run --features mnist --example mnist");
+}
 
-    // Deconstruct the returned Mnist struct.
-    let Mnist {
-        trn_img,
-        trn_lbl,
-        tst_img,
-     tst_lbl,
-        ..
-    } = MnistBuilder::new()
-        .label_format_digit()
-        .training_set_length(50_000)
-        .validation_set_length(10_000)
-        .test_set_length(10_000)
-        .base_path("out/mnist/")
-        .download_and_extract()
-        .finalize();
+#[cfg(feature = "mnist")]
+fn main() {
+    use hog_detector::{dataset::MnistDataSet, DataSet, HogDetector, Trainable};
 
-    let image_num = 0;
-    // Can use an Array2 or Array3 here (Array3 for visualization)
-    let train_data = Array3::from_shape_vec((50_000, 28, 28), trn_img)
-        .expect("Error converting images to Array3 struct")
-        .map(|x| *x as f32 / 256.0);
-    println!("{:#.1?}\n",train_data.slice(s![image_num, .., ..]));
+    let mut model = HogDetector::default();
 
-    // Convert the returned Mnist struct to Array2 format
-    let train_labels: Array2<f32> = Array2::from_shape_vec((50_000, 1), trn_lbl)
-        .expect("Error converting training labels to Array2 struct")
-        .map(|x| *x as f32);
-    println!("The first digit is a {:?}",train_labels.slice(s![image_num, ..]) );
+    let mut dataset = MnistDataSet::default();
+    dataset.load(false);
 
-    let _test_data = Array3::from_shape_vec((10_000, 28, 28), tst_img)
-        .expect("Error converting images to Array3 struct")
-        .map(|x| *x as f32 / 256.);
-
-    let _test_labels: Array2<f32> = Array2::from_shape_vec((10_000, 1), tst_lbl)
-        .expect("Error converting testing labels to Array2 struct")
-        .map(|x| *x as f32);
+    model.train_class(&dataset, 1);
+    assert!(model.svc.is_some());
+    println!("class 1: {:?} %", model.evaluate(&dataset, 1) * 100.0);
+    assert!(model.evaluate(&dataset, 1) > 0.0);
+    model.train_class(&dataset, 2);
+    model.train_class(&dataset, 3);
+    model.train_class(&dataset, 4);
+    assert!(model.svc.is_some());
+    println!("class 2: {:?} %", model.evaluate(&dataset, 2) * 100.0);
+    assert!(model.evaluate(&dataset, 1) > 0.0);
+    println!("class 3: {:?} %", model.evaluate(&dataset, 3) * 100.0);
+    assert!(model.evaluate(&dataset, 1) > 0.0);
+    println!("class 4: {:?} %", model.evaluate(&dataset, 4) * 100.0);
+    assert!(model.evaluate(&dataset, 1) > 0.0);
 }
