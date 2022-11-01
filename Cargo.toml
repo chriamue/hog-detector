@@ -42,3 +42,6 @@ web-sys = { version="0.3.59", features = [
 ] }
 js-sys = "0.3.55"
 yew = "0.19"
+
+[dev-dependencies]
+mnist = { version="0.5.0", features=["download"] }
