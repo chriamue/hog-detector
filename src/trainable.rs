@@ -10,7 +10,12 @@ pub trait Trainable {
 
 impl Trainable for HogDetector {
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<f32>) {
-        let svc = SVC::fit(&x_train, &y_train, SVCParameters::default().with_c(10.0)).unwrap();
+        let svc = SVC::fit(
+            &x_train,
+            &y_train,
+            SVCParameters::default().with_c(10.0).with_epoch(3),
+        )
+        .unwrap();
         self.svc = Some(svc);
     }
 

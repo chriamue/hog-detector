@@ -13,17 +13,27 @@ fn main() {
     dataset.load(false);
 
     model.train_class(&dataset, 1);
-    assert!(model.svc.is_some());
-    println!("class 1: {:?} %", model.evaluate(&dataset, 1) * 100.0);
-    assert!(model.evaluate(&dataset, 1) > 0.0);
     model.train_class(&dataset, 2);
     model.train_class(&dataset, 3);
     model.train_class(&dataset, 4);
+    model.train_class(&dataset, 5);
+    model.train_class(&dataset, 6);
+    model.train_class(&dataset, 7);
+    model.train_class(&dataset, 8);
+    model.train_class(&dataset, 9);
     assert!(model.svc.is_some());
+    println!("class 1: {:?} %", model.evaluate(&dataset, 1) * 100.0);
+    assert!(model.evaluate(&dataset, 1) > 0.0);
     println!("class 2: {:?} %", model.evaluate(&dataset, 2) * 100.0);
-    assert!(model.evaluate(&dataset, 1) > 0.0);
+    assert!(model.evaluate(&dataset, 2) > 0.0);
     println!("class 3: {:?} %", model.evaluate(&dataset, 3) * 100.0);
-    assert!(model.evaluate(&dataset, 1) > 0.0);
+    assert!(model.evaluate(&dataset, 3) > 0.0);
     println!("class 4: {:?} %", model.evaluate(&dataset, 4) * 100.0);
-    assert!(model.evaluate(&dataset, 1) > 0.0);
+    assert!(model.evaluate(&dataset, 4) > 0.0);
+
+    println!("class 5: {:?} %", model.evaluate(&dataset, 5) * 100.0);
+    println!("class 6: {:?} %", model.evaluate(&dataset, 6) * 100.0);
+    println!("class 7: {:?} %", model.evaluate(&dataset, 7) * 100.0);
+    println!("class 8: {:?} %", model.evaluate(&dataset, 8) * 100.0);
+    println!("class 9: {:?} %", model.evaluate(&dataset, 9) * 100.0);
 }
