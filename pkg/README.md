@@ -4,6 +4,8 @@ Histogram of Oriented Gradients and Object Detection
 
 This project contains an algorithm for object detection based on SVM on HOG descriptors.
 
+You can find a [demo here](https://chriamue.github.io/hog-detector)
+
 ## how it works
 
 1. A training dataset with positive and negative samples is given.
@@ -27,6 +29,10 @@ cargo run --features mnist --example mnist
 wasm-pack build --target web
 python3 -m http.server
 ```
+
+## train data preparation
+
+Find a minimal annotation tool in the [demo](https://chriamue.github.io/hog-detector).
 
 ## references
 
