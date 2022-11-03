@@ -1,8 +1,14 @@
-use hog_detector::{dataset::EyeDataSet, DataSet, Detector, HogDetector, Trainable};
+#[cfg(not(feature = "eyes"))]
 fn main() {
+    eprintln!("mnist example needs mnist feature: cargo run --features eyes --example eyes");
+}
+
+#[cfg(feature = "eyes")]
+fn main() {
+    use hog_detector::{dataset::EyesDataSet, DataSet, Detector, HogDetector, Trainable};
     let mut model = HogDetector::default();
 
-    let mut dataset = EyeDataSet::default();
+    let mut dataset = EyesDataSet::default();
     println!("downloading eyes dataset");
     dataset.load(true);
     println!("training eyes detector model");

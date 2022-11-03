@@ -13,7 +13,7 @@ use std::io::Cursor;
 use std::io::{self, BufRead, SeekFrom};
 use std::vec;
 
-pub struct EyeDataSet {
+pub struct EyesDataSet {
     zip_url: String,
     pos_path: String,
     neg_path: String,
@@ -21,7 +21,7 @@ pub struct EyeDataSet {
     window_size: u32,
 }
 
-impl EyeDataSet {
+impl EyesDataSet {
     pub fn new(zip_url: String, pos_path: String, neg_path: String, window_size: u32) -> Self {
         Self {
             zip_url,
@@ -188,7 +188,7 @@ impl EyeDataSet {
     }
 }
 
-impl DataSet for EyeDataSet {
+impl DataSet for EyesDataSet {
     fn load(&mut self, _augment: bool) {
         self.unzip();
     }
@@ -209,13 +209,13 @@ impl DataSet for EyeDataSet {
     }
 }
 
-impl Default for EyeDataSet {
+impl Default for EyesDataSet {
     fn default() -> Self {
         let zip_url =
             "https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip".to_string();
         let pos_data = "eye_data/eye_image/".to_string();
         let neg_data = "eye_data/noneye_image/".to_string();
-        EyeDataSet::new(zip_url, pos_data, neg_data, 32)
+        EyesDataSet::new(zip_url, pos_data, neg_data, 32)
     }
 }
 
@@ -230,14 +230,14 @@ mod tests {
     fn test_default() {
         let zip_url =
             "https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip".to_string();
-        let dataset = EyeDataSet::default();
+        let dataset = EyesDataSet::default();
         assert_eq!(dataset.zip_url, zip_url);
     }
 
     #[ignore = "prevent download"]
     #[test]
     fn test_download() {
-        let dataset = EyeDataSet::default();
+        let dataset = EyesDataSet::default();
         let downloaded = dataset.download_zip().unwrap();
         println!("{:?}", downloaded.len());
         assert!(downloaded.len() > 40_000_000);
@@ -246,7 +246,7 @@ mod tests {
     #[ignore = "prevent download"]
     #[test]
     fn test_unzip() {
-        let mut dataset = EyeDataSet::default();
+        let mut dataset = EyesDataSet::default();
         dataset.unzip();
         assert!(dataset.data.len() > 0);
     }
@@ -256,7 +256,7 @@ mod tests {
     fn test_train() {
         let mut model = HogDetector::default();
 
-        let mut dataset = EyeDataSet::default();
+        let mut dataset = EyesDataSet::default();
         dataset.load(false);
         model.train_class(&dataset, 1);
         assert!(model.svc.is_some());
