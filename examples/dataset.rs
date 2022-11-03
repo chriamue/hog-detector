@@ -1,5 +1,4 @@
-
-use hog_detector::{DataSet, dataset::FolderDataSet, HogDetector, Trainable};
+use hog_detector::{dataset::FolderDataSet, DataSet, HogDetector, Trainable};
 fn main() {
     let mut model = HogDetector::default();
 
@@ -15,5 +14,8 @@ fn main() {
 
     dataset.generate_hard_negative_samples(&model, 5);
     model.train_class(&dataset, 5);
-    println!("evaluated after training with hard negative samples: {:?} %", model.evaluate(&dataset, 5) * 100.0);
+    println!(
+        "evaluated after training with hard negative samples: {:?} %",
+        model.evaluate(&dataset, 5) * 100.0
+    );
 }
