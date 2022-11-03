@@ -6,7 +6,7 @@ description = "Histogram of Oriented Gradients and Object Detection"
 authors = ["Christian <chriamue@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/rusty-rails/hog-detector"
+repository = "https://github.com/chriamue/hog-detector"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
