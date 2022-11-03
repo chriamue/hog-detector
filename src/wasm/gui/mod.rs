@@ -10,6 +10,7 @@ pub mod header;
 pub mod labels;
 pub mod upload_annotations;
 pub mod upload_image;
+pub mod use_webcam_image;
 
 pub fn image_to_base64(img: &DynamicImage) -> String {
     let mut image_data: Vec<u8> = Vec::new();
@@ -122,7 +123,8 @@ impl Component for App {
         html! {
             <>
             <header::Header />
-            <upload_image::UploadImage onchange={on_image_change}/>
+            <use_webcam_image::UseWebcamImage onchange={on_image_change.clone()} />
+            <upload_image::UploadImage onchange={on_image_change.clone()}/>
             <upload_annotations::UploadAnnotations onchange={on_annotations_change}/>
             <labels::Labels onchange={ on_label_change } label={ label.clone()} />
             <editor::Editor {label} filename={self.current_filename.to_string()} image={self.current_image.to_string()} annotations={self.annotations.clone()} onchange={on_new_annotation}/>
