@@ -54,8 +54,9 @@ impl Component for UploadImage {
         };
 
         html! {
-            <>
-                <input class="btn btn-success"
+            <div class="form-group">
+                <label for="upload-image">{"Upload an image file"}</label>
+                <input id="upload-image" class="btn btn-success"
                     aria-description="Upload an image file"
                     type="file"
                     accept="image/*"
@@ -63,7 +64,7 @@ impl Component for UploadImage {
                     ref={self.input_ref.clone()}
                     disabled={false}
                 />
-            </>
+            </div>
         }
     }
 }
