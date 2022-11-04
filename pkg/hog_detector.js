@@ -259,6 +259,21 @@ export function main(root) {
     wasm.main(addHeapObject(root));
 }
 
+function _assertClass(instance, klass) {
+    if (!(instance instanceof klass)) {
+        throw new Error(`expected instance of ${klass.name}`);
+    }
+    return instance.ptr;
+}
+/**
+* @param {Element} root
+* @param {HogDetectorJS} detector
+*/
+export function init_trainer(root, detector) {
+    _assertClass(detector, HogDetectorJS);
+    wasm.init_trainer(addHeapObject(root), detector.ptr);
+}
+
 let cachedUint32Memory0 = new Uint32Array();
 
 function getUint32Memory0() {
@@ -768,12 +783,12 @@ function getImports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper776 = function(arg0, arg1, arg2) {
-        const ret = makeClosure(arg0, arg1, 304, __wbg_adapter_22);
+    imports.wbg.__wbindgen_closure_wrapper782 = function(arg0, arg1, arg2) {
+        const ret = makeClosure(arg0, arg1, 310, __wbg_adapter_22);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper878 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 338, __wbg_adapter_25);
+    imports.wbg.__wbindgen_closure_wrapper884 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 344, __wbg_adapter_25);
         return addHeapObject(ret);
     };
 

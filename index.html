@@ -58,7 +58,10 @@
         >Annotation Tool</label
       >
     </div>
-    <div id="annotation-tool" />
+    <div>
+      <div id="trainer">Trainer</div>
+      <div id="annotation-tool" />
+    </div>
     <script type="module">
       var video = document.querySelector("#videoElement");
       var canvas = document.getElementById("canvas");
@@ -68,19 +71,29 @@
       annotateCheckbox.onclick = function () {
         if (annotateCheckbox.checked) {
           annotationTool.hidden = false;
+          trainer_element.hidden = false;
         } else {
           annotationTool.hidden = true;
+          trainer_element.hidden = true;
         }
       };
       var annotationTool = document.getElementById("annotation-tool");
+      var trainer_element = document.getElementById("trainer");
       annotationTool.hidden = true;
+      trainer_element.hidden = true;
       var detector = null;
       var processing = false;
 
-      import init, { HogDetectorJS, main } from "./pkg/hog_detector.js";
+      import init, {
+        HogDetectorJS,
+        main,
+        init_trainer,
+      } from "./pkg/hog_detector.js";
       init().then(async () => {
         try {
+          detector = new HogDetectorJS();
           main(annotationTool);
+          init_trainer(trainer_element, detector);
         } catch (e) {
           console.error(e);
         }
@@ -106,9 +119,6 @@
         var width = video.videoWidth;
         var height = video.videoHeight;
         if (width && height) {
-          if (detector == null) {
-            detector = new HogDetectorJS();
-          }
           canvas.width = width;
           canvas.height = height;
           var c = document.createElement("canvas");

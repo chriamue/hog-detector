@@ -5,6 +5,11 @@
 */
 export function main(root: Element): void;
 /**
+* @param {Element} root
+* @param {HogDetectorJS} detector
+*/
+export function init_trainer(root: Element, detector: HogDetectorJS): void;
+/**
 */
 export class HogDetectorJS {
   free(): void;
@@ -25,6 +30,7 @@ export interface InitOutput {
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
   readonly hogdetectorjs_new: () => number;
   readonly hogdetectorjs_next: (a: number, b: number, c: number, d: number) => void;
+  readonly init_trainer: (a: number, b: number) => void;
   readonly main: (a: number) => void;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
