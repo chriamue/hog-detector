@@ -68,6 +68,14 @@
       var img = document.getElementById("img");
       var processCheckbox = document.getElementById("processCheckbox");
       var annotateCheckbox = document.getElementById("annotateCheckbox");
+      var annotations = [];
+
+      function updateAnnotations(newAnnotations) {
+        while (annotations.length > 0) {
+          annotations.pop();
+        }
+        annotations.push(...newAnnotations);
+      }
       annotateCheckbox.onclick = function () {
         if (annotateCheckbox.checked) {
           annotationTool.hidden = false;

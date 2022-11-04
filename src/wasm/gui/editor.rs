@@ -59,7 +59,7 @@ impl Component for Editor {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::Dropped(data) => true,
+            Msg::Dropped(_data) => true,
             Msg::MouseDown(x1, y1) => {
                 self.pos = (x1, y1);
                 true
@@ -137,5 +137,49 @@ impl Component for Editor {
             </button>
             </div>
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_format_annotations() {
+        let det1 = Detection {
+            bbox: BBox {
+                x: 0.5,
+                y: 0.5,
+                w: 1.0,
+                h: 1.0,
+            },
+            class: 0,
+            confidence: 0.1,
+        };
+        let det2 = Detection {
+            bbox: BBox {
+                x: 0.6,
+                y: 0.6,
+                w: 1.0,
+                h: 1.0,
+            },
+            class: 0,
+            confidence: 0.1,
+        };
+        let det3 = Detection {
+            bbox: BBox {
+                x: 1.5,
+                y: 1.5,
+                w: 1.0,
+                h: 1.0,
+            },
+            class: 1,
+            confidence: 0.1,
+        };
+        let labels = vec!["other".to_string(), "one".to_string()];
+        let annotations = vec![det1, det2, det3];
+        let formatted = format_annotations(&annotations, &labels);
+        assert_eq!(3, formatted.len());
+        assert_eq!("other 0 0 1 1".to_string(), formatted[0]);
     }
 }

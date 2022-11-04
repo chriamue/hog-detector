@@ -1,7 +1,18 @@
 use image::{DynamicImage, ImageOutputFormat, RgbaImage};
 use std::io::Cursor;
 use wasm_bindgen::JsCast;
+use web_sys::ImageData;
 use yew::{html, Callback, Component, Context, Html, Properties};
+
+fn convert_image_data_to_png_data(image: &ImageData) -> Vec<u8> {
+    let tmp = RgbaImage::from_raw(image.width(), image.height(), image.data().to_vec()).unwrap();
+    let dyn_image = DynamicImage::ImageRgba8(tmp);
+    let mut image_png: Vec<u8> = Vec::new();
+    dyn_image
+        .write_to(&mut Cursor::new(&mut image_png), ImageOutputFormat::Png)
+        .unwrap();
+    image_png
+}
 
 pub enum Msg {
     GetWebcamImage,
@@ -45,12 +56,8 @@ impl Component for UseWebcamImage {
                         canvas.height() as f64,
                     )
                     .unwrap();
-                let tmp = RgbaImage::from_raw(canvas.width(), canvas.height(), img.data().to_vec())
-                    .unwrap();
-                let img = DynamicImage::ImageRgba8(tmp);
-                let mut image_data: Vec<u8> = Vec::new();
-                img.write_to(&mut Cursor::new(&mut image_data), ImageOutputFormat::Png)
-                    .unwrap();
+                let image_data = convert_image_data_to_png_data(&img);
+
                 ctx.props()
                     .onchange
                     .emit(("webcam".to_string(), image_data));
@@ -69,5 +76,23 @@ impl Component for UseWebcamImage {
                 </button>
             </>
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use wasm_bindgen_test::*;
+    use web_sys::ImageData;
+
+    #[wasm_bindgen_test]
+    fn test_convert_image_data_to_png_data() {
+        let image_data = ImageData::new_with_sw(100, 100).unwrap();
+        let image_png = convert_image_data_to_png_data(&image_data);
+        let img = image::load_from_memory(&image_png);
+        assert!(img.is_ok());
+        let img = img.unwrap();
+        assert_eq!(100, img.width());
+        assert_eq!(100, img.height());
     }
 }

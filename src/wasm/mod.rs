@@ -1,6 +1,6 @@
 use crate::Detector;
 use crate::HogDetector;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use wasm_bindgen::prelude::*;
 
 pub mod download;

@@ -16,7 +16,7 @@ impl Component for TrainerApp {
         Self {}
     }
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <>
                 <button type="button" class="btn btn-success">

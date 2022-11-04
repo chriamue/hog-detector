@@ -39,10 +39,11 @@ zip = { version = "0.6.3", default-features = false, features = [
   "deflate",
 ], optional = true }
 
-[target.wasm32-unknown-unknown.dependencies]
+#[target.wasm32-unknown-unknown.dependencies]
 base64 = "0.13.0"
 console_error_panic_hook = "0.1"
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+wasm-bindgen-test = "0.3.33"
 wasm-bindgen-futures = "0.4.30"
 web-sys = { version = "0.3.59", features = [
   "HtmlAnchorElement",
