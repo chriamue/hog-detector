@@ -1,13 +1,16 @@
 use crate::Detector;
 use crate::HogDetector;
+use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
 
 pub mod download;
 pub mod gui;
+pub mod trainer;
 
 #[wasm_bindgen]
+#[derive(PartialEq, Clone)]
 pub struct HogDetectorJS {
-    hog: HogDetector,
+    hog: Arc<HogDetector>,
 }
 
 #[wasm_bindgen]
@@ -22,7 +25,7 @@ impl HogDetectorJS {
             serde_json::from_str::<HogDetector>(&model).unwrap()
         };
 
-        HogDetectorJS { hog }
+        HogDetectorJS { hog: Arc::new(hog) }
     }
 
     #[wasm_bindgen]
@@ -45,4 +48,14 @@ impl HogDetectorJS {
 #[wasm_bindgen]
 pub fn main(root: web_sys::Element) {
     yew::start_app_in_element::<gui::App>(root);
+}
+
+#[wasm_bindgen]
+pub fn init_trainer(root: web_sys::Element, detector: &HogDetectorJS) {
+    yew::start_app_with_props_in_element::<trainer::TrainerApp>(
+        root,
+        trainer::Props {
+            detector: detector.clone(),
+        },
+    );
 }

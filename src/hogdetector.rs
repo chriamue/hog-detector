@@ -10,6 +10,12 @@ pub struct HogDetector {
     pub svc: Option<SVC<f32, DenseMatrix<f32>, LinearKernel>>,
 }
 
+impl PartialEq for HogDetector {
+    fn eq(&self, other: &HogDetector) -> bool {
+        self.svc.is_some() && other.svc.is_some()
+    }
+}
+
 impl Default for HogDetector {
     fn default() -> Self {
         HogDetector { svc: None }

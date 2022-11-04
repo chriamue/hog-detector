@@ -1,9 +1,7 @@
 use image::{DynamicImage, ImageOutputFormat, RgbaImage};
-use js_sys::{ArrayBuffer, Uint8Array};
 use std::io::Cursor;
 use wasm_bindgen::JsCast;
-use web_sys::HtmlCanvasElement;
-use yew::{html, Callback, Component, Context, Html, NodeRef, Properties};
+use yew::{html, Callback, Component, Context, Html, Properties};
 
 pub enum Msg {
     GetWebcamImage,
@@ -58,7 +56,6 @@ impl Component for UseWebcamImage {
                     .emit(("webcam".to_string(), image_data));
                 true
             }
-            _ => false,
         }
     }
 
