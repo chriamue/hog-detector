@@ -96,8 +96,8 @@ mod tests {
         let (train_x, train_y, test_x, test_y) = dataset.get();
         assert_eq!(train_x.len(), train_y.len());
         assert_eq!(train_x.len(), test_x.len());
-        assert_eq!(5, train_x[0].width());
-        assert_eq!(5, train_x[0].height());
+        assert_eq!(32, train_x[0].width());
+        assert_eq!(32, train_x[0].height());
         assert_eq!(detection.class, test_y[0] as usize);
     }
 }

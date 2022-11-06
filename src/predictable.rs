@@ -25,29 +25,4 @@ impl Predictable for HogDetector {
 
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::dataset::{window_crop, DataSet, FolderDataSet};
-    use crate::trainable::Trainable;
-
-    #[test]
-    fn test_predict() {
-        let mut model = HogDetector::default();
-
-        let mut dataset = FolderDataSet::new(
-            "res/training/".to_string(),
-            "res/labels.txt".to_string(),
-            32,
-        );
-        dataset.load(false);
-        dataset.generate_random_annotations(5);
-
-        model.train_class(&dataset, 5);
-        assert!(model.svc.is_some());
-        let loco03 = image::open("res/loco03.jpg").unwrap().to_rgb8();
-        let loco03 = window_crop(&loco03, 32, 32, (60, 35));
-
-        let predicted = model.predict(&loco03);
-        assert_eq!(predicted, 5);
-    }
-}
+mod tests {}

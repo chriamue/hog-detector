@@ -262,8 +262,6 @@ impl DataSet for FolderDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::HogDetector;
-    use crate::Trainable;
 
     const ANNOTATIONS: usize = 42;
     const IMAGES_PER_LABEL: usize = 21;
@@ -356,22 +354,5 @@ mod tests {
         );
         dataset.load(true);
         dataset.export("out/export");
-    }
-
-    #[test]
-    fn generate_hard_negative_samples() {
-        let mut model = HogDetector::default();
-
-        let mut dataset = FolderDataSet::new(
-            "res/training/".to_string(),
-            "res/labels.txt".to_string(),
-            32,
-        );
-        dataset.load(true);
-
-        model.train_class(&dataset, 5);
-        assert_eq!(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL);
-        dataset.generate_hard_negative_samples(&model, 5);
-        assert!(dataset.samples() > ANNOTATIONS * IMAGES_PER_LABEL);
     }
 }
