@@ -48,10 +48,6 @@ export class AnnotationsJS {
 /**
 */
   constructor();
-/**
-* @param {string} annotation
-*/
-  push(annotation: string): void;
 }
 /**
 */
@@ -111,12 +107,11 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_annotationsjs_free: (a: number) => void;
-  readonly annotationsjs_new: () => number;
-  readonly annotationsjs_push: (a: number, b: number, c: number) => void;
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
   readonly hogdetectorjs_new: () => number;
   readonly hogdetectorjs_next: (a: number, b: number, c: number, d: number) => void;
+  readonly __wbg_annotationsjs_free: (a: number) => void;
+  readonly annotationsjs_new: () => number;
   readonly init_annotation_tool: (a: number, b: number) => void;
   readonly init_trainer: (a: number, b: number, c: number) => void;
   readonly __wbg_wasmbindgentestcontext_free: (a: number) => void;
