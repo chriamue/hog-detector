@@ -27,19 +27,21 @@ pub struct Props {
     pub onchange: Callback<Detection>,
 }
 
+pub fn format_annotation(annotation: &Detection, labels: &Vec<String>) -> String {
+    format!(
+        "{} {} {} {} {}",
+        labels[annotation.class],
+        annotation.bbox.x as i32,
+        annotation.bbox.y as i32,
+        annotation.bbox.w as i32,
+        annotation.bbox.h as i32
+    )
+}
+
 pub fn format_annotations(annotations: &Vec<Detection>, labels: &Vec<String>) -> Vec<String> {
     annotations
         .iter()
-        .map(|annotation| {
-            format!(
-                "{} {} {} {} {}",
-                labels[annotation.class],
-                annotation.bbox.x as i32,
-                annotation.bbox.y as i32,
-                annotation.bbox.w as i32,
-                annotation.bbox.h as i32
-            )
-        })
+        .map(|annotation| format_annotation(annotation, labels))
         .collect::<Vec<String>>()
 }
 

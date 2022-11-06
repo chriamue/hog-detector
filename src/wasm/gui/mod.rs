@@ -1,3 +1,4 @@
+use super::AnnotationsJS;
 use crate::prelude::BBox;
 use crate::prelude::Detection;
 use image::{DynamicImage, ImageOutputFormat};
@@ -27,6 +28,11 @@ pub enum Msg {
     NewAnnotation(Detection),
 }
 
+#[derive(Clone, PartialEq, Properties)]
+pub struct Props {
+    pub annotations: AnnotationsJS,
+}
+
 pub struct App {
     current_label: String,
     current_image: String,
@@ -37,7 +43,7 @@ pub struct App {
 
 impl Component for App {
     type Message = Msg;
-    type Properties = ();
+    type Properties = Props;
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
@@ -52,7 +58,7 @@ impl Component for App {
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::LabelChanged(label) => {
                 self.current_label = label;
@@ -101,6 +107,8 @@ impl Component for App {
             }
             Msg::NewAnnotation(annotation) => {
                 self.annotations.push(annotation);
+                let formatted = editor::format_annotation(&annotation, &self.labels);
+                ctx.props().annotations.push(formatted);
                 true
             }
         }
