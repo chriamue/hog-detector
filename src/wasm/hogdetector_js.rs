@@ -1,12 +1,22 @@
+use crate::DataSet;
 use crate::Detector;
 use crate::HogDetector;
-use std::sync::Arc;
+use crate::Trainable;
+use std::ops::Deref;
+use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-#[derive(PartialEq, Clone)]
+#[derive(Clone)]
 pub struct HogDetectorJS {
-    hog: Arc<HogDetector>,
+    hog: Arc<Mutex<HogDetector>>,
+}
+
+impl HogDetectorJS {
+    pub fn train(&self, dataset: &dyn DataSet) {
+        let mut hog = self.hog.lock().unwrap();
+        hog.train_class(dataset, 1);
+    }
 }
 
 #[wasm_bindgen]
@@ -21,7 +31,9 @@ impl HogDetectorJS {
             serde_json::from_str::<HogDetector>(&model).unwrap()
         };
 
-        HogDetectorJS { hog: Arc::new(hog) }
+        HogDetectorJS {
+            hog: Arc::new(Mutex::new(hog)),
+        }
     }
 
     #[wasm_bindgen]
@@ -29,7 +41,7 @@ impl HogDetectorJS {
         let mut img =
             image::load_from_memory_with_format(img_data, image::ImageFormat::Png).unwrap();
 
-        img = self.hog.visualize_detections(&mut img);
+        img = self.hog.lock().unwrap().visualize_detections(&mut img);
 
         let mut image_data: Vec<u8> = Vec::new();
         img.write_to(
@@ -38,5 +50,15 @@ impl HogDetectorJS {
         )
         .unwrap();
         image_data
+    }
+}
+
+impl PartialEq for HogDetectorJS {
+    fn eq(&self, other: &Self) -> bool {
+        if ::core::ptr::eq(&self, &other) {
+            true
+        } else {
+            other.hog.try_lock().unwrap().deref() == self.hog.try_lock().unwrap().deref()
+        }
     }
 }

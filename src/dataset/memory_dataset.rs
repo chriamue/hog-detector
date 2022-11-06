@@ -1,13 +1,26 @@
 use super::DataSet;
 use crate::detection::Detection;
-use image::imageops::crop;
-use image::RgbImage;
+use image::{
+    imageops::{crop, resize, FilterType},
+    DynamicImage, RgbImage,
+};
 
 type Sample = (RgbImage, Vec<Detection>);
 
-#[derive(Default)]
 pub struct MemoryDataSet {
     data: Vec<Sample>,
+    window_width: u32,
+    window_height: u32,
+}
+
+impl Default for MemoryDataSet {
+    fn default() -> Self {
+        MemoryDataSet {
+            data: Vec::new(),
+            window_width: 32,
+            window_height: 32,
+        }
+    }
 }
 
 impl MemoryDataSet {
@@ -38,10 +51,18 @@ impl DataSet for MemoryDataSet {
                     bbox.y as u32,
                     bbox.w as u32,
                     bbox.h as u32,
+                )
+                .to_image();
+                let scaled_window = resize(
+                    &DynamicImage::ImageRgb8(window),
+                    self.window_width,
+                    self.window_height,
+                    FilterType::Nearest,
                 );
-                train_x.push(window.to_image());
+                let image = DynamicImage::ImageRgba8(scaled_window).to_rgb8();
+                train_x.push(image.clone());
                 train_y.push(annotation.class as u32);
-                test_x.push(window.to_image());
+                test_x.push(image);
                 test_y.push(annotation.class as u32);
             }
         }

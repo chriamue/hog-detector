@@ -1,3 +1,6 @@
+use crate::dataset::MemoryDataSet;
+use crate::detection::Detection;
+use image::DynamicImage;
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
@@ -5,7 +8,27 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 #[derive(Debug, Clone)]
 pub struct AnnotationsJS {
-    annotations: Arc<Mutex<Vec<String>>>,
+    image: Arc<Mutex<DynamicImage>>,
+    annotations: Arc<Mutex<Vec<Detection>>>,
+}
+
+impl AnnotationsJS {
+    pub fn set_image(&self, image: DynamicImage) {
+        *self.image.lock().unwrap() = image;
+    }
+
+    pub fn create_dataset(&self) -> MemoryDataSet {
+        let mut dataset = MemoryDataSet::default();
+        dataset.add((
+            self.image.lock().unwrap().to_rgb8(),
+            self.annotations.lock().unwrap().clone(),
+        ));
+        dataset
+    }
+
+    pub fn push(&self, annotation: Detection) {
+        self.annotations.lock().unwrap().push(annotation);
+    }
 }
 
 #[wasm_bindgen]
@@ -15,12 +38,9 @@ impl AnnotationsJS {
         use console_error_panic_hook;
         console_error_panic_hook::set_once();
         AnnotationsJS {
+            image: Arc::new(Mutex::new(DynamicImage::default())),
             annotations: Arc::new(Mutex::new(Vec::new())),
         }
-    }
-
-    pub fn push(&self, annotation: String) {
-        self.annotations.lock().unwrap().push(annotation);
     }
 }
 

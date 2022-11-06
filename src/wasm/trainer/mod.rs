@@ -26,6 +26,10 @@ impl Component for TrainerApp {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Train => {
+                console_log!("training started...");
+                let dataset = ctx.props().annotations.create_dataset();
+                ctx.props().detector.train(&dataset);
+                console_log!("training done");
                 console_log!("{}", ctx.props().annotations);
                 true
             }

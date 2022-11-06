@@ -72,6 +72,7 @@ impl Component for App {
                     "{}",
                     Path::new(&filename).with_extension("").to_str().unwrap()
                 );
+                ctx.props().annotations.set_image(img);
                 true
             }
             Msg::AnnotationsChanged((_, data)) => {
@@ -106,9 +107,7 @@ impl Component for App {
                 true
             }
             Msg::NewAnnotation(annotation) => {
-                self.annotations.push(annotation);
-                let formatted = editor::format_annotation(&annotation, &self.labels);
-                ctx.props().annotations.push(formatted);
+                ctx.props().annotations.push(annotation);
                 true
             }
         }
