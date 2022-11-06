@@ -263,9 +263,9 @@ function _assertClass(instance, klass) {
 * @param {Element} root
 * @param {AnnotationsJS} annotations
 */
-export function main(root, annotations) {
+export function init_annotation_tool(root, annotations) {
     _assertClass(annotations, AnnotationsJS);
-    wasm.main(addHeapObject(root), annotations.ptr);
+    wasm.init_annotation_tool(addHeapObject(root), annotations.ptr);
 }
 
 /**
@@ -1095,12 +1095,12 @@ function getImports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper923 = function(arg0, arg1, arg2) {
-        const ret = makeClosure(arg0, arg1, 366, __wbg_adapter_26);
+    imports.wbg.__wbindgen_closure_wrapper921 = function(arg0, arg1, arg2) {
+        const ret = makeClosure(arg0, arg1, 364, __wbg_adapter_26);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1025 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 400, __wbg_adapter_29);
+    imports.wbg.__wbindgen_closure_wrapper1023 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 398, __wbg_adapter_29);
         return addHeapObject(ret);
     };
 

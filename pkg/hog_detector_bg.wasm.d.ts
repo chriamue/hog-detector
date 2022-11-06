@@ -7,7 +7,7 @@ export function annotationsjs_push(a: number, b: number, c: number): void;
 export function __wbg_hogdetectorjs_free(a: number): void;
 export function hogdetectorjs_new(): number;
 export function hogdetectorjs_next(a: number, b: number, c: number, d: number): void;
-export function main(a: number, b: number): void;
+export function init_annotation_tool(a: number, b: number): void;
 export function init_trainer(a: number, b: number, c: number): void;
 export function __wbg_wasmbindgentestcontext_free(a: number): void;
 export function wasmbindgentestcontext_new(): number;

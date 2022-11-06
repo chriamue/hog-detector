@@ -72,16 +72,16 @@
 
       annotateCheckbox.onclick = function () {
         if (annotateCheckbox.checked) {
-          annotationTool.hidden = false;
+          annotation_tool_element.hidden = false;
           trainer_element.hidden = false;
         } else {
-          annotationTool.hidden = true;
+          annotation_tool_element.hidden = true;
           trainer_element.hidden = true;
         }
       };
-      var annotationTool = document.getElementById("annotation-tool");
+      var annotation_tool_element = document.getElementById("annotation-tool");
       var trainer_element = document.getElementById("trainer");
-      annotationTool.hidden = true;
+      annotation_tool_element.hidden = true;
       trainer_element.hidden = true;
       var detector = null;
       var processing = false;
@@ -89,14 +89,14 @@
       import init, {
         AnnotationsJS,
         HogDetectorJS,
-        main,
+        init_annotation_tool,
         init_trainer,
       } from "./pkg/hog_detector.js";
       init().then(async () => {
         try {
           annotations = new AnnotationsJS();
           detector = new HogDetectorJS();
-          main(annotationTool, annotations);
+          init_annotation_tool(annotation_tool_element, annotations);
           init_trainer(trainer_element, annotations, detector);
         } catch (e) {
           console.error(e);

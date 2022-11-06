@@ -4,7 +4,7 @@
 * @param {Element} root
 * @param {AnnotationsJS} annotations
 */
-export function main(root: Element, annotations: AnnotationsJS): void;
+export function init_annotation_tool(root: Element, annotations: AnnotationsJS): void;
 /**
 * @param {Element} root
 * @param {AnnotationsJS} annotations
@@ -117,7 +117,7 @@ export interface InitOutput {
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
   readonly hogdetectorjs_new: () => number;
   readonly hogdetectorjs_next: (a: number, b: number, c: number, d: number) => void;
-  readonly main: (a: number, b: number) => void;
+  readonly init_annotation_tool: (a: number, b: number) => void;
   readonly init_trainer: (a: number, b: number, c: number) => void;
   readonly __wbg_wasmbindgentestcontext_free: (a: number) => void;
   readonly wasmbindgentestcontext_new: () => number;
