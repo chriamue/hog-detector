@@ -6,6 +6,7 @@ use imageproc::geometric_transformations::{rotate_about_center, warp, Interpolat
 mod eyes_dataset;
 #[cfg(not(target_arch = "wasm32"))]
 mod folder_dataset;
+mod memory_dataset;
 #[cfg(feature = "mnist")]
 #[cfg(not(target_arch = "wasm32"))]
 mod mnist_dataset;
@@ -61,6 +62,7 @@ pub trait DataSet {
 pub use eyes_dataset::EyesDataSet;
 #[cfg(not(target_arch = "wasm32"))]
 pub use folder_dataset::FolderDataSet;
+pub use memory_dataset::MemoryDataSet;
 #[cfg(feature = "mnist")]
 #[cfg(not(target_arch = "wasm32"))]
 pub use mnist_dataset::MnistDataSet;
