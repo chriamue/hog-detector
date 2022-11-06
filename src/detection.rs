@@ -53,7 +53,6 @@ pub fn nms_sort(mut dets: Vec<Detection>) -> Vec<Detection> {
 mod tests {
     use super::*;
 
-    #[cfg(not(target_arch = "wasm32"))]
     #[test]
     fn nms_sort_test() {
         let det1 = Detection {

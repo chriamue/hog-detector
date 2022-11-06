@@ -1,5 +1,10 @@
-use hog_detector::{dataset::FolderDataSet, DataSet, HogDetector, Trainable};
+#[cfg(target_arch = "wasm32")]
 fn main() {
+    eprintln!("dataset example does not run in wasm32 mode");
+}
+#[cfg(not(target_arch = "wasm32"))]
+fn main() {
+    use hog_detector::{dataset::FolderDataSet, DataSet, HogDetector, Trainable};
     let mut model = HogDetector::default();
 
     let mut dataset = FolderDataSet::new(

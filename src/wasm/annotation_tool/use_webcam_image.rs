@@ -83,10 +83,10 @@ impl Component for UseWebcamImage {
 mod tests {
     use super::*;
     use wasm_bindgen_test::*;
-    use web_sys::ImageData;
 
     #[wasm_bindgen_test]
     fn test_convert_image_data_to_png_data() {
+        use web_sys::ImageData;
         let image_data = ImageData::new_with_sw(100, 100).unwrap();
         let image_png = convert_image_data_to_png_data(&image_data);
         let img = image::load_from_memory(&image_png);
