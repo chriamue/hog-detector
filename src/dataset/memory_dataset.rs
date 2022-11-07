@@ -1,6 +1,6 @@
-use super::generate_random_subimages;
 use super::DataSet;
 use crate::detection::Detection;
+use crate::utils::generate_random_subimages;
 use image::{
     imageops::{crop, resize, FilterType},
     DynamicImage, RgbImage,

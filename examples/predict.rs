@@ -4,7 +4,8 @@ fn main() {
 }
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
-    use hog_detector::dataset::{window_crop, DataSet, FolderDataSet};
+    use hog_detector::dataset::{DataSet, FolderDataSet};
+    use hog_detector::utils::window_crop;
     use hog_detector::HogDetector;
     use hog_detector::Predictable;
     use hog_detector::Trainable;

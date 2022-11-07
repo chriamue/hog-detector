@@ -1,5 +1,6 @@
 use crate::bbox::BBox;
-use crate::dataset::{rotated_frames, scaled_frames, window_crop, DataSet};
+use crate::dataset::DataSet;
+use crate::utils::{rotated_frames, scaled_frames, window_crop};
 use crate::Detector;
 use image::{open, RgbImage};
 use rand::prelude::ThreadRng;
