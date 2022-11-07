@@ -102,12 +102,12 @@ impl DataSet for MemoryDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use imageproc::utils::rgb_bench_image;
+    use crate::tests::test_image;
 
     #[test]
     fn test_add_sample() {
         let mut dataset = MemoryDataSet::default();
-        let sample = (rgb_bench_image(10, 10), vec![Detection::default()]);
+        let sample = (test_image(), vec![Detection::default()]);
         dataset.add(sample);
         assert_eq!(0, dataset.samples());
     }
@@ -115,7 +115,7 @@ mod tests {
     #[test]
     fn test_load() {
         let mut dataset = MemoryDataSet::default();
-        let sample = (rgb_bench_image(100, 100), vec![Detection::default()]);
+        let sample = (test_image(), vec![Detection::default()]);
         dataset.add(sample);
         assert_eq!(0, dataset.samples());
         dataset.load(false);
@@ -127,7 +127,7 @@ mod tests {
     #[test]
     fn test_generate_annotations() {
         let mut dataset = MemoryDataSet::default();
-        let sample = (rgb_bench_image(100, 100), vec![Detection::default()]);
+        let sample = (test_image(), vec![Detection::default()]);
         dataset.add(sample);
         assert_eq!(0, dataset.samples());
         dataset.load(false);
@@ -139,11 +139,10 @@ mod tests {
     #[test]
     fn test_get_data() {
         let mut dataset = MemoryDataSet::default();
-        let (width, height) = (10, 10);
         let mut detection = Detection::default();
         detection.bbox.w = 5.0;
         detection.bbox.h = 5.0;
-        let sample = (rgb_bench_image(width, height), vec![detection]);
+        let sample = (test_image(), vec![detection]);
         dataset.add(sample);
         dataset.load(false);
         let (train_x, train_y, test_x, test_y) = dataset.get();

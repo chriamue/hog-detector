@@ -7,7 +7,10 @@ pub mod predictable;
 pub mod trainable;
 pub mod utils;
 
+pub mod tests;
+
 //#[cfg(target_arch = "wasm32")]
+#[cfg(not(tarpaulin_include))]
 pub mod wasm;
 
 pub use dataset::DataSet;
