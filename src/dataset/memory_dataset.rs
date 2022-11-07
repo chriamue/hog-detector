@@ -32,6 +32,32 @@ impl MemoryDataSet {
     pub fn add(&mut self, sample: Sample) {
         self.samples.push(sample);
     }
+
+    #[cfg(test)]
+    pub fn new_test() -> Self {
+        use crate::tests::test_image;
+
+        let mut dataset = MemoryDataSet::default();
+        let sample = (test_image(), vec![
+            Detection {
+                confidence: 1.0,
+                class: 1,
+                bbox: crate::bbox::BBox { x:0.0, y: 0.0, w: 50.0, h: 50.0 }
+            },
+            Detection {
+                confidence: 1.0,
+                class: 2,
+                bbox: crate::bbox::BBox { x:0.0, y: 50.0, w: 50.0, h: 50.0 }
+            },
+            Detection {
+                confidence: 1.0,
+                class: 3,
+                bbox: crate::bbox::BBox { x:50.0, y: 50.0, w: 50.0, h: 50.0 }
+            }
+        ]);
+        dataset.add(sample);
+        dataset
+    }
 }
 
 impl DataSet for MemoryDataSet {
@@ -103,6 +129,13 @@ impl DataSet for MemoryDataSet {
 mod tests {
     use super::*;
     use crate::tests::test_image;
+
+    #[test]
+    fn test_new_test() {
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load(false);
+        assert_eq!(3, dataset.samples());
+    }
 
     #[test]
     fn test_add_sample() {

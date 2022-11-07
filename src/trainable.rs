@@ -46,20 +46,28 @@ impl Trainable for HogDetector {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dataset::FolderDataSet;
+    use crate::dataset::MemoryDataSet;
 
     #[test]
     fn test_train() {
         let mut model = HogDetector::default();
 
-        let mut dataset = FolderDataSet::new(
-            "res/training/".to_string(),
-            "res/labels.txt".to_string(),
-            32,
-        );
+        let mut dataset = MemoryDataSet::new_test();
         dataset.load(false);
 
-        model.train_class(&dataset, 5);
+        model.train_class(&dataset, 1);
         assert!(model.svc.is_some());
+    }
+
+    #[test]
+    fn test_evaluate() {
+        let mut model = HogDetector::default();
+
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load(false);
+
+        model.train_class(&dataset, 1);
+        assert!(model.svc.is_some());
+        assert!(model.evaluate(&dataset, 1) > 0.0);
     }
 }
