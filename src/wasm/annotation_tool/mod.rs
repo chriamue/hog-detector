@@ -65,7 +65,7 @@ impl Component for App {
                 true
             }
             Msg::ImageChanged((filename, data)) => {
-                let img = image::load_from_memory(&data.clone()).unwrap();
+                let img = image::load_from_memory(&data).unwrap();
                 self.current_image = image_to_base64(&img);
                 self.annotations.clear();
                 self.current_filename = format!(

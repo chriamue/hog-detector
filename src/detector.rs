@@ -89,27 +89,4 @@ impl Detector for HogDetector {
 
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::dataset::{DataSet, FolderDataSet};
-    use crate::trainable::Trainable;
-
-    #[test]
-    fn test_detect() {
-        let mut model = HogDetector::default();
-
-        let mut dataset = FolderDataSet::new(
-            "res/training/".to_string(),
-            "res/labels.txt".to_string(),
-            32,
-        );
-        dataset.load(false);
-
-        model.train_class(&dataset, 5);
-        assert!(model.svc.is_some());
-        let webcam01 = image::open("res/training/webcam01.jpg").unwrap();
-        let detections = model.detect_objects(&webcam01);
-        println!("{:?}", detections);
-        assert!(detections.len() > 0);
-    }
-}
+mod tests {}

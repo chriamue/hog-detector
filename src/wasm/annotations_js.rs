@@ -1,4 +1,4 @@
-use crate::dataset::MemoryDataSet;
+use crate::dataset::{DataSet, MemoryDataSet};
 use crate::detection::Detection;
 use image::DynamicImage;
 use std::ops::Deref;
@@ -23,6 +23,8 @@ impl AnnotationsJS {
             self.image.lock().unwrap().to_rgb8(),
             self.annotations.lock().unwrap().clone(),
         ));
+        dataset.load(false);
+        dataset.generate_random_annotations(10);
         dataset
     }
 

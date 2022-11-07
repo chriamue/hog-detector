@@ -36,15 +36,6 @@ impl BBox {
     pub fn iou(&self, rhs: &BBox) -> f32 {
         self.overlay(rhs) / self.union(rhs)
     }
-    pub fn scale_to_rect(&self, imw: i32, imh: i32) -> (i32, i32, u32, u32) {
-        let w = imw as f32;
-        let h = imh as f32;
-        let left = ((self.left() * w) as i32).max(0);
-        let right = ((self.right() * w) as i32).min(imw - 1);
-        let top = ((self.top() * h) as i32).max(0);
-        let bot = ((self.bot() * h) as i32).min(imh - 1);
-        (left, top, (right - left) as u32, (bot - top) as u32)
-    }
 }
 
 #[cfg(test)]
@@ -52,7 +43,7 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn iou() {
+    pub fn test_iou() {
         let b1 = BBox {
             x: 0.5,
             y: 0.5,
@@ -69,7 +60,7 @@ mod tests {
     }
 
     #[test]
-    pub fn overlay() {
+    pub fn test_overlay() {
         let b1 = BBox {
             x: 4.0,
             y: 4.0,
