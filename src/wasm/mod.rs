@@ -1,3 +1,4 @@
+#![allow(missing_docs)]
 use wasm_bindgen::prelude::*;
 
 pub mod annotation_tool;

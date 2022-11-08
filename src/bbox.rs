@@ -1,10 +1,15 @@
 // source: https://github.com/12101111/yolo-rs/blob/master/src/yolo.rs
 // x, y is the upper left corner
+/// A bounding box struct with mergre functions
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
 pub struct BBox {
+    /// left side
     pub x: f32,
+    /// upper side
     pub y: f32,
+    /// width
     pub w: f32,
+    /// height
     pub h: f32,
 }
 
@@ -21,6 +26,8 @@ impl BBox {
     pub fn bot(&self) -> f32 {
         self.y + self.h
     }
+
+    /// calculate the amount of overlap with another bounding box
     pub fn overlay(&self, rhs: &BBox) -> f32 {
         let left = self.left().max(rhs.left());
         let right = self.right().min(rhs.right());
@@ -30,9 +37,13 @@ impl BBox {
         let h = (bot - top).max(0.0);
         w * h
     }
+
+    /// calculate the union with another bounding box
     pub fn union(&self, rhs: &BBox) -> f32 {
         self.w * self.h + rhs.w * rhs.h - self.overlay(rhs)
     }
+
+    /// calculate the intersection over union with another bounding box
     pub fn iou(&self, rhs: &BBox) -> f32 {
         self.overlay(rhs) / self.union(rhs)
     }
