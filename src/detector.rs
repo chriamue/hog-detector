@@ -117,16 +117,19 @@ mod tests {
 
     #[test]
     fn test_detector() {
-        let img = test_image();
+        let img = DynamicImage::ImageRgb8(test_image());
         let mut dataset = MemoryDataSet::new_test();
         dataset.load(false);
         let mut detector = HogDetector::default();
         detector.train_class(&dataset, 1);
-        let detections = detector.detect_objects(&DynamicImage::ImageRgb8(img));
+        let detections = detector.detect_objects(&img);
         assert_eq!(1, detections.len());
         assert!(detections[0].bbox.x < 75.0);
         assert!(detections[0].bbox.x > 25.0);
         assert!(detections[0].bbox.y < 25.0);
         assert!(detections[0].bbox.y >= 0.0);
+        let visualization = detector.visualize_detections(&img).to_rgb8();
+        assert_eq!(&Rgb([125, 255, 0]), visualization.get_pixel(55, 0));
+        assert_eq!(&Rgb([125, 255, 0]), visualization.get_pixel(75, 0));
     }
 }
