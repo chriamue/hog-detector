@@ -71,14 +71,22 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{DataSet, HogDetector, Predictable};
 <span class="kw">use </span>smartcore::linalg::naive::dense_matrix::DenseMatrix;
 <span class="kw">use </span>smartcore::svm::svc::{SVCParameters, SVC};
 
-<span class="kw">pub trait </span>Trainable {
-    <span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;f32&gt;);
-    <span class="kw">fn </span>train_class(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: u32);
-    <span class="kw">fn </span>evaluate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: u32) -&gt; f32;
+<span class="doccomment">/// trainable trait
+</span><span class="kw">pub trait </span>Trainable {
+    <span class="doccomment">/// trains on given data
+    </span><span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;f32&gt;);
+    <span class="doccomment">/// train class on given dataset
+    </span><span class="kw">fn </span>train_class(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: u32);
+    <span class="doccomment">/// evaluate class on dataset
+    </span><span class="kw">fn </span>evaluate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: u32) -&gt; f32;
 }
 
 <span class="kw">impl </span>Trainable <span class="kw">for </span>HogDetector {

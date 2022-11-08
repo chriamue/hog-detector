@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["test_image",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["test_image","mod for test image"]]};

@@ -26,13 +26,15 @@
 <span id="26">26</span>
 <span id="27">27</span>
 <span id="28">28</span>
+<span id="29">29</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::HogDetector;
 <span class="kw">use </span>image::{imageops::resize, imageops::FilterType};
 <span class="kw">use </span>image::{DynamicImage, RgbImage};
 <span class="kw">use </span>smartcore::linalg::naive::dense_matrix::DenseMatrix;
-
-<span class="kw">pub trait </span>Predictable {
-    <span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; u32;
+<span class="doccomment">/// predictable trait
+</span><span class="kw">pub trait </span>Predictable {
+    <span class="doccomment">/// predicts class of image
+    </span><span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; u32;
 }
 
 <span class="kw">impl </span>Predictable <span class="kw">for </span>HogDetector {

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["merge",""],["nms_sort",""]],"struct":[["Detection",""]]};
+window.SIDEBAR_ITEMS = {"fn":[["merge","merge all possible detections from the list of detections"],["nms_sort","run non max suppression sort algorithm on detections"]],"struct":[["Detection","representation of a detection"]]};

@@ -137,6 +137,12 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
 </pre><pre class="rust"><code><span class="kw">use </span>image::{
     imageops, imageops::resize, imageops::FilterType, DynamicImage, Rgb, RgbImage, SubImage,
 };
@@ -148,7 +154,8 @@
 <span class="kw">type </span>Y = u32;
 <span class="kw">type </span>Window&lt;<span class="lifetime">&#39;a</span>&gt; = (X, Y, RgbImage);
 
-<span class="kw">pub fn </span>pyramid(image: <span class="kw-2">&amp;</span>RgbImage, scale: f32, step_size: usize, window_size: u32) -&gt; Vec&lt;Window&gt; {
+<span class="doccomment">/// calculates pyramid of windows from image
+</span><span class="kw">pub fn </span>pyramid(image: <span class="kw-2">&amp;</span>RgbImage, scale: f32, step_size: usize, window_size: u32) -&gt; Vec&lt;Window&gt; {
     <span class="kw">let </span>width = image.width() <span class="kw">as </span>f32 / scale;
     <span class="kw">let </span>height = image.height() <span class="kw">as </span>f32 / scale;
     <span class="kw">let </span>image = resize(
@@ -165,7 +172,8 @@
         .collect()
 }
 
-<span class="kw">pub fn </span>sliding_window(image: <span class="kw-2">&amp;</span>RgbImage, step_size: usize, window_size: u32) -&gt; Vec&lt;Window&gt; {
+<span class="doccomment">/// calculates sliding window based windows
+</span><span class="kw">pub fn </span>sliding_window(image: <span class="kw-2">&amp;</span>RgbImage, step_size: usize, window_size: u32) -&gt; Vec&lt;Window&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>windows = Vec::new();
 
     <span class="kw">for </span>y <span class="kw">in </span>(<span class="number">0</span>..image.height() - window_size <span class="kw">as </span>u32).step_by(step_size) {
@@ -180,7 +188,8 @@
     windows
 }
 
-<span class="kw">pub fn </span>rotated_frames(frame: <span class="kw-2">&amp;</span>RgbImage) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RgbImage&gt; + <span class="lifetime">&#39;_ </span>{
+<span class="doccomment">/// returns iterator over rotated windows of given image
+</span><span class="kw">pub fn </span>rotated_frames(frame: <span class="kw-2">&amp;</span>RgbImage) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RgbImage&gt; + <span class="lifetime">&#39;_ </span>{
     [
         <span class="number">0.02</span>, -<span class="number">0.02</span>, <span class="number">0.05</span>, -<span class="number">0.05</span>, <span class="number">0.07</span>, -<span class="number">0.07</span>, <span class="number">0.09</span>, -<span class="number">0.09</span>, <span class="number">1.1</span>, -<span class="number">1.1</span>, <span class="number">1.3</span>, -<span class="number">1.3</span>, <span class="number">1.5</span>, -<span class="number">1.5</span>, <span class="number">2.0</span>,
         -<span class="number">2.0</span>,
@@ -189,7 +198,8 @@
     .map(|rad| rotate_about_center(frame, <span class="kw-2">*</span>rad, Interpolation::Nearest, Rgb([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>])))
 }
 
-<span class="kw">pub fn </span>scaled_frames(frame: <span class="kw-2">&amp;</span>RgbImage) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RgbImage&gt; + <span class="lifetime">&#39;_ </span>{
+<span class="doccomment">/// returns iterator over scaled frames of given image
+</span><span class="kw">pub fn </span>scaled_frames(frame: <span class="kw-2">&amp;</span>RgbImage) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RgbImage&gt; + <span class="lifetime">&#39;_ </span>{
     [<span class="number">0.8</span>, <span class="number">0.9</span>, <span class="number">1.1</span>, <span class="number">1.2</span>].into_iter().map(|scalefactor| {
         <span class="kw">let </span>scale = Projection::scale(scalefactor, scalefactor);
 
@@ -197,7 +207,8 @@
     })
 }
 
-<span class="kw">pub fn </span>window_crop(
+<span class="doccomment">/// returns crop of image
+</span><span class="kw">pub fn </span>window_crop(
     input_frame: <span class="kw-2">&amp;</span>RgbImage,
     window_width: u32,
     window_height: u32,
@@ -219,7 +230,8 @@
     .to_image()
 }
 
-<span class="kw">pub fn </span>generate_random_subimages(
+<span class="doccomment">/// generates random subimage of given size
+</span><span class="kw">pub fn </span>generate_random_subimages(
     image: <span class="kw-2">&amp;</span>RgbImage,
     count: usize,
     width: u32,

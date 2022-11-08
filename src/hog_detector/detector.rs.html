@@ -133,6 +133,11 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span><span class="kw">crate</span>::detection::{merge, nms_sort, Detection};
 <span class="kw">use </span><span class="kw">crate</span>::utils::{pyramid, sliding_window};
@@ -143,7 +148,8 @@
 <span class="kw">use </span>imageproc::rect::Rect;
 <span class="kw">use </span>rusttype::{Font, Scale};
 
-<span class="kw">pub fn </span>detect_objects(predictions: Vec&lt;(u32, u32, u32)&gt;, window_size: u32) -&gt; Vec&lt;Detection&gt; {
+<span class="doccomment">/// converts list of (x, y, class) into detections
+</span><span class="kw">pub fn </span>detect_objects(predictions: Vec&lt;(u32, u32, u32)&gt;, window_size: u32) -&gt; Vec&lt;Detection&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>detections: Vec&lt;Detection&gt; = Vec::new();
     predictions.iter().for_each(|(x, y, class)| {
         <span class="kw">if </span><span class="kw-2">*</span>class &gt; <span class="number">0 </span>{
@@ -166,7 +172,8 @@
     nms_sort(detections)
 }
 
-<span class="kw">pub fn </span>visualize_detections(image: <span class="kw-2">&amp;</span>DynamicImage, detections: <span class="kw-2">&amp;</span>Vec&lt;Detection&gt;) -&gt; DynamicImage {
+<span class="doccomment">/// visualizes detections on given image
+</span><span class="kw">pub fn </span>visualize_detections(image: <span class="kw-2">&amp;</span>DynamicImage, detections: <span class="kw-2">&amp;</span>Vec&lt;Detection&gt;) -&gt; DynamicImage {
     <span class="kw">let </span><span class="kw-2">mut </span>img_copy = image.to_rgba8();
     <span class="kw">for </span>detection <span class="kw">in </span>detections.iter() {
         <span class="kw">let </span>color = Rgba([<span class="number">125u8</span>, <span class="number">255u8</span>, <span class="number">0u8</span>, <span class="number">0u8</span>]);
@@ -195,9 +202,12 @@
     DynamicImage::ImageRgba8(img_copy)
 }
 
-<span class="kw">pub trait </span>Detector {
-    <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt;;
-    <span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; DynamicImage;
+<span class="doccomment">/// detector trait
+</span><span class="kw">pub trait </span>Detector {
+    <span class="doccomment">/// detects objects im given image
+    </span><span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt;;
+    <span class="doccomment">/// visualize detections on image
+    </span><span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; DynamicImage;
 }
 
 <span class="kw">impl </span>Detector <span class="kw">for </span>HogDetector {

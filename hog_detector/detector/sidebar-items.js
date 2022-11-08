@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["detect_objects",""],["visualize_detections",""]],"trait":[["Detector",""]]};
+window.SIDEBAR_ITEMS = {"fn":[["detect_objects","converts list of (x, y, class) into detections"],["visualize_detections","visualizes detections on given image"]],"trait":[["Detector","detector trait"]]};

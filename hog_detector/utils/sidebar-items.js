@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["generate_random_subimages",""],["pyramid",""],["rotated_frames",""],["scaled_frames",""],["sliding_window",""],["window_crop",""]]};
+window.SIDEBAR_ITEMS = {"fn":[["generate_random_subimages","generates random subimage of given size"],["pyramid","calculates pyramid of windows from image"],["rotated_frames","returns iterator over rotated windows of given image"],["scaled_frames","returns iterator over scaled frames of given image"],["sliding_window","calculates sliding window based windows"],["window_crop","returns crop of image"]]};

@@ -75,6 +75,9 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
 </pre><pre class="rust"><code><span class="kw">use </span>image::{DynamicImage, RgbImage};
 <span class="kw">use </span>imageproc::hog::{hog, HogOptions};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -82,9 +85,11 @@
 <span class="kw">use </span>smartcore::svm::svc::SVC;
 <span class="kw">use </span>smartcore::svm::LinearKernel;
 
-<span class="attribute">#[derive(Serialize, Deserialize, Debug)]
+<span class="doccomment">/// Hog Detector struct
+</span><span class="attribute">#[derive(Serialize, Deserialize, Debug)]
 </span><span class="kw">pub struct </span>HogDetector {
-    <span class="kw">pub </span>svc: <span class="prelude-ty">Option</span>&lt;SVC&lt;f32, DenseMatrix&lt;f32&gt;, LinearKernel&gt;&gt;,
+    <span class="doccomment">/// support vector classifier
+    </span><span class="kw">pub </span>svc: <span class="prelude-ty">Option</span>&lt;SVC&lt;f32, DenseMatrix&lt;f32&gt;, LinearKernel&gt;&gt;,
 }
 
 <span class="kw">impl </span>PartialEq <span class="kw">for </span>HogDetector {
@@ -101,7 +106,8 @@
 }
 
 <span class="kw">impl </span>HogDetector {
-    <span class="kw">pub fn </span>preprocess(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; Vec&lt;f32&gt; {
+    <span class="doccomment">/// preprocesses image to vector
+    </span><span class="kw">pub fn </span>preprocess(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; Vec&lt;f32&gt; {
         <span class="kw">let </span>luma = DynamicImage::ImageRgb8(image.clone()).to_luma8();
         <span class="kw">let </span>options = HogOptions {
             orientations: <span class="number">8</span>,
@@ -112,8 +118,8 @@
         };
         hog(<span class="kw-2">&amp;</span>luma, options).unwrap()
     }
-
-    <span class="kw">pub fn </span>preprocess_matrix(<span class="kw-2">&amp;</span><span class="self">self</span>, images: Vec&lt;RgbImage&gt;) -&gt; DenseMatrix&lt;f32&gt; {
+    <span class="doccomment">/// preprocesses images into dense matrix
+    </span><span class="kw">pub fn </span>preprocess_matrix(<span class="kw-2">&amp;</span><span class="self">self</span>, images: Vec&lt;RgbImage&gt;) -&gt; DenseMatrix&lt;f32&gt; {
         <span class="kw">let </span>descriptors: Vec&lt;Vec&lt;f32&gt;&gt; =
             images.iter().map(|image| <span class="self">self</span>.preprocess(image)).collect();
         <span class="kw">let </span>samples = descriptors.len();

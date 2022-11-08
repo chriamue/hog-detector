@@ -36,8 +36,8 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
-</pre><pre class="rust"><code><span class="comment">//#![warn(missing_docs)]
-</span><span class="attribute">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
+</pre><pre class="rust"><code><span class="attribute">#![warn(missing_docs)]
+#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 
 </span><span class="doccomment">/// bounding box struct and functions
 </span><span class="kw">pub mod </span>bbox;
@@ -51,12 +51,12 @@
 </span><span class="kw">pub mod </span>hogdetector;
 <span class="doccomment">/// predict functionality
 </span><span class="kw">pub mod </span>predictable;
+<span class="doccomment">/// some structs and functions usable for tests
+</span><span class="kw">pub mod </span>tests;
 <span class="doccomment">/// train functions
 </span><span class="kw">pub mod </span>trainable;
 <span class="doccomment">/// some functions for manipulating images
 </span><span class="kw">pub mod </span>utils;
-<span class="doccomment">/// some structs and functions usable for tests
-</span><span class="kw">pub mod </span>tests;
 
 <span class="doccomment">/// web assembly module
 </span><span class="comment">//#[cfg(target_arch = &quot;wasm32&quot;)]

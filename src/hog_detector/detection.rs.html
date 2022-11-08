@@ -163,21 +163,33 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
 </pre><pre class="rust"><code><span class="comment">// source: https://github.com/12101111/yolo-rs/blob/master/src/yolo.rs
 </span><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span>float_ord::FloatOrd;
 
-<span class="attribute">#[derive(Default, Debug, Clone, Copy, PartialEq)]
+<span class="doccomment">/// representation of a detection
+</span><span class="attribute">#[derive(Default, Debug, Clone, Copy, PartialEq)]
 </span><span class="kw">pub struct </span>Detection {
-    <span class="kw">pub </span>bbox: BBox,
-    <span class="kw">pub </span>class: usize,
-    <span class="kw">pub </span>confidence: f32,
+    <span class="doccomment">/// bounding box of the detection
+    </span><span class="kw">pub </span>bbox: BBox,
+    <span class="doccomment">/// class of the detection
+    </span><span class="kw">pub </span>class: usize,
+    <span class="doccomment">/// confidence of the detection
+    </span><span class="kw">pub </span>confidence: f32,
 }
 
 <span class="kw">const </span>NMS_THRESH: f32 = <span class="number">0.45</span>;
 
 <span class="kw">impl </span>Detection {
-    <span class="kw">pub fn </span>merge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Detection) {
+    <span class="doccomment">/// merge other detection into this detection
+    </span><span class="kw">pub fn </span>merge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Detection) {
         <span class="kw">if </span><span class="self">self</span>.class == other.class {
             <span class="kw">if </span><span class="self">self</span>.bbox.overlay(<span class="kw-2">&amp;</span>other.bbox) &gt; <span class="number">0.0 </span>{
                 <span class="self">self</span>.bbox.w =
@@ -191,7 +203,8 @@
     }
 }
 
-<span class="kw">pub fn </span>merge(dets: Vec&lt;Detection&gt;) -&gt; Vec&lt;Detection&gt; {
+<span class="doccomment">/// merge all possible detections from the list of detections
+</span><span class="kw">pub fn </span>merge(dets: Vec&lt;Detection&gt;) -&gt; Vec&lt;Detection&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>merged = Vec::new();
     dets.clone().into_iter().for_each(|d| {
         <span class="kw">let </span><span class="kw-2">mut </span>merged_d = d;
@@ -201,7 +214,8 @@
     merged
 }
 
-<span class="kw">pub fn </span>nms_sort(<span class="kw-2">mut </span>dets: Vec&lt;Detection&gt;) -&gt; Vec&lt;Detection&gt; {
+<span class="doccomment">/// run non max suppression sort algorithm on detections
+</span><span class="kw">pub fn </span>nms_sort(<span class="kw-2">mut </span>dets: Vec&lt;Detection&gt;) -&gt; Vec&lt;Detection&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>ans = Vec::new();
     <span class="kw">while </span>!dets.is_empty() {
         dets.sort_by_key(|d| FloatOrd(d.confidence));
