@@ -2,8 +2,9 @@ use crate::HogDetector;
 use image::{imageops::resize, imageops::FilterType};
 use image::{DynamicImage, RgbImage};
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
-
+/// predictable trait
 pub trait Predictable {
+    /// predicts class of image
     fn predict(&self, image: &RgbImage) -> u32;
 }
 

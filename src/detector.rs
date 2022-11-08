@@ -8,6 +8,7 @@ use imageproc::drawing::{draw_hollow_rect_mut, draw_text_mut};
 use imageproc::rect::Rect;
 use rusttype::{Font, Scale};
 
+/// converts list of (x, y, class) into detections
 pub fn detect_objects(predictions: Vec<(u32, u32, u32)>, window_size: u32) -> Vec<Detection> {
     let mut detections: Vec<Detection> = Vec::new();
     predictions.iter().for_each(|(x, y, class)| {
@@ -31,6 +32,7 @@ pub fn detect_objects(predictions: Vec<(u32, u32, u32)>, window_size: u32) -> Ve
     nms_sort(detections)
 }
 
+/// visualizes detections on given image
 pub fn visualize_detections(image: &DynamicImage, detections: &Vec<Detection>) -> DynamicImage {
     let mut img_copy = image.to_rgba8();
     for detection in detections.iter() {
@@ -60,8 +62,11 @@ pub fn visualize_detections(image: &DynamicImage, detections: &Vec<Detection>) -
     DynamicImage::ImageRgba8(img_copy)
 }
 
+/// detector trait
 pub trait Detector {
+    /// detects objects im given image
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection>;
+    /// visualize detections on image
     fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage;
 }
 

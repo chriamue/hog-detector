@@ -4,6 +4,7 @@ use imageproc::{
     rect::Rect,
 };
 
+/// a simple image for testing purposes
 pub fn test_image() -> RgbImage {
     let mut img = RgbImage::new(100, 100);
     draw_filled_circle_mut(&mut img, (75, 25), 25, Rgb([255, 0, 0]));

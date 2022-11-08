@@ -5,8 +5,10 @@ use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 use smartcore::svm::svc::SVC;
 use smartcore::svm::LinearKernel;
 
+/// Hog Detector struct
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HogDetector {
+    /// support vector classifier
     pub svc: Option<SVC<f32, DenseMatrix<f32>, LinearKernel>>,
 }
 
@@ -24,6 +26,7 @@ impl Default for HogDetector {
 }
 
 impl HogDetector {
+    /// preprocesses image to vector
     pub fn preprocess(&self, image: &RgbImage) -> Vec<f32> {
         let luma = DynamicImage::ImageRgb8(image.clone()).to_luma8();
         let options = HogOptions {
@@ -35,7 +38,7 @@ impl HogDetector {
         };
         hog(&luma, options).unwrap()
     }
-
+    /// preprocesses images into dense matrix
     pub fn preprocess_matrix(&self, images: Vec<RgbImage>) -> DenseMatrix<f32> {
         let descriptors: Vec<Vec<f32>> =
             images.iter().map(|image| self.preprocess(image)).collect();

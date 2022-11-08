@@ -2,9 +2,13 @@ use crate::{DataSet, HogDetector, Predictable};
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 use smartcore::svm::svc::{SVCParameters, SVC};
 
+/// trainable trait
 pub trait Trainable {
+    /// trains on given data
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<f32>);
+    /// train class on given dataset
     fn train_class(&mut self, dataset: &dyn DataSet, class: u32);
+    /// evaluate class on dataset
     fn evaluate(&mut self, dataset: &dyn DataSet, class: u32) -> f32;
 }
 

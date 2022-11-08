@@ -14,15 +14,19 @@ pub struct BBox {
 }
 
 impl BBox {
+    /// left side of bounding box
     pub fn left(&self) -> f32 {
         self.x
     }
+    /// right side of bounding box
     pub fn right(&self) -> f32 {
         self.x + self.w
     }
+    /// top of bounding box
     pub fn top(&self) -> f32 {
         self.y
     }
+    /// bottom of bounding box
     pub fn bot(&self) -> f32 {
         self.y + self.h
     }

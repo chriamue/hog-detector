@@ -2,16 +2,21 @@
 use crate::bbox::BBox;
 use float_ord::FloatOrd;
 
+/// representation of a detection
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
 pub struct Detection {
+    /// bounding box of the detection
     pub bbox: BBox,
+    /// class of the detection
     pub class: usize,
+    /// confidence of the detection
     pub confidence: f32,
 }
 
 const NMS_THRESH: f32 = 0.45;
 
 impl Detection {
+    /// merge other detection into this detection
     pub fn merge(&mut self, other: &Detection) {
         if self.class == other.class {
             if self.bbox.overlay(&other.bbox) > 0.0 {
@@ -26,6 +31,7 @@ impl Detection {
     }
 }
 
+/// merge all possible detections from the list of detections
 pub fn merge(dets: Vec<Detection>) -> Vec<Detection> {
     let mut merged = Vec::new();
     dets.clone().into_iter().for_each(|d| {
@@ -36,6 +42,7 @@ pub fn merge(dets: Vec<Detection>) -> Vec<Detection> {
     merged
 }
 
+/// run non max suppression sort algorithm on detections
 pub fn nms_sort(mut dets: Vec<Detection>) -> Vec<Detection> {
     let mut ans = Vec::new();
     while !dets.is_empty() {

@@ -1,4 +1,4 @@
-//#![warn(missing_docs)]
+#![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
 /// bounding box struct and functions
@@ -13,12 +13,12 @@ pub mod detector;
 pub mod hogdetector;
 /// predict functionality
 pub mod predictable;
+/// some structs and functions usable for tests
+pub mod tests;
 /// train functions
 pub mod trainable;
 /// some functions for manipulating images
 pub mod utils;
-/// some structs and functions usable for tests
-pub mod tests;
 
 /// web assembly module
 //#[cfg(target_arch = "wasm32")]

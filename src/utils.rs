@@ -9,6 +9,7 @@ type X = u32;
 type Y = u32;
 type Window<'a> = (X, Y, RgbImage);
 
+/// calculates pyramid of windows from image
 pub fn pyramid(image: &RgbImage, scale: f32, step_size: usize, window_size: u32) -> Vec<Window> {
     let width = image.width() as f32 / scale;
     let height = image.height() as f32 / scale;
@@ -26,6 +27,7 @@ pub fn pyramid(image: &RgbImage, scale: f32, step_size: usize, window_size: u32)
         .collect()
 }
 
+/// calculates sliding window based windows
 pub fn sliding_window(image: &RgbImage, step_size: usize, window_size: u32) -> Vec<Window> {
     let mut windows = Vec::new();
 
@@ -41,6 +43,7 @@ pub fn sliding_window(image: &RgbImage, step_size: usize, window_size: u32) -> V
     windows
 }
 
+/// returns iterator over rotated windows of given image
 pub fn rotated_frames(frame: &RgbImage) -> impl Iterator<Item = RgbImage> + '_ {
     [
         0.02, -0.02, 0.05, -0.05, 0.07, -0.07, 0.09, -0.09, 1.1, -1.1, 1.3, -1.3, 1.5, -1.5, 2.0,
@@ -50,6 +53,7 @@ pub fn rotated_frames(frame: &RgbImage) -> impl Iterator<Item = RgbImage> + '_ {
     .map(|rad| rotate_about_center(frame, *rad, Interpolation::Nearest, Rgb([0, 0, 0])))
 }
 
+/// returns iterator over scaled frames of given image
 pub fn scaled_frames(frame: &RgbImage) -> impl Iterator<Item = RgbImage> + '_ {
     [0.8, 0.9, 1.1, 1.2].into_iter().map(|scalefactor| {
         let scale = Projection::scale(scalefactor, scalefactor);
@@ -58,6 +62,7 @@ pub fn scaled_frames(frame: &RgbImage) -> impl Iterator<Item = RgbImage> + '_ {
     })
 }
 
+/// returns crop of image
 pub fn window_crop(
     input_frame: &RgbImage,
     window_width: u32,
@@ -80,6 +85,7 @@ pub fn window_crop(
     .to_image()
 }
 
+/// generates random subimage of given size
 pub fn generate_random_subimages(
     image: &RgbImage,
     count: usize,
