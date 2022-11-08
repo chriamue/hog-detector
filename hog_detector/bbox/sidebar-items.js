@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["BBox","A bounding box struct with mergre functions"]]};

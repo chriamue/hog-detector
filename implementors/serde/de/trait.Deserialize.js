@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"hog_detector":[["impl&lt;'de&gt; <a class=\"trait\" href=\"https://docs.rs/serde/1.0.147/serde/de/trait.Deserialize.html\" title=\"trait serde::de::Deserialize\">Deserialize</a>&lt;'de&gt; for <a class=\"struct\" href=\"hog_detector/hogdetector/struct.HogDetector.html\" title=\"struct hog_detector::hogdetector::HogDetector\">HogDetector</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

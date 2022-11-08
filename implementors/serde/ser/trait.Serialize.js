@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"hog_detector":[["impl <a class=\"trait\" href=\"https://docs.rs/serde/1.0.147/serde/ser/trait.Serialize.html\" title=\"trait serde::ser::Serialize\">Serialize</a> for <a class=\"struct\" href=\"hog_detector/hogdetector/struct.HogDetector.html\" title=\"struct hog_detector::hogdetector::HogDetector\">HogDetector</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

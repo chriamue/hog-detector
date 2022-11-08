@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Msg",""]],"fn":[["format_annotation",""],["format_annotations",""]],"struct":[["Editor",""],["Props",""]]};

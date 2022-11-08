@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Msg",""]],"fn":[["image_to_base64",""]],"mod":[["editor",""],["header",""],["labels",""],["upload_annotations",""],["upload_image",""],["use_webcam_image",""]],"struct":[["App",""],["Props",""]]};
