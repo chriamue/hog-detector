@@ -38,23 +38,51 @@ impl MemoryDataSet {
         use crate::tests::test_image;
 
         let mut dataset = MemoryDataSet::default();
-        let sample = (test_image(), vec![
-            Detection {
-                confidence: 1.0,
-                class: 1,
-                bbox: crate::bbox::BBox { x:0.0, y: 0.0, w: 50.0, h: 50.0 }
-            },
-            Detection {
-                confidence: 1.0,
-                class: 2,
-                bbox: crate::bbox::BBox { x:0.0, y: 50.0, w: 50.0, h: 50.0 }
-            },
-            Detection {
-                confidence: 1.0,
-                class: 3,
-                bbox: crate::bbox::BBox { x:50.0, y: 50.0, w: 50.0, h: 50.0 }
-            }
-        ]);
+        let sample = (
+            test_image(),
+            vec![
+                Detection {
+                    confidence: 1.0,
+                    class: 0,
+                    bbox: crate::bbox::BBox {
+                        x: 0.0,
+                        y: 0.0,
+                        w: 50.0,
+                        h: 50.0,
+                    },
+                },
+                Detection {
+                    confidence: 1.0,
+                    class: 1,
+                    bbox: crate::bbox::BBox {
+                        x: 50.0,
+                        y: 0.0,
+                        w: 50.0,
+                        h: 50.0,
+                    },
+                },
+                Detection {
+                    confidence: 1.0,
+                    class: 2,
+                    bbox: crate::bbox::BBox {
+                        x: 0.0,
+                        y: 50.0,
+                        w: 50.0,
+                        h: 50.0,
+                    },
+                },
+                Detection {
+                    confidence: 1.0,
+                    class: 3,
+                    bbox: crate::bbox::BBox {
+                        x: 50.0,
+                        y: 50.0,
+                        w: 50.0,
+                        h: 50.0,
+                    },
+                },
+            ],
+        );
         dataset.add(sample);
         dataset
     }
@@ -134,7 +162,7 @@ mod tests {
     fn test_new_test() {
         let mut dataset = MemoryDataSet::new_test();
         dataset.load(false);
-        assert_eq!(3, dataset.samples());
+        assert_eq!(4, dataset.samples());
     }
 
     #[test]

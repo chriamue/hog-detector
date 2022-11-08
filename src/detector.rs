@@ -87,6 +87,46 @@ impl Detector for HogDetector {
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::*;
+    use crate::dataset::{DataSet, MemoryDataSet};
+    use crate::tests::test_image;
+    use crate::Trainable;
+    use image::Rgb;
+
+    #[test]
+    fn test_detect_objects() {
+        let detections = vec![(25, 25, 1), (30, 30, 1), (40, 40, 2)];
+        let objects = detect_objects(detections, 16);
+        assert_eq!(2, objects.len());
+    }
+
+    #[test]
+    fn test_visualize_detections() {
+        let detections = vec![(8, 8, 1), (40, 40, 2)];
+        let objects = detect_objects(detections, 16);
+        let img = test_image();
+
+        assert_eq!(&Rgb([0, 0, 0]), img.get_pixel(8, 8));
+        let img = visualize_detections(&DynamicImage::ImageRgb8(img), &objects).to_rgb8();
+
+        img.save("out/test_image2.png").unwrap();
+        assert_eq!(&Rgb([125, 255, 0]), img.get_pixel(8, 8));
+    }
+
+    #[test]
+    fn test_detector() {
+        let img = test_image();
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load(false);
+        let mut detector = HogDetector::default();
+        detector.train_class(&dataset, 1);
+        let detections = detector.detect_objects(&DynamicImage::ImageRgb8(img));
+        assert_eq!(1, detections.len());
+        assert!(detections[0].bbox.x < 75.0);
+        assert!(detections[0].bbox.x > 25.0);
+        assert!(detections[0].bbox.y < 25.0);
+        assert!(detections[0].bbox.y >= 0.0);
+    }
+}

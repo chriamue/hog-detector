@@ -12,7 +12,11 @@ pub struct HogDetector {
 
 impl PartialEq for HogDetector {
     fn eq(&self, other: &HogDetector) -> bool {
-        self.svc.is_some() && other.svc.is_some()
+        if ::core::ptr::eq(&self, &other) {
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -54,6 +58,14 @@ mod tests {
     fn test_default() {
         let model = HogDetector::default();
         assert!(model.svc.is_none());
+    }
+
+    #[test]
+    fn test_part_eq() {
+        let model1 = HogDetector::default();
+        let model2 = HogDetector::default();
+        assert!(model1.svc.is_none());
+        assert!(!model1.eq(&model2));
     }
 
     #[test]
