@@ -10,10 +10,15 @@ mod memory_dataset;
 #[cfg(not(target_arch = "wasm32"))]
 mod mnist_dataset;
 
+/// trait for a dataset
 pub trait DataSet {
+    /// loads the dataset
     fn load(&mut self, augment: bool);
+    /// generates random annotations
     fn generate_random_annotations(&mut self, count_each: usize);
+    /// number of samples in dataset
     fn samples(&self) -> usize;
+    /// get train and test data
     fn get(&self) -> (Vec<RgbImage>, Vec<u32>, Vec<RgbImage>, Vec<u32>);
 }
 

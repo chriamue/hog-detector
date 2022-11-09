@@ -3,6 +3,7 @@ use image::{imageops::resize, imageops::FilterType, DynamicImage, ImageBuffer, R
 use mnist::*;
 use ndarray::prelude::*;
 
+/// the well known mnist dataset
 pub struct MnistDataSet {
     mnist: Option<Mnist>,
     data_len: usize,

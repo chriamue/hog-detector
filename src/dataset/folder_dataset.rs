@@ -8,16 +8,17 @@ use rand::Rng;
 use std::fs::read_dir;
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::vec;
 
+/// Dataset of data from a folder
 pub struct FolderDataSet {
     path: String,
-    pub data: Vec<(String, RgbImage)>,
+    data: Vec<(String, RgbImage)>,
     names: Vec<String>,
     window_size: u32,
 }
 
 impl FolderDataSet {
+    /// constructor of FolderDataSet
     pub fn new(path: String, label_names_path: String, window_size: u32) -> Self {
         FolderDataSet {
             path,
@@ -27,7 +28,7 @@ impl FolderDataSet {
         }
     }
 
-    pub fn load_label_names(path: String) -> Vec<String> {
+    fn load_label_names(path: String) -> Vec<String> {
         let file = File::open(path).unwrap();
         io::BufReader::new(file)
             .lines()
@@ -35,7 +36,7 @@ impl FolderDataSet {
             .collect()
     }
 
-    pub fn list_pathes(path: &str) -> Vec<(String, String)> {
+    fn list_pathes(path: &str) -> Vec<(String, String)> {
         let mut file_pathes = Vec::new();
         for entry in read_dir(path).unwrap() {
             let path = entry.unwrap();
@@ -49,7 +50,7 @@ impl FolderDataSet {
         file_pathes
     }
 
-    pub fn load_annotation(
+    fn load_annotation(
         image_path: String,
         label: String,
         x: u32,
@@ -61,7 +62,7 @@ impl FolderDataSet {
         (label, window)
     }
 
-    pub fn load_annotations(
+    fn load_annotations(
         pathes: Vec<(String, String)>,
         window_size: u32,
         augment: bool,
@@ -112,11 +113,7 @@ impl FolderDataSet {
         annotations
     }
 
-    pub fn get_negative_samples(
-        &self,
-        detector: &dyn Detector,
-        class: u32,
-    ) -> Vec<(String, RgbImage)> {
+    fn get_negative_samples(&self, detector: &dyn Detector, class: u32) -> Vec<(String, RgbImage)> {
         let mut annotations = Vec::new();
         let pathes = Self::list_pathes(&self.path);
         let class_label = self.names[class as usize].clone();
@@ -170,12 +167,13 @@ impl FolderDataSet {
         annotations
     }
 
+    /// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)
     pub fn generate_hard_negative_samples(&mut self, detector: &dyn Detector, class: u32) {
         let annotations = self.get_negative_samples(detector, class);
         self.data.extend(annotations);
     }
 
-    pub fn generate_random_annotations_from_image(
+    fn generate_random_annotations_from_image(
         image: &RgbImage,
         label: String,
         count: usize,
@@ -195,17 +193,11 @@ impl FolderDataSet {
         annotations
     }
 
-    pub fn label_props(label: &str, labels: &[String]) -> Vec<f32> {
-        let mut props = vec![0.0; 10];
-        let idx = labels.iter().position(|x| x == label).unwrap();
-        props[idx] = 1.0;
-        props
-    }
-
-    pub fn label_id(label: &str, labels: &[String]) -> u32 {
+    fn label_id(label: &str, labels: &[String]) -> u32 {
         labels.iter().position(|x| x == label).unwrap() as u32
     }
 
+    /// export dataset to given folder
     pub fn export(&self, folder: &str) {
         self.data
             .iter()
@@ -301,15 +293,6 @@ mod tests {
         assert_eq!(labels.len(), 10);
         assert_eq!(labels[5], "loco5");
         assert_eq!(labels.into_iter().position(|x| x == "loco5"), Some(5));
-    }
-
-    #[test]
-    fn test_label_props() {
-        let labels = FolderDataSet::load_label_names("res/labels.txt".to_string());
-        let props = FolderDataSet::label_props("loco5", &labels);
-        assert_eq!(props.len(), 10);
-        assert_eq!(props[5], 1.0);
-        assert_eq!(props[0], 0.0);
     }
 
     #[test]

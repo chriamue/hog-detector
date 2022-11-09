@@ -8,6 +8,7 @@ use image::{
 
 type Sample = (RgbImage, Vec<Detection>);
 
+/// Memory only dataset
 pub struct MemoryDataSet {
     samples: Vec<Sample>,
     x: Vec<RgbImage>,
@@ -29,6 +30,7 @@ impl Default for MemoryDataSet {
 }
 
 impl MemoryDataSet {
+    /// adds sample to dataset
     pub fn add(&mut self, sample: Sample) {
         self.samples.push(sample);
     }

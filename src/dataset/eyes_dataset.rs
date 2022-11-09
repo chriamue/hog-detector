@@ -1,27 +1,29 @@
 // source: https://github.com/tiruss/eye_detector
 // https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip
 
-use crate::dataset::{rotated_frames, scaled_frames, window_crop, DataSet};
+use crate::dataset::DataSet;
+use crate::utils::window_crop;
 use image::io::Reader as ImageReader;
+use image::RgbImage;
 use image::{imageops::resize, imageops::FilterType, DynamicImage};
-use image::{open, RgbImage};
 use rand::prelude::ThreadRng;
 use rand::Rng;
-use std::fs::File;
 use std::io::prelude::*;
 use std::io::Cursor;
-use std::io::{self, BufRead, SeekFrom};
+use std::io::{self, SeekFrom};
 use std::vec;
 
+/// dataset of eyes images from [tiruss/eye_detector](https://github.com/tiruss/eye_detector/)
 pub struct EyesDataSet {
     zip_url: String,
     pos_path: String,
     neg_path: String,
-    pub data: Vec<(u32, RgbImage)>,
+    data: Vec<(u32, RgbImage)>,
     window_size: u32,
 }
 
 impl EyesDataSet {
+    /// construct new EyesDataSet
     pub fn new(zip_url: String, pos_path: String, neg_path: String, window_size: u32) -> Self {
         Self {
             zip_url,
@@ -83,69 +85,7 @@ impl EyesDataSet {
         }
     }
 
-    pub fn load_annotation(
-        image_path: String,
-        label: String,
-        x: u32,
-        y: u32,
-        window_size: u32,
-    ) -> (String, RgbImage) {
-        let img = open(image_path).unwrap().to_rgb8();
-        let window = window_crop(&img, window_size, window_size, (x, y));
-        (label, window)
-    }
-
-    pub fn load_annotations(
-        pathes: Vec<(String, String)>,
-        window_size: u32,
-        augment: bool,
-    ) -> Vec<(String, RgbImage)> {
-        let mut annotations = Vec::new();
-        for path in pathes {
-            let file = File::open(path.0).unwrap();
-            for line in io::BufReader::new(file).lines() {
-                match line {
-                    Ok(line) => {
-                        let mut l = line.split(' ');
-                        let label = l.next().unwrap();
-                        let x: u32 = l.next().unwrap().parse().unwrap();
-                        let y: u32 = l.next().unwrap().parse().unwrap();
-                        match augment {
-                            true => {
-                                let annotation = Self::load_annotation(
-                                    path.1.clone(),
-                                    label.to_string(),
-                                    x,
-                                    y,
-                                    window_size,
-                                );
-                                let frame = annotation.1.clone();
-                                let frames = std::iter::once(&frame)
-                                    .cloned()
-                                    .chain(rotated_frames(&frame))
-                                    .chain(scaled_frames(&frame));
-                                let augmented_annotations =
-                                    frames.map(|f| (annotation.0.clone(), f));
-                                annotations.extend(augmented_annotations);
-                            }
-                            false => {
-                                annotations.push(Self::load_annotation(
-                                    path.1.clone(),
-                                    label.to_string(),
-                                    x,
-                                    y,
-                                    window_size,
-                                ));
-                            }
-                        };
-                    }
-                    _ => (),
-                }
-            }
-        }
-        annotations
-    }
-
+    /// generates random annotations from an image
     pub fn generate_random_annotations_from_image(
         image: &RgbImage,
         label: String,
@@ -166,6 +106,7 @@ impl EyesDataSet {
         annotations
     }
 
+    /// get vector of labels with given label as 1
     pub fn label_props(label: &str, labels: &[String]) -> Vec<f32> {
         let mut props = vec![0.0; 10];
         let idx = labels.iter().position(|x| x == label).unwrap();
@@ -173,10 +114,12 @@ impl EyesDataSet {
         props
     }
 
+    /// get id of label from labels
     pub fn label_id(label: &str, labels: &[String]) -> u32 {
         labels.iter().position(|x| x == label).unwrap() as u32
     }
 
+    /// export dataset to given folder
     pub fn export(&self, folder: &str) {
         self.data
             .iter()
