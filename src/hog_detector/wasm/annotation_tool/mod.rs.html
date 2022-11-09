@@ -138,10 +138,9 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
-<span id="141">141</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::AnnotationsJS;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::BBox;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::Detection;
+<span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span>image::{DynamicImage, ImageOutputFormat};
 <span class="kw">use </span>std::io::Cursor;
 <span class="kw">use </span>std::path::Path;
@@ -166,7 +165,7 @@
     LabelChanged(String),
     ImageChanged((String, Vec&lt;u8&gt;)),
     AnnotationsChanged((String, Vec&lt;u8&gt;)),
-    NewAnnotation(Detection),
+    NewAnnotation(Annotation),
 }
 
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
@@ -179,7 +178,7 @@
     current_image: String,
     current_filename: String,
     labels: Vec&lt;String&gt;,
-    annotations: Vec&lt;Detection&gt;,
+    annotations: Vec&lt;Annotation&gt;,
 }
 
 <span class="kw">impl </span>Component <span class="kw">for </span>App {
@@ -222,7 +221,7 @@
                 <span class="kw">for </span>line <span class="kw">in </span>data.split(<span class="string">&#39;\n&#39;</span>).collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;() {
                     <span class="kw">let </span><span class="kw-2">mut </span>l = line.split(<span class="string">&#39; &#39;</span>);
                     <span class="kw">let </span>label = l.next().unwrap();
-                    <span class="kw">let </span>class = <span class="self">self</span>.labels.iter().position(|x| x == label).unwrap() <span class="kw">as </span>usize;
+                    <span class="kw">let </span>class = <span class="self">self</span>.labels.iter().position(|x| x == label).unwrap() <span class="kw">as </span>u32;
                     <span class="kw">let </span>x: u32 = l.next().unwrap().parse().unwrap();
                     <span class="kw">let </span>y: u32 = l.next().unwrap().parse().unwrap();
                     <span class="kw">let </span>w: u32 = <span class="kw">match </span>l.next() {
@@ -233,16 +232,15 @@
                         <span class="prelude-val">Some</span>(h) =&gt; h.parse().unwrap(),
                         <span class="prelude-val">None </span>=&gt; <span class="number">32</span>,
                     };
-                    <span class="kw">let </span>annotation = Detection {
-                        class,
-                        confidence: <span class="number">1.0</span>,
-                        bbox: BBox {
+                    <span class="kw">let </span>annotation = (
+                        BBox {
                             x: x <span class="kw">as </span>f32,
                             y: y <span class="kw">as </span>f32,
                             w: w <span class="kw">as </span>f32,
                             h: h <span class="kw">as </span>f32,
                         },
-                    };
+                        class,
+                    );
                     <span class="self">self</span>.annotations.push(annotation);
                 }
                 <span class="bool-val">true
@@ -267,7 +265,7 @@
         });
         <span class="kw">let </span>on_new_annotation = ctx
             .link()
-            .callback(|annotation: Detection| Msg::NewAnnotation(annotation));
+            .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
         <span class="macro">html! </span>{
             &lt;&gt;
             &lt;header::Header /&gt;

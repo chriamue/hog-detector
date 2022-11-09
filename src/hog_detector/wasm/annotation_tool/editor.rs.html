@@ -185,8 +185,11 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::wasm::download::download_bytes;
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::wasm::download::download_bytes;
+<span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, Annotation, Class};
 <span class="kw">use </span>yew::{
     events::{DragEvent, MouseEvent},
     html, Callback, Component, Context, Html, Properties,
@@ -210,22 +213,19 @@
     <span class="kw">pub </span>filename: String,
     <span class="kw">pub </span>label: String,
     <span class="kw">pub </span>image: String,
-    <span class="kw">pub </span>annotations: Vec&lt;Detection&gt;,
-    <span class="kw">pub </span>onchange: Callback&lt;Detection&gt;,
+    <span class="kw">pub </span>annotations: Vec&lt;Annotation&gt;,
+    <span class="kw">pub </span>onchange: Callback&lt;Annotation&gt;,
 }
 
-<span class="kw">pub fn </span>format_annotation(annotation: <span class="kw-2">&amp;</span>Detection, labels: <span class="kw-2">&amp;</span>Vec&lt;String&gt;) -&gt; String {
+<span class="kw">pub fn </span>format_annotation(annotation: <span class="kw-2">&amp;</span>Annotation, labels: <span class="kw-2">&amp;</span>Vec&lt;String&gt;) -&gt; String {
+    <span class="kw">let </span>(bbox, class) = annotation;
     <span class="macro">format!</span>(
         <span class="string">&quot;{} {} {} {} {}&quot;</span>,
-        labels[annotation.class],
-        annotation.bbox.x <span class="kw">as </span>i32,
-        annotation.bbox.y <span class="kw">as </span>i32,
-        annotation.bbox.w <span class="kw">as </span>i32,
-        annotation.bbox.h <span class="kw">as </span>i32
+        labels[<span class="kw-2">*</span>class <span class="kw">as </span>usize], bbox.x <span class="kw">as </span>i32, bbox.y <span class="kw">as </span>i32, bbox.w <span class="kw">as </span>i32, bbox.h <span class="kw">as </span>i32
     )
 }
 
-<span class="kw">pub fn </span>format_annotations(annotations: <span class="kw-2">&amp;</span>Vec&lt;Detection&gt;, labels: <span class="kw-2">&amp;</span>Vec&lt;String&gt;) -&gt; Vec&lt;String&gt; {
+<span class="kw">pub fn </span>format_annotations(annotations: <span class="kw-2">&amp;</span>Vec&lt;Annotation&gt;, labels: <span class="kw-2">&amp;</span>Vec&lt;String&gt;) -&gt; Vec&lt;String&gt; {
     annotations
         .iter()
         .map(|annotation| format_annotation(annotation, labels))
@@ -259,17 +259,16 @@
                     </span>.labels
                     .iter()
                     .position(|x| x == <span class="kw-2">&amp;</span>ctx.props().label)
-                    .unwrap() <span class="kw">as </span>usize;
-                ctx.props().onchange.emit(Detection {
-                    class,
-                    confidence: <span class="number">1.0</span>,
-                    bbox: BBox {
+                    .unwrap() <span class="kw">as </span>Class;
+                ctx.props().onchange.emit((
+                    BBox {
                         x: x1 <span class="kw">as </span>f32,
                         y: y1 <span class="kw">as </span>f32,
                         w: (x2 - x1) <span class="kw">as </span>f32,
                         h: (y2 - y1) <span class="kw">as </span>f32,
                     },
-                });
+                    class,
+                ));
                 <span class="bool-val">true
             </span>}
             Msg::DownloadAnnotations =&gt; {
@@ -309,7 +308,17 @@
                 .replace(<span class="string">&quot;data:image/png;base64,&quot;</span>, <span class="string">&quot;&quot;</span>);
             <span class="kw">let </span>data = base64::decode(b64img).unwrap();
             <span class="kw">let </span>img = image::load_from_memory(<span class="kw-2">&amp;</span>data).unwrap();
-            <span class="kw">let </span>img = <span class="kw">crate</span>::detector::visualize_detections(<span class="kw-2">&amp;</span>img, <span class="kw-2">&amp;</span>ctx.props().annotations);
+            <span class="kw">let </span>detections = ctx
+                .props()
+                .annotations
+                .iter()
+                .map(|annotation| Detection {
+                    bbox: annotation.<span class="number">0</span>,
+                    confidence: <span class="number">1.0</span>,
+                    class: annotation.<span class="number">1 </span><span class="kw">as </span>usize,
+                })
+                .collect();
+            <span class="kw">let </span>img = <span class="kw">crate</span>::detector::visualize_detections(<span class="kw-2">&amp;</span>img, <span class="kw-2">&amp;</span>detections);
             url = <span class="kw">super</span>::image_to_base64(<span class="kw-2">&amp;</span>img);
         };
 
@@ -335,38 +344,35 @@
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_format_annotations() {
-        <span class="kw">let </span>det1 = Detection {
-            bbox: BBox {
+        <span class="kw">let </span>det1 = (
+            BBox {
                 x: <span class="number">0.5</span>,
                 y: <span class="number">0.5</span>,
                 w: <span class="number">1.0</span>,
                 h: <span class="number">1.0</span>,
             },
-            class: <span class="number">0</span>,
-            confidence: <span class="number">0.1</span>,
-        };
-        <span class="kw">let </span>det2 = Detection {
-            bbox: BBox {
+            <span class="number">0</span>,
+        );
+        <span class="kw">let </span>det2 = (
+            BBox {
                 x: <span class="number">0.6</span>,
                 y: <span class="number">0.6</span>,
                 w: <span class="number">1.0</span>,
                 h: <span class="number">1.0</span>,
             },
-            class: <span class="number">0</span>,
-            confidence: <span class="number">0.1</span>,
-        };
-        <span class="kw">let </span>det3 = Detection {
-            bbox: BBox {
+            <span class="number">0</span>,
+        );
+        <span class="kw">let </span>det3 = (
+            BBox {
                 x: <span class="number">1.5</span>,
                 y: <span class="number">1.5</span>,
                 w: <span class="number">1.0</span>,
                 h: <span class="number">1.0</span>,
             },
-            class: <span class="number">1</span>,
-            confidence: <span class="number">0.1</span>,
-        };
+            <span class="number">1</span>,
+        );
         <span class="kw">let </span>labels = <span class="macro">vec!</span>[<span class="string">&quot;other&quot;</span>.to_string(), <span class="string">&quot;one&quot;</span>.to_string()];
-        <span class="kw">let </span>annotations = <span class="macro">vec!</span>[det1, det2, det3];
+        <span class="kw">let </span>annotations: Vec&lt;Annotation&gt; = <span class="macro">vec!</span>[det1, det2, det3];
         <span class="kw">let </span>formatted = format_annotations(<span class="kw-2">&amp;</span>annotations, <span class="kw-2">&amp;</span>labels);
         <span class="macro">assert_eq!</span>(<span class="number">3</span>, formatted.len());
         <span class="macro">assert_eq!</span>(<span class="string">&quot;other 0 0 1 1&quot;</span>.to_string(), formatted[<span class="number">0</span>]);

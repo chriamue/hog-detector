@@ -216,15 +216,17 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DataSet;
-<span class="kw">use </span><span class="kw">crate</span>::detection::Detection;
 <span class="kw">use </span><span class="kw">crate</span>::utils::generate_random_subimages;
+<span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span>image::{
     imageops::{crop, resize, FilterType},
     DynamicImage, RgbImage,
 };
 
-<span class="kw">type </span>Sample = (RgbImage, Vec&lt;Detection&gt;);
+<span class="kw">type </span>Sample = (RgbImage, Vec&lt;Annotation&gt;);
 
 <span class="doccomment">/// Memory only dataset
 </span><span class="kw">pub struct </span>MemoryDataSet {
@@ -255,52 +257,48 @@
 
     <span class="attribute">#[cfg(test)]
     </span><span class="kw">pub fn </span>new_test() -&gt; <span class="self">Self </span>{
-        <span class="kw">use </span><span class="kw">crate</span>::tests::test_image;
+        <span class="kw">use crate</span>::{tests::test_image, bbox::BBox};
 
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
         <span class="kw">let </span>sample = (
             test_image(),
             <span class="macro">vec!</span>[
-                Detection {
-                    confidence: <span class="number">1.0</span>,
-                    class: <span class="number">0</span>,
-                    bbox: <span class="kw">crate</span>::bbox::BBox {
+                (
+                    BBox {
                         x: <span class="number">0.0</span>,
                         y: <span class="number">0.0</span>,
                         w: <span class="number">50.0</span>,
                         h: <span class="number">50.0</span>,
                     },
-                },
-                Detection {
-                    confidence: <span class="number">1.0</span>,
-                    class: <span class="number">1</span>,
-                    bbox: <span class="kw">crate</span>::bbox::BBox {
+                    <span class="number">0</span>,
+                ),
+                (
+                    BBox {
                         x: <span class="number">50.0</span>,
                         y: <span class="number">0.0</span>,
                         w: <span class="number">50.0</span>,
                         h: <span class="number">50.0</span>,
                     },
-                },
-                Detection {
-                    confidence: <span class="number">1.0</span>,
-                    class: <span class="number">2</span>,
-                    bbox: <span class="kw">crate</span>::bbox::BBox {
+                    <span class="number">1</span>,
+                ),
+                (
+                    BBox {
                         x: <span class="number">0.0</span>,
                         y: <span class="number">50.0</span>,
                         w: <span class="number">50.0</span>,
                         h: <span class="number">50.0</span>,
                     },
-                },
-                Detection {
-                    confidence: <span class="number">1.0</span>,
-                    class: <span class="number">3</span>,
-                    bbox: <span class="kw">crate</span>::bbox::BBox {
+                    <span class="number">2</span>,
+                ),
+                (
+                    BBox {
                         x: <span class="number">50.0</span>,
                         y: <span class="number">50.0</span>,
                         w: <span class="number">50.0</span>,
                         h: <span class="number">50.0</span>,
                     },
-                },
+                    <span class="number">3</span>,
+                ),
             ],
         );
         dataset.add(sample);
@@ -315,7 +313,7 @@
         <span class="kw">for </span>(img, annotations) <span class="kw">in </span><span class="self">self</span>.samples.iter() {
             <span class="kw">let </span><span class="kw-2">mut </span>img = img.clone();
             <span class="kw">for </span>annotation <span class="kw">in </span>annotations {
-                <span class="kw">let </span>bbox = annotation.bbox;
+                <span class="kw">let </span>(bbox, class) = annotation;
                 <span class="kw">let </span>window = crop(
                     <span class="kw-2">&amp;mut </span>img,
                     bbox.x <span class="kw">as </span>u32,
@@ -332,7 +330,7 @@
                 );
                 <span class="kw">let </span>image = DynamicImage::ImageRgba8(scaled_window).to_rgb8();
                 <span class="self">self</span>.x.push(image);
-                <span class="self">self</span>.y.push(annotation.class <span class="kw">as </span>u32);
+                <span class="self">self</span>.y.push(<span class="kw-2">*</span>class);
             }
         }
     }
@@ -376,7 +374,7 @@
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::tests::test_image;
+    <span class="kw">use crate</span>::{tests::test_image, bbox::BBox};
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_new_test() {
@@ -388,7 +386,7 @@
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_add_sample() {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
-        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[Detection::default()]);
+        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
         dataset.add(sample);
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, dataset.samples());
     }
@@ -396,7 +394,7 @@
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_load() {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
-        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[Detection::default()]);
+        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
         dataset.add(sample);
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, dataset.samples());
         dataset.load(<span class="bool-val">false</span>);
@@ -408,7 +406,7 @@
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_generate_annotations() {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
-        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[Detection::default()]);
+        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
         dataset.add(sample);
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, dataset.samples());
         dataset.load(<span class="bool-val">false</span>);
@@ -420,10 +418,16 @@
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_get_data() {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
-        <span class="kw">let </span><span class="kw-2">mut </span>detection = Detection::default();
-        detection.bbox.w = <span class="number">5.0</span>;
-        detection.bbox.h = <span class="number">5.0</span>;
-        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[detection]);
+        <span class="kw">let </span>annotation = (
+            BBox {
+                x: <span class="number">0.0</span>,
+                y: <span class="number">0.0</span>,
+                w: <span class="number">5.0</span>,
+                h: <span class="number">5.0</span>,
+            },
+            <span class="number">0</span>,
+        );
+        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[annotation]);
         dataset.add(sample);
         dataset.load(<span class="bool-val">false</span>);
         <span class="kw">let </span>(train_x, train_y, test_x, test_y) = dataset.get();
@@ -431,7 +435,7 @@
         <span class="macro">assert_eq!</span>(train_x.len(), test_x.len());
         <span class="macro">assert_eq!</span>(<span class="number">32</span>, train_x[<span class="number">0</span>].width());
         <span class="macro">assert_eq!</span>(<span class="number">32</span>, train_x[<span class="number">0</span>].height());
-        <span class="macro">assert_eq!</span>(detection.class, test_y[<span class="number">0</span>] <span class="kw">as </span>usize);
+        <span class="macro">assert_eq!</span>(annotation.<span class="number">1</span>, test_y[<span class="number">0</span>]);
     }
 }
 </code></pre></div>

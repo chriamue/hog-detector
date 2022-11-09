@@ -67,7 +67,7 @@
 <span id="67">67</span>
 <span id="68">68</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::dataset::{DataSet, MemoryDataSet};
-<span class="kw">use </span><span class="kw">crate</span>::detection::Detection;
+<span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span>image::DynamicImage;
 <span class="kw">use </span>std::ops::Deref;
 <span class="kw">use </span>std::sync::{Arc, Mutex};
@@ -77,7 +77,7 @@
 #[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>AnnotationsJS {
     image: Arc&lt;Mutex&lt;DynamicImage&gt;&gt;,
-    annotations: Arc&lt;Mutex&lt;Vec&lt;Detection&gt;&gt;&gt;,
+    annotations: Arc&lt;Mutex&lt;Vec&lt;Annotation&gt;&gt;&gt;,
 }
 
 <span class="kw">impl </span>AnnotationsJS {
@@ -96,7 +96,7 @@
         dataset
     }
 
-    <span class="kw">pub fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, annotation: Detection) {
+    <span class="kw">pub fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, annotation: Annotation) {
         <span class="self">self</span>.annotations.lock().unwrap().push(annotation);
     }
 }
