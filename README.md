@@ -1,5 +1,9 @@
 # hog-detector
 
+[![Github Pages Build](https://github.com/chriamue/hog-detector/actions/workflows/gh-pages.yml/badge.svg)](https://chriamue.github.io/hog-detector/)
+[![Demo](https://img.shields.io/badge/Demo-online-green.svg)](https://chriamue.github.io/hog-detector/)
+[![Doc](https://img.shields.io/badge/Docs-online-green.svg)](https://chriamue.github.io/hog-detector/hog_detector/)
+
 Histogram of Oriented Gradients and Object Detection
 
 This project contains an algorithm for object detection based on SVM on HOG descriptors.
