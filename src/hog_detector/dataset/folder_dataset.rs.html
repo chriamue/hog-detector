@@ -340,23 +340,6 @@
 <span id="340">340</span>
 <span id="341">341</span>
 <span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span><span class="kw">crate</span>::dataset::DataSet;
 <span class="kw">use </span><span class="kw">crate</span>::utils::{rotated_frames, scaled_frames, window_crop};
@@ -367,17 +350,18 @@
 <span class="kw">use </span>std::fs::read_dir;
 <span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::io::{<span class="self">self</span>, BufRead};
-<span class="kw">use </span>std::vec;
 
-<span class="kw">pub struct </span>FolderDataSet {
+<span class="doccomment">/// Dataset of data from a folder
+</span><span class="kw">pub struct </span>FolderDataSet {
     path: String,
-    <span class="kw">pub </span>data: Vec&lt;(String, RgbImage)&gt;,
+    data: Vec&lt;(String, RgbImage)&gt;,
     names: Vec&lt;String&gt;,
     window_size: u32,
 }
 
 <span class="kw">impl </span>FolderDataSet {
-    <span class="kw">pub fn </span>new(path: String, label_names_path: String, window_size: u32) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// constructor of FolderDataSet
+    </span><span class="kw">pub fn </span>new(path: String, label_names_path: String, window_size: u32) -&gt; <span class="self">Self </span>{
         FolderDataSet {
             path,
             data: Vec::new(),
@@ -386,7 +370,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>load_label_names(path: String) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>load_label_names(path: String) -&gt; Vec&lt;String&gt; {
         <span class="kw">let </span>file = File::open(path).unwrap();
         io::BufReader::new(file)
             .lines()
@@ -394,7 +378,7 @@
             .collect()
     }
 
-    <span class="kw">pub fn </span>list_pathes(path: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;(String, String)&gt; {
+    <span class="kw">fn </span>list_pathes(path: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;(String, String)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>file_pathes = Vec::new();
         <span class="kw">for </span>entry <span class="kw">in </span>read_dir(path).unwrap() {
             <span class="kw">let </span>path = entry.unwrap();
@@ -408,7 +392,7 @@
         file_pathes
     }
 
-    <span class="kw">pub fn </span>load_annotation(
+    <span class="kw">fn </span>load_annotation(
         image_path: String,
         label: String,
         x: u32,
@@ -420,7 +404,7 @@
         (label, window)
     }
 
-    <span class="kw">pub fn </span>load_annotations(
+    <span class="kw">fn </span>load_annotations(
         pathes: Vec&lt;(String, String)&gt;,
         window_size: u32,
         augment: bool,
@@ -471,11 +455,7 @@
         annotations
     }
 
-    <span class="kw">pub fn </span>get_negative_samples(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector,
-        class: u32,
-    ) -&gt; Vec&lt;(String, RgbImage)&gt; {
+    <span class="kw">fn </span>get_negative_samples(<span class="kw-2">&amp;</span><span class="self">self</span>, detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector, class: u32) -&gt; Vec&lt;(String, RgbImage)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>annotations = Vec::new();
         <span class="kw">let </span>pathes = <span class="self">Self</span>::list_pathes(<span class="kw-2">&amp;</span><span class="self">self</span>.path);
         <span class="kw">let </span>class_label = <span class="self">self</span>.names[class <span class="kw">as </span>usize].clone();
@@ -529,12 +509,13 @@
         annotations
     }
 
-    <span class="kw">pub fn </span>generate_hard_negative_samples(<span class="kw-2">&amp;mut </span><span class="self">self</span>, detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector, class: u32) {
+    <span class="doccomment">/// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)
+    </span><span class="kw">pub fn </span>generate_hard_negative_samples(<span class="kw-2">&amp;mut </span><span class="self">self</span>, detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector, class: u32) {
         <span class="kw">let </span>annotations = <span class="self">self</span>.get_negative_samples(detector, class);
         <span class="self">self</span>.data.extend(annotations);
     }
 
-    <span class="kw">pub fn </span>generate_random_annotations_from_image(
+    <span class="kw">fn </span>generate_random_annotations_from_image(
         image: <span class="kw-2">&amp;</span>RgbImage,
         label: String,
         count: usize,
@@ -554,18 +535,12 @@
         annotations
     }
 
-    <span class="kw">pub fn </span>label_props(label: <span class="kw-2">&amp;</span>str, labels: <span class="kw-2">&amp;</span>[String]) -&gt; Vec&lt;f32&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>props = <span class="macro">vec!</span>[<span class="number">0.0</span>; <span class="number">10</span>];
-        <span class="kw">let </span>idx = labels.iter().position(|x| x == label).unwrap();
-        props[idx] = <span class="number">1.0</span>;
-        props
-    }
-
-    <span class="kw">pub fn </span>label_id(label: <span class="kw-2">&amp;</span>str, labels: <span class="kw-2">&amp;</span>[String]) -&gt; u32 {
+    <span class="kw">fn </span>label_id(label: <span class="kw-2">&amp;</span>str, labels: <span class="kw-2">&amp;</span>[String]) -&gt; u32 {
         labels.iter().position(|x| x == label).unwrap() <span class="kw">as </span>u32
     }
 
-    <span class="kw">pub fn </span>export(<span class="kw-2">&amp;</span><span class="self">self</span>, folder: <span class="kw-2">&amp;</span>str) {
+    <span class="doccomment">/// export dataset to given folder
+    </span><span class="kw">pub fn </span>export(<span class="kw-2">&amp;</span><span class="self">self</span>, folder: <span class="kw-2">&amp;</span>str) {
         <span class="self">self</span>.data
             .iter()
             .enumerate()
@@ -660,15 +635,6 @@
         <span class="macro">assert_eq!</span>(labels.len(), <span class="number">10</span>);
         <span class="macro">assert_eq!</span>(labels[<span class="number">5</span>], <span class="string">&quot;loco5&quot;</span>);
         <span class="macro">assert_eq!</span>(labels.into_iter().position(|x| x == <span class="string">&quot;loco5&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">5</span>));
-    }
-
-    <span class="attribute">#[test]
-    </span><span class="kw">fn </span>test_label_props() {
-        <span class="kw">let </span>labels = FolderDataSet::load_label_names(<span class="string">&quot;res/labels.txt&quot;</span>.to_string());
-        <span class="kw">let </span>props = FolderDataSet::label_props(<span class="string">&quot;loco5&quot;</span>, <span class="kw-2">&amp;</span>labels);
-        <span class="macro">assert_eq!</span>(props.len(), <span class="number">10</span>);
-        <span class="macro">assert_eq!</span>(props[<span class="number">5</span>], <span class="number">1.0</span>);
-        <span class="macro">assert_eq!</span>(props[<span class="number">0</span>], <span class="number">0.0</span>);
     }
 
     <span class="attribute">#[test]

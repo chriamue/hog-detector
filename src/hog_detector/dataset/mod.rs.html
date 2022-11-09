@@ -26,6 +26,11 @@
 <span id="26">26</span>
 <span id="27">27</span>
 <span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
 </pre><pre class="rust"><code><span class="kw">use </span>image::RgbImage;
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;eyes&quot;</span>)]
@@ -38,11 +43,16 @@
 #[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
 </span><span class="kw">mod </span>mnist_dataset;
 
-<span class="kw">pub trait </span>DataSet {
-    <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>, augment: bool);
-    <span class="kw">fn </span>generate_random_annotations(<span class="kw-2">&amp;mut </span><span class="self">self</span>, count_each: usize);
-    <span class="kw">fn </span>samples(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
-    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;, Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;);
+<span class="doccomment">/// trait for a dataset
+</span><span class="kw">pub trait </span>DataSet {
+    <span class="doccomment">/// loads the dataset
+    </span><span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>, augment: bool);
+    <span class="doccomment">/// generates random annotations
+    </span><span class="kw">fn </span>generate_random_annotations(<span class="kw-2">&amp;mut </span><span class="self">self</span>, count_each: usize);
+    <span class="doccomment">/// number of samples in dataset
+    </span><span class="kw">fn </span>samples(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
+    <span class="doccomment">/// get train and test data
+    </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;, Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;);
 }
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;eyes&quot;</span>)]
