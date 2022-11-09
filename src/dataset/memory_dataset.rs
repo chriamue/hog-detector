@@ -1,12 +1,12 @@
 use super::DataSet;
-use crate::detection::Detection;
 use crate::utils::generate_random_subimages;
+use crate::Annotation;
 use image::{
     imageops::{crop, resize, FilterType},
     DynamicImage, RgbImage,
 };
 
-type Sample = (RgbImage, Vec<Detection>);
+type Sample = (RgbImage, Vec<Annotation>);
 
 /// Memory only dataset
 pub struct MemoryDataSet {
@@ -37,52 +37,48 @@ impl MemoryDataSet {
 
     #[cfg(test)]
     pub fn new_test() -> Self {
-        use crate::tests::test_image;
+        use crate::{tests::test_image, bbox::BBox};
 
         let mut dataset = MemoryDataSet::default();
         let sample = (
             test_image(),
             vec![
-                Detection {
-                    confidence: 1.0,
-                    class: 0,
-                    bbox: crate::bbox::BBox {
+                (
+                    BBox {
                         x: 0.0,
                         y: 0.0,
                         w: 50.0,
                         h: 50.0,
                     },
-                },
-                Detection {
-                    confidence: 1.0,
-                    class: 1,
-                    bbox: crate::bbox::BBox {
+                    0,
+                ),
+                (
+                    BBox {
                         x: 50.0,
                         y: 0.0,
                         w: 50.0,
                         h: 50.0,
                     },
-                },
-                Detection {
-                    confidence: 1.0,
-                    class: 2,
-                    bbox: crate::bbox::BBox {
+                    1,
+                ),
+                (
+                    BBox {
                         x: 0.0,
                         y: 50.0,
                         w: 50.0,
                         h: 50.0,
                     },
-                },
-                Detection {
-                    confidence: 1.0,
-                    class: 3,
-                    bbox: crate::bbox::BBox {
+                    2,
+                ),
+                (
+                    BBox {
                         x: 50.0,
                         y: 50.0,
                         w: 50.0,
                         h: 50.0,
                     },
-                },
+                    3,
+                ),
             ],
         );
         dataset.add(sample);
@@ -97,7 +93,7 @@ impl DataSet for MemoryDataSet {
         for (img, annotations) in self.samples.iter() {
             let mut img = img.clone();
             for annotation in annotations {
-                let bbox = annotation.bbox;
+                let (bbox, class) = annotation;
                 let window = crop(
                     &mut img,
                     bbox.x as u32,
@@ -114,7 +110,7 @@ impl DataSet for MemoryDataSet {
                 );
                 let image = DynamicImage::ImageRgba8(scaled_window).to_rgb8();
                 self.x.push(image);
-                self.y.push(annotation.class as u32);
+                self.y.push(*class);
             }
         }
     }
@@ -158,7 +154,7 @@ impl DataSet for MemoryDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::test_image;
+    use crate::{tests::test_image, bbox::BBox};
 
     #[test]
     fn test_new_test() {
@@ -170,7 +166,7 @@ mod tests {
     #[test]
     fn test_add_sample() {
         let mut dataset = MemoryDataSet::default();
-        let sample = (test_image(), vec![Detection::default()]);
+        let sample = (test_image(), vec![(BBox::default(), 0)]);
         dataset.add(sample);
         assert_eq!(0, dataset.samples());
     }
@@ -178,7 +174,7 @@ mod tests {
     #[test]
     fn test_load() {
         let mut dataset = MemoryDataSet::default();
-        let sample = (test_image(), vec![Detection::default()]);
+        let sample = (test_image(), vec![(BBox::default(), 0)]);
         dataset.add(sample);
         assert_eq!(0, dataset.samples());
         dataset.load(false);
@@ -190,7 +186,7 @@ mod tests {
     #[test]
     fn test_generate_annotations() {
         let mut dataset = MemoryDataSet::default();
-        let sample = (test_image(), vec![Detection::default()]);
+        let sample = (test_image(), vec![(BBox::default(), 0)]);
         dataset.add(sample);
         assert_eq!(0, dataset.samples());
         dataset.load(false);
@@ -202,10 +198,16 @@ mod tests {
     #[test]
     fn test_get_data() {
         let mut dataset = MemoryDataSet::default();
-        let mut detection = Detection::default();
-        detection.bbox.w = 5.0;
-        detection.bbox.h = 5.0;
-        let sample = (test_image(), vec![detection]);
+        let annotation = (
+            BBox {
+                x: 0.0,
+                y: 0.0,
+                w: 5.0,
+                h: 5.0,
+            },
+            0,
+        );
+        let sample = (test_image(), vec![annotation]);
         dataset.add(sample);
         dataset.load(false);
         let (train_x, train_y, test_x, test_y) = dataset.get();
@@ -213,6 +215,6 @@ mod tests {
         assert_eq!(train_x.len(), test_x.len());
         assert_eq!(32, train_x[0].width());
         assert_eq!(32, train_x[0].height());
-        assert_eq!(detection.class, test_y[0] as usize);
+        assert_eq!(annotation.1, test_y[0]);
     }
 }

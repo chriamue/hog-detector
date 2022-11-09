@@ -1,6 +1,6 @@
 use super::AnnotationsJS;
 use crate::prelude::BBox;
-use crate::prelude::Detection;
+use crate::Annotation;
 use image::{DynamicImage, ImageOutputFormat};
 use std::io::Cursor;
 use std::path::Path;
@@ -25,7 +25,7 @@ pub enum Msg {
     LabelChanged(String),
     ImageChanged((String, Vec<u8>)),
     AnnotationsChanged((String, Vec<u8>)),
-    NewAnnotation(Detection),
+    NewAnnotation(Annotation),
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -38,7 +38,7 @@ pub struct App {
     current_image: String,
     current_filename: String,
     labels: Vec<String>,
-    annotations: Vec<Detection>,
+    annotations: Vec<Annotation>,
 }
 
 impl Component for App {
@@ -81,7 +81,7 @@ impl Component for App {
                 for line in data.split('\n').collect::<Vec<&str>>() {
                     let mut l = line.split(' ');
                     let label = l.next().unwrap();
-                    let class = self.labels.iter().position(|x| x == label).unwrap() as usize;
+                    let class = self.labels.iter().position(|x| x == label).unwrap() as u32;
                     let x: u32 = l.next().unwrap().parse().unwrap();
                     let y: u32 = l.next().unwrap().parse().unwrap();
                     let w: u32 = match l.next() {
@@ -92,16 +92,15 @@ impl Component for App {
                         Some(h) => h.parse().unwrap(),
                         None => 32,
                     };
-                    let annotation = Detection {
-                        class,
-                        confidence: 1.0,
-                        bbox: BBox {
+                    let annotation = (
+                        BBox {
                             x: x as f32,
                             y: y as f32,
                             w: w as f32,
                             h: h as f32,
                         },
-                    };
+                        class,
+                    );
                     self.annotations.push(annotation);
                 }
                 true
@@ -126,7 +125,7 @@ impl Component for App {
         });
         let on_new_annotation = ctx
             .link()
-            .callback(|annotation: Detection| Msg::NewAnnotation(annotation));
+            .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
         html! {
             <>
             <header::Header />

@@ -31,6 +31,11 @@ pub use hogdetector::HogDetector;
 pub use predictable::Predictable;
 pub use trainable::Trainable;
 
+/// object class type
+pub type Class = u32;
+/// annotation is a object bounding box in image and class type
+pub type Annotation = (bbox::BBox, Class);
+
 /// the hog_detector prelude
 pub mod prelude {
     pub use crate::bbox::BBox;

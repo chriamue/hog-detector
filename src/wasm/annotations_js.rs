@@ -1,5 +1,5 @@
 use crate::dataset::{DataSet, MemoryDataSet};
-use crate::detection::Detection;
+use crate::Annotation;
 use image::DynamicImage;
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
@@ -9,7 +9,7 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Clone)]
 pub struct AnnotationsJS {
     image: Arc<Mutex<DynamicImage>>,
-    annotations: Arc<Mutex<Vec<Detection>>>,
+    annotations: Arc<Mutex<Vec<Annotation>>>,
 }
 
 impl AnnotationsJS {
@@ -28,7 +28,7 @@ impl AnnotationsJS {
         dataset
     }
 
-    pub fn push(&self, annotation: Detection) {
+    pub fn push(&self, annotation: Annotation) {
         self.annotations.lock().unwrap().push(annotation);
     }
 }

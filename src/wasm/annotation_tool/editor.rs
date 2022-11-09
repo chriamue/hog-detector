@@ -1,5 +1,5 @@
-use crate::prelude::*;
 use crate::wasm::download::download_bytes;
+use crate::{prelude::*, Annotation, Class};
 use yew::{
     events::{DragEvent, MouseEvent},
     html, Callback, Component, Context, Html, Properties,
@@ -23,22 +23,19 @@ pub struct Props {
     pub filename: String,
     pub label: String,
     pub image: String,
-    pub annotations: Vec<Detection>,
-    pub onchange: Callback<Detection>,
+    pub annotations: Vec<Annotation>,
+    pub onchange: Callback<Annotation>,
 }
 
-pub fn format_annotation(annotation: &Detection, labels: &Vec<String>) -> String {
+pub fn format_annotation(annotation: &Annotation, labels: &Vec<String>) -> String {
+    let (bbox, class) = annotation;
     format!(
         "{} {} {} {} {}",
-        labels[annotation.class],
-        annotation.bbox.x as i32,
-        annotation.bbox.y as i32,
-        annotation.bbox.w as i32,
-        annotation.bbox.h as i32
+        labels[*class as usize], bbox.x as i32, bbox.y as i32, bbox.w as i32, bbox.h as i32
     )
 }
 
-pub fn format_annotations(annotations: &Vec<Detection>, labels: &Vec<String>) -> Vec<String> {
+pub fn format_annotations(annotations: &Vec<Annotation>, labels: &Vec<String>) -> Vec<String> {
     annotations
         .iter()
         .map(|annotation| format_annotation(annotation, labels))
@@ -72,17 +69,16 @@ impl Component for Editor {
                     .labels
                     .iter()
                     .position(|x| x == &ctx.props().label)
-                    .unwrap() as usize;
-                ctx.props().onchange.emit(Detection {
-                    class,
-                    confidence: 1.0,
-                    bbox: BBox {
+                    .unwrap() as Class;
+                ctx.props().onchange.emit((
+                    BBox {
                         x: x1 as f32,
                         y: y1 as f32,
                         w: (x2 - x1) as f32,
                         h: (y2 - y1) as f32,
                     },
-                });
+                    class,
+                ));
                 true
             }
             Msg::DownloadAnnotations => {
@@ -122,7 +118,17 @@ impl Component for Editor {
                 .replace("data:image/png;base64,", "");
             let data = base64::decode(b64img).unwrap();
             let img = image::load_from_memory(&data).unwrap();
-            let img = crate::detector::visualize_detections(&img, &ctx.props().annotations);
+            let detections = ctx
+                .props()
+                .annotations
+                .iter()
+                .map(|annotation| Detection {
+                    bbox: annotation.0,
+                    confidence: 1.0,
+                    class: annotation.1 as usize,
+                })
+                .collect();
+            let img = crate::detector::visualize_detections(&img, &detections);
             url = super::image_to_base64(&img);
         };
 
@@ -148,38 +154,35 @@ mod tests {
 
     #[test]
     fn test_format_annotations() {
-        let det1 = Detection {
-            bbox: BBox {
+        let det1 = (
+            BBox {
                 x: 0.5,
                 y: 0.5,
                 w: 1.0,
                 h: 1.0,
             },
-            class: 0,
-            confidence: 0.1,
-        };
-        let det2 = Detection {
-            bbox: BBox {
+            0,
+        );
+        let det2 = (
+            BBox {
                 x: 0.6,
                 y: 0.6,
                 w: 1.0,
                 h: 1.0,
             },
-            class: 0,
-            confidence: 0.1,
-        };
-        let det3 = Detection {
-            bbox: BBox {
+            0,
+        );
+        let det3 = (
+            BBox {
                 x: 1.5,
                 y: 1.5,
                 w: 1.0,
                 h: 1.0,
             },
-            class: 1,
-            confidence: 0.1,
-        };
+            1,
+        );
         let labels = vec!["other".to_string(), "one".to_string()];
-        let annotations = vec![det1, det2, det3];
+        let annotations: Vec<Annotation> = vec![det1, det2, det3];
         let formatted = format_annotations(&annotations, &labels);
         assert_eq!(3, formatted.len());
         assert_eq!("other 0 0 1 1".to_string(), formatted[0]);
