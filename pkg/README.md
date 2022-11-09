@@ -1,5 +1,6 @@
 # hog-detector
 
+[![Github Repo](https://img.shields.io/badge/github-repo-green)](https://github.com/chriamue/hog-detector/)
 [![Github Pages Build](https://github.com/chriamue/hog-detector/actions/workflows/gh-pages.yml/badge.svg)](https://chriamue.github.io/hog-detector/)
 [![Demo](https://img.shields.io/badge/Demo-online-green.svg)](https://chriamue.github.io/hog-detector/)
 [![Doc](https://img.shields.io/badge/Docs-online-green.svg)](https://chriamue.github.io/hog-detector/hog_detector/)
