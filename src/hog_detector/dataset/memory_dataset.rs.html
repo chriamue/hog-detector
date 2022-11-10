@@ -257,7 +257,7 @@
 
     <span class="attribute">#[cfg(test)]
     </span><span class="kw">pub fn </span>new_test() -&gt; <span class="self">Self </span>{
-        <span class="kw">use crate</span>::{tests::test_image, bbox::BBox};
+        <span class="kw">use crate</span>::{bbox::BBox, tests::test_image};
 
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
         <span class="kw">let </span>sample = (
@@ -374,7 +374,7 @@
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{tests::test_image, bbox::BBox};
+    <span class="kw">use crate</span>::{bbox::BBox, tests::test_image};
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_new_test() {

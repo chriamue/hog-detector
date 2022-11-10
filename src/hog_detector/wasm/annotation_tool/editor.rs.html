@@ -183,12 +183,8 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::wasm::download::download_bytes;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::utils::{base64_image_to_image, image_to_base64_image};
+<span class="kw">use </span><span class="kw">crate</span>::wasm::download::download_bytes;
 <span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, Annotation, Class};
 <span class="kw">use </span>yew::{
     events::{DragEvent, MouseEvent},
@@ -301,13 +297,7 @@
             .callback(|e: MouseEvent| Msg::MouseUp(e.offset_x(), e.offset_y()));
         <span class="kw">let </span><span class="kw-2">mut </span>url = ctx.props().image.to_string();
         <span class="kw">if </span>url.starts_with(<span class="string">&quot;data&quot;</span>) {
-            <span class="kw">let </span>b64img = ctx
-                .props()
-                .image
-                .to_string()
-                .replace(<span class="string">&quot;data:image/png;base64,&quot;</span>, <span class="string">&quot;&quot;</span>);
-            <span class="kw">let </span>data = base64::decode(b64img).unwrap();
-            <span class="kw">let </span>img = image::load_from_memory(<span class="kw-2">&amp;</span>data).unwrap();
+            <span class="kw">let </span>img = base64_image_to_image(<span class="kw-2">&amp;</span>url);
             <span class="kw">let </span>detections = ctx
                 .props()
                 .annotations
@@ -319,7 +309,7 @@
                 })
                 .collect();
             <span class="kw">let </span>img = <span class="kw">crate</span>::detector::visualize_detections(<span class="kw-2">&amp;</span>img, <span class="kw-2">&amp;</span>detections);
-            url = <span class="kw">super</span>::image_to_base64(<span class="kw-2">&amp;</span>img);
+            url = image_to_base64_image(<span class="kw-2">&amp;</span>img);
         };
 
         <span class="macro">html! </span>{

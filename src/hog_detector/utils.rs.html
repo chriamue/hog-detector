@@ -143,7 +143,39 @@
 <span id="143">143</span>
 <span id="144">144</span>
 <span id="145">145</span>
-</pre><pre class="rust"><code><span class="kw">use </span>image::{
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+</pre><pre class="rust"><code><span class="kw">use </span>std::io::Cursor;
+
+<span class="kw">use </span>image::ImageOutputFormat;
+<span class="kw">use </span>image::{
     imageops, imageops::resize, imageops::FilterType, DynamicImage, Rgb, RgbImage, SubImage,
 };
 <span class="kw">use </span>imageproc::geometric_transformations::{rotate_about_center, warp, Interpolation, Projection};
@@ -248,6 +280,22 @@
     subimages
 }
 
+<span class="doccomment">/// converts dynamic image to base64 encoded png image
+</span><span class="kw">pub fn </span>image_to_base64_image(img: <span class="kw-2">&amp;</span>DynamicImage) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>image_data: Vec&lt;u8&gt; = Vec::new();
+    img.write_to(<span class="kw-2">&amp;mut </span>Cursor::new(<span class="kw-2">&amp;mut </span>image_data), ImageOutputFormat::Png)
+        .unwrap();
+    <span class="kw">let </span>res_base64 = base64::encode(image_data);
+    <span class="macro">format!</span>(<span class="string">&quot;data:image/png;base64,{}&quot;</span>, res_base64)
+}
+
+<span class="doccomment">/// decodes base64 encoded image to dynamic image
+</span><span class="kw">pub fn </span>base64_image_to_image(b64img: <span class="kw-2">&amp;</span>String) -&gt; DynamicImage {
+    <span class="kw">let </span>b64img = b64img.replace(<span class="string">&quot;data:image/png;base64,&quot;</span>, <span class="string">&quot;&quot;</span>);
+    <span class="kw">let </span>data = base64::decode(b64img).unwrap();
+    image::load_from_memory(<span class="kw-2">&amp;</span>data).unwrap()
+}
+
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
@@ -286,6 +334,16 @@
         <span class="macro">assert_eq!</span>(<span class="number">4</span>, subimages.len());
         <span class="macro">assert_eq!</span>(<span class="number">8</span>, subimages[<span class="number">0</span>].width());
         <span class="macro">assert_eq!</span>(<span class="number">10</span>, subimages[<span class="number">0</span>].height());
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_image_base64_encoding_and_decoding() {
+        <span class="kw">let </span>image = rgb_bench_image(<span class="number">100</span>, <span class="number">100</span>);
+        <span class="kw">let </span>encoded = image_to_base64_image(<span class="kw-2">&amp;</span>DynamicImage::ImageRgb8(image.clone()));
+        <span class="macro">assert!</span>(encoded.starts_with(<span class="string">&quot;data:image/png;base64&quot;</span>));
+        <span class="kw">let </span>decoded = base64_image_to_image(<span class="kw-2">&amp;</span>encoded).to_rgb8();
+        <span class="macro">assert_eq!</span>(image.width(), decoded.width());
+        <span class="macro">assert_eq!</span>(image.height(), decoded.height());
     }
 }
 </code></pre></div>

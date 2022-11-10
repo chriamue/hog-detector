@@ -134,32 +134,20 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::AnnotationsJS;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotations_js::AnnotationsJS;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::BBox;
+<span class="kw">use </span><span class="kw">crate</span>::utils::image_to_base64_image;
 <span class="kw">use </span><span class="kw">crate</span>::Annotation;
-<span class="kw">use </span>image::{DynamicImage, ImageOutputFormat};
-<span class="kw">use </span>std::io::Cursor;
 <span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>yew::prelude::<span class="kw-2">*</span>;
 
 <span class="kw">pub mod </span>editor;
 <span class="kw">pub mod </span>header;
+<span class="kw">pub mod </span>images_list;
 <span class="kw">pub mod </span>labels;
 <span class="kw">pub mod </span>upload_annotations;
 <span class="kw">pub mod </span>upload_image;
 <span class="kw">pub mod </span>use_webcam_image;
-
-<span class="kw">pub fn </span>image_to_base64(img: <span class="kw-2">&amp;</span>DynamicImage) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>image_data: Vec&lt;u8&gt; = Vec::new();
-    img.write_to(<span class="kw-2">&amp;mut </span>Cursor::new(<span class="kw-2">&amp;mut </span>image_data), ImageOutputFormat::Png)
-        .unwrap();
-    <span class="kw">let </span>res_base64 = base64::encode(image_data);
-    <span class="macro">format!</span>(<span class="string">&quot;data:image/png;base64,{}&quot;</span>, res_base64)
-}
 
 <span class="kw">pub enum </span>Msg {
     LabelChanged(String),
@@ -206,7 +194,7 @@
             </span>}
             Msg::ImageChanged((filename, data)) =&gt; {
                 <span class="kw">let </span>img = image::load_from_memory(<span class="kw-2">&amp;</span>data).unwrap();
-                <span class="self">self</span>.current_image = image_to_base64(<span class="kw-2">&amp;</span>img);
+                <span class="self">self</span>.current_image = image_to_base64_image(<span class="kw-2">&amp;</span>img);
                 <span class="self">self</span>.annotations.clear();
                 <span class="self">self</span>.current_filename = <span class="macro">format!</span>(
                     <span class="string">&quot;{}&quot;</span>,
@@ -266,6 +254,9 @@
         <span class="kw">let </span>on_new_annotation = ctx
             .link()
             .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
+        <span class="kw">let </span>annotation1 = AnnotationsJS::new();
+        <span class="kw">let </span>annotation2 = AnnotationsJS::new();
+        <span class="kw">let </span>image_annotations = <span class="macro">vec!</span>[annotation1, annotation2];
         <span class="macro">html! </span>{
             &lt;&gt;
             &lt;header::Header /&gt;
@@ -274,6 +265,7 @@
             &lt;upload_annotations::UploadAnnotations onchange={on_annotations_change}/&gt;
             &lt;labels::Labels onchange={ on_label_change } label={ label.clone()} /&gt;
             &lt;editor::Editor {label} filename={<span class="self">self</span>.current_filename.to_string()} image={<span class="self">self</span>.current_image.to_string()} annotations={<span class="self">self</span>.annotations.clone()} onchange={on_new_annotation}/&gt;
+            &lt;images_list::ImagesList {image_annotations} /&gt;
             &lt;/&gt;
         }
     }
