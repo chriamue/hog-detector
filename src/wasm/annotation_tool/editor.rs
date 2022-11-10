@@ -1,6 +1,8 @@
-use crate::utils::{base64_image_to_image, image_to_base64_image};
+use crate::detector::visualize_detections;
+use crate::utils::image_to_base64_image;
 use crate::wasm::download::download_bytes;
 use crate::{prelude::*, Annotation, Class};
+use image::DynamicImage;
 use yew::{
     events::{DragEvent, MouseEvent},
     html, Callback, Component, Context, Html, Properties,
@@ -23,7 +25,7 @@ pub struct Editor {
 pub struct Props {
     pub filename: String,
     pub label: String,
-    pub image: String,
+    pub image: DynamicImage,
     pub annotations: Vec<Annotation>,
     pub onchange: Callback<Annotation>,
 }
@@ -110,22 +112,18 @@ impl Component for Editor {
         let onmouseup = ctx
             .link()
             .callback(|e: MouseEvent| Msg::MouseUp(e.offset_x(), e.offset_y()));
-        let mut url = ctx.props().image.to_string();
-        if url.starts_with("data") {
-            let img = base64_image_to_image(&url);
-            let detections = ctx
-                .props()
-                .annotations
-                .iter()
-                .map(|annotation| Detection {
-                    bbox: annotation.0,
-                    confidence: 1.0,
-                    class: annotation.1 as usize,
-                })
-                .collect();
-            let img = crate::detector::visualize_detections(&img, &detections);
-            url = image_to_base64_image(&img);
-        };
+        let detections = ctx
+            .props()
+            .annotations
+            .iter()
+            .map(|annotation| Detection {
+                bbox: annotation.0,
+                confidence: 1.0,
+                class: annotation.1 as usize,
+            })
+            .collect();
+        let img = visualize_detections(&ctx.props().image, &detections);
+        let url = image_to_base64_image(&img);
 
         html! {
             <div class="flex w-screen bg-gray-100" { ondrop }>

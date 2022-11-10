@@ -1,6 +1,5 @@
-use super::annotations_js::AnnotationsJS;
+use super::annotated_images_js::AnnotatedImagesJS;
 use crate::prelude::BBox;
-use crate::utils::image_to_base64_image;
 use crate::Annotation;
 use std::path::Path;
 use yew::prelude::*;
@@ -22,15 +21,14 @@ pub enum Msg {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props {
-    pub annotations: AnnotationsJS,
+    pub images: AnnotatedImagesJS,
 }
 
 pub struct App {
+    current: usize,
     current_label: String,
-    current_image: String,
     current_filename: String,
     labels: Vec<String>,
-    annotations: Vec<Annotation>,
 }
 
 impl Component for App {
@@ -39,14 +37,13 @@ impl Component for App {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
+            current: 0,
             current_label: "none".to_string(),
-            current_image: "https://picsum.photos/640/480/".to_string(),
             current_filename: "Unknown".to_string(),
             labels: include_str!("../../../res/labels.txt")
                 .split("\n")
                 .map(|s| s.to_string())
                 .collect(),
-            annotations: Vec::new(),
         }
     }
 
@@ -58,17 +55,27 @@ impl Component for App {
             }
             Msg::ImageChanged((filename, data)) => {
                 let img = image::load_from_memory(&data).unwrap();
-                self.current_image = image_to_base64_image(&img);
-                self.annotations.clear();
                 self.current_filename = format!(
                     "{}",
                     Path::new(&filename).with_extension("").to_str().unwrap()
                 );
-                ctx.props().annotations.set_image(img);
+                {
+                    let images = ctx.props().images.inner();
+                    let mut annotations = images.lock().unwrap();
+                    annotations.get_mut(self.current).unwrap().set_image(img);
+                    annotations.get_mut(self.current).unwrap().clear()
+                };
                 true
             }
             Msg::AnnotationsChanged((_, data)) => {
-                self.annotations.clear();
+                ctx.props()
+                    .images
+                    .inner()
+                    .lock()
+                    .unwrap()
+                    .get_mut(self.current)
+                    .unwrap()
+                    .clear();
                 let data = std::str::from_utf8(&data).unwrap().to_string();
                 for line in data.split('\n').collect::<Vec<&str>>() {
                     let mut l = line.split(' ');
@@ -93,12 +100,20 @@ impl Component for App {
                         },
                         class,
                     );
-                    self.annotations.push(annotation);
+                    ctx.props()
+                        .images
+                        .inner()
+                        .lock()
+                        .unwrap()
+                        .get_mut(self.current)
+                        .unwrap()
+                        .get_annotations()
+                        .push(annotation);
                 }
                 true
             }
             Msg::NewAnnotation(annotation) => {
-                ctx.props().annotations.push(annotation);
+                ctx.props().images.add_annotation(self.current, annotation);
                 true
             }
         }
@@ -118,9 +133,15 @@ impl Component for App {
         let on_new_annotation = ctx
             .link()
             .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
-        let annotation1 = AnnotationsJS::new();
-        let annotation2 = AnnotationsJS::new();
-        let image_annotations = vec![annotation1, annotation2];
+        let images = ctx.props().images.inner().lock().unwrap().clone();
+        let (image, annotations) = {
+            let images = ctx.props().images.inner();
+            let image_annotations = images.lock().unwrap();
+            let image_annotations = image_annotations.get(self.current).unwrap();
+            let image = image_annotations.get_image().clone();
+            let annotations = image_annotations.get_annotations();
+            (image, annotations)
+        };
         html! {
             <>
             <header::Header />
@@ -128,8 +149,8 @@ impl Component for App {
             <upload_image::UploadImage onchange={on_image_change.clone()}/>
             <upload_annotations::UploadAnnotations onchange={on_annotations_change}/>
             <labels::Labels onchange={ on_label_change } label={ label.clone()} />
-            <editor::Editor {label} filename={self.current_filename.to_string()} image={self.current_image.to_string()} annotations={self.annotations.clone()} onchange={on_new_annotation}/>
-            <images_list::ImagesList {image_annotations} />
+            <editor::Editor {label} filename={self.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/>
+            <images_list::ImagesList {images} />
             </>
         }
     }

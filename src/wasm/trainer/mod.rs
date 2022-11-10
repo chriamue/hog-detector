@@ -1,4 +1,4 @@
-use super::AnnotationsJS;
+use super::annotated_images_js::AnnotatedImagesJS;
 use super::HogDetectorJS;
 use wasm_bindgen_test::console_log;
 use yew::prelude::*;
@@ -12,7 +12,7 @@ pub enum Msg {
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props {
     pub detector: HogDetectorJS,
-    pub annotations: AnnotationsJS,
+    pub images: AnnotatedImagesJS,
 }
 
 impl Component for TrainerApp {
@@ -27,10 +27,10 @@ impl Component for TrainerApp {
         match msg {
             Msg::Train => {
                 console_log!("training started...");
-                let dataset = ctx.props().annotations.create_dataset();
+                let dataset = ctx.props().images.create_dataset();
                 ctx.props().detector.train(&dataset);
                 console_log!("training done");
-                console_log!("{}", ctx.props().annotations);
+                console_log!("{}", ctx.props().images);
                 true
             }
         }

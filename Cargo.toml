@@ -12,7 +12,7 @@ repository = "https://github.com/chriamue/hog-detector"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = []
+default = ["reqwest"]
 mnist = ["dep:mnist"]
 eyes = ["reqwest", "zip"]
 
@@ -50,7 +50,8 @@ web-sys = { version = "0.3.59", features = [
   "HtmlCanvasElement",
   "CanvasRenderingContext2d",
   "CssStyleDeclaration",
-  "ImageData"
+  "ImageData",
 ] }
 js-sys = "0.3.55"
 yew = "0.19"
+#reqwest = { version = "0.11", features = ["blocking", "json"] }

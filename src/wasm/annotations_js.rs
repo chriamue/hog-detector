@@ -1,7 +1,6 @@
 use crate::dataset::{DataSet, MemoryDataSet};
 use crate::Annotation;
 use image::DynamicImage;
-use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
 
@@ -32,8 +31,16 @@ impl AnnotationsJS {
         self.annotations.lock().unwrap().push(annotation);
     }
 
+    pub fn clear(&self) {
+        self.annotations.lock().unwrap().clear();
+    }
+
     pub fn len(&self) -> usize {
         self.annotations.lock().unwrap().len()
+    }
+
+    pub fn get_annotations(&self) -> Vec<Annotation> {
+        self.annotations.lock().unwrap().clone()
     }
 
     pub fn get_image(&self) -> DynamicImage {
@@ -69,8 +76,7 @@ impl PartialEq for AnnotationsJS {
         if ::core::ptr::eq(&self, &other) {
             true
         } else {
-            other.annotations.try_lock().unwrap().deref()
-                == self.annotations.try_lock().unwrap().deref()
+            false
         }
     }
 }

@@ -5,7 +5,7 @@ pub struct ImagesList;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props {
-    pub image_annotations: Vec<AnnotationsJS>,
+    pub images: Vec<AnnotationsJS>,
 }
 
 impl Component for ImagesList {
@@ -21,7 +21,7 @@ impl Component for ImagesList {
             <div class="card" style="width: 18rem;">
             <ul class="list-group list-group-flush">
             {
-                ctx.props().image_annotations.clone().into_iter().enumerate().map(|(i, annotations)| {
+                ctx.props().images.clone().into_iter().enumerate().map(|(i, annotations)| {
                     html!{<div key={format!("annotations-{}",i)}>
                     <img src={image_to_base64_image(&annotations.get_image())} width={32} height={32} />
                     { format!("count: {}",annotations.len()) }
