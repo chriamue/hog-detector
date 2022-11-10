@@ -31,6 +31,14 @@ impl AnnotationsJS {
     pub fn push(&self, annotation: Annotation) {
         self.annotations.lock().unwrap().push(annotation);
     }
+
+    pub fn len(&self) -> usize {
+        self.annotations.lock().unwrap().len()
+    }
+
+    pub fn get_image(&self) -> DynamicImage {
+        self.image.lock().unwrap().clone()
+    }
 }
 
 #[wasm_bindgen]
@@ -40,7 +48,7 @@ impl AnnotationsJS {
         use console_error_panic_hook;
         console_error_panic_hook::set_once();
         AnnotationsJS {
-            image: Arc::new(Mutex::new(DynamicImage::default())),
+            image: Arc::new(Mutex::new(DynamicImage::new_rgb8(1, 1))),
             annotations: Arc::new(Mutex::new(Vec::new())),
         }
     }
@@ -64,5 +72,19 @@ impl PartialEq for AnnotationsJS {
             other.annotations.try_lock().unwrap().deref()
                 == self.annotations.try_lock().unwrap().deref()
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use wasm_bindgen_test::*;
+
+    #[wasm_bindgen_test]
+    fn test_len() {
+        let annotations = AnnotationsJS::new();
+        let annotation = Annotation::default();
+        annotations.push(annotation);
+        assert_eq!(1, annotations.len());
     }
 }

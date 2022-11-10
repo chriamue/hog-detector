@@ -1,3 +1,4 @@
+use crate::utils::{base64_image_to_image, image_to_base64_image};
 use crate::wasm::download::download_bytes;
 use crate::{prelude::*, Annotation, Class};
 use yew::{
@@ -111,13 +112,7 @@ impl Component for Editor {
             .callback(|e: MouseEvent| Msg::MouseUp(e.offset_x(), e.offset_y()));
         let mut url = ctx.props().image.to_string();
         if url.starts_with("data") {
-            let b64img = ctx
-                .props()
-                .image
-                .to_string()
-                .replace("data:image/png;base64,", "");
-            let data = base64::decode(b64img).unwrap();
-            let img = image::load_from_memory(&data).unwrap();
+            let img = base64_image_to_image(&url);
             let detections = ctx
                 .props()
                 .annotations
@@ -129,7 +124,7 @@ impl Component for Editor {
                 })
                 .collect();
             let img = crate::detector::visualize_detections(&img, &detections);
-            url = super::image_to_base64(&img);
+            url = image_to_base64_image(&img);
         };
 
         html! {

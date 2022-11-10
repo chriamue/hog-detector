@@ -1,25 +1,17 @@
-use super::AnnotationsJS;
+use super::annotations_js::AnnotationsJS;
 use crate::prelude::BBox;
+use crate::utils::image_to_base64_image;
 use crate::Annotation;
-use image::{DynamicImage, ImageOutputFormat};
-use std::io::Cursor;
 use std::path::Path;
 use yew::prelude::*;
 
 pub mod editor;
 pub mod header;
+pub mod images_list;
 pub mod labels;
 pub mod upload_annotations;
 pub mod upload_image;
 pub mod use_webcam_image;
-
-pub fn image_to_base64(img: &DynamicImage) -> String {
-    let mut image_data: Vec<u8> = Vec::new();
-    img.write_to(&mut Cursor::new(&mut image_data), ImageOutputFormat::Png)
-        .unwrap();
-    let res_base64 = base64::encode(image_data);
-    format!("data:image/png;base64,{}", res_base64)
-}
 
 pub enum Msg {
     LabelChanged(String),
@@ -66,7 +58,7 @@ impl Component for App {
             }
             Msg::ImageChanged((filename, data)) => {
                 let img = image::load_from_memory(&data).unwrap();
-                self.current_image = image_to_base64(&img);
+                self.current_image = image_to_base64_image(&img);
                 self.annotations.clear();
                 self.current_filename = format!(
                     "{}",
@@ -126,6 +118,9 @@ impl Component for App {
         let on_new_annotation = ctx
             .link()
             .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
+        let annotation1 = AnnotationsJS::new();
+        let annotation2 = AnnotationsJS::new();
+        let image_annotations = vec![annotation1, annotation2];
         html! {
             <>
             <header::Header />
@@ -134,6 +129,7 @@ impl Component for App {
             <upload_annotations::UploadAnnotations onchange={on_annotations_change}/>
             <labels::Labels onchange={ on_label_change } label={ label.clone()} />
             <editor::Editor {label} filename={self.current_filename.to_string()} image={self.current_image.to_string()} annotations={self.annotations.clone()} onchange={on_new_annotation}/>
+            <images_list::ImagesList {image_annotations} />
             </>
         }
     }

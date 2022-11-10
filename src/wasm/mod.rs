@@ -13,7 +13,7 @@ use hogdetector_js::HogDetectorJS;
 wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
 #[wasm_bindgen]
-pub fn init_annotation_tool(root: web_sys::Element, annotations: &mut AnnotationsJS) {
+pub fn init_annotation_tool(root: web_sys::Element, annotations: &AnnotationsJS) {
     yew::start_app_with_props_in_element::<annotation_tool::App>(
         root,
         annotation_tool::Props {
@@ -23,11 +23,7 @@ pub fn init_annotation_tool(root: web_sys::Element, annotations: &mut Annotation
 }
 
 #[wasm_bindgen]
-pub fn init_trainer(
-    root: web_sys::Element,
-    annotations: &mut AnnotationsJS,
-    detector: &HogDetectorJS,
-) {
+pub fn init_trainer(root: web_sys::Element, annotations: &AnnotationsJS, detector: &HogDetectorJS) {
     yew::start_app_with_props_in_element::<trainer::TrainerApp>(
         root,
         trainer::Props {

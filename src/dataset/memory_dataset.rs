@@ -37,7 +37,7 @@ impl MemoryDataSet {
 
     #[cfg(test)]
     pub fn new_test() -> Self {
-        use crate::{tests::test_image, bbox::BBox};
+        use crate::{bbox::BBox, tests::test_image};
 
         let mut dataset = MemoryDataSet::default();
         let sample = (
@@ -154,7 +154,7 @@ impl DataSet for MemoryDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{tests::test_image, bbox::BBox};
+    use crate::{bbox::BBox, tests::test_image};
 
     #[test]
     fn test_new_test() {
