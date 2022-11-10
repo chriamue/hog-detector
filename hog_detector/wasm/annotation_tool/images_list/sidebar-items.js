@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["ImagesList",""],["Props",""]]};
+window.SIDEBAR_ITEMS = {"enum":[["Msg",""]],"struct":[["ImagesList",""],["Props",""]]};

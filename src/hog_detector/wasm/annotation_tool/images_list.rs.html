@@ -33,34 +33,116 @@
 <span id="33">33</span>
 <span id="34">34</span>
 <span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{utils::image_to_base64_image, wasm::annotations_js::AnnotationsJS};
-<span class="kw">use </span>yew::{html, Component, Context, Html, Properties};
+<span class="kw">use </span>yew::{html, Callback, Component, Context, Html, Properties};
 
 <span class="kw">pub struct </span>ImagesList;
+
+<span class="kw">pub enum </span>Msg {
+    AddImage,
+}
 
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
 </span><span class="kw">pub struct </span>Props {
     <span class="kw">pub </span>images: Vec&lt;AnnotationsJS&gt;,
+    <span class="kw">pub </span>current: usize,
+    <span class="kw">pub </span>onaddimage: Callback&lt;()&gt;,
+    <span class="kw">pub </span>onimageselected: Callback&lt;usize&gt;,
+}
+
+<span class="kw">impl </span>ImagesList {
+    <span class="kw">fn </span>create_image_element(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        index: usize,
+        annotations: <span class="kw-2">&amp;</span>AnnotationsJS,
+        current: usize,
+        onclick: Callback&lt;usize&gt;,
+    ) -&gt; Html {
+        <span class="kw">let </span>border = <span class="kw">if </span>index == current {
+            <span class="string">&quot;border border-primary&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot;&quot;
+        </span>};
+        <span class="macro">html! </span>{&lt;li class=<span class="string">&quot;list-group-item&quot;</span>&gt;
+        &lt;div key={<span class="macro">format!</span>(<span class="string">&quot;annotations-{}&quot;</span>,index)} class={border} onclick={ <span class="kw">move </span>|<span class="kw">_</span>|{ onclick.emit(index); }}&gt;
+        &lt;img src={image_to_base64_image(<span class="kw-2">&amp;</span>annotations.get_image())} width={<span class="number">32</span>} height={<span class="number">32</span>} /&gt;
+        { <span class="macro">format!</span>(<span class="string">&quot;count: {}&quot;</span>,annotations.len()) }
+        &lt;/div&gt;&lt;/li&gt;}
+    }
 }
 
 <span class="kw">impl </span>Component <span class="kw">for </span>ImagesList {
-    <span class="kw">type </span>Message = ();
+    <span class="kw">type </span>Message = Msg;
     <span class="kw">type </span>Properties = Props;
 
     <span class="kw">fn </span>create(_ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self
     </span>}
 
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;, msg: <span class="self">Self</span>::Message) -&gt; bool {
+        <span class="kw">match </span>msg {
+            Msg::AddImage =&gt; {
+                ctx.props().onaddimage.emit(());
+                <span class="bool-val">true
+            </span>}
+        }
+    }
+
     <span class="kw">fn </span>view(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;) -&gt; Html {
+        <span class="kw">let </span>on_add_image = ctx.link().callback(|<span class="kw">_</span>| Msg::AddImage);
+        <span class="kw">let </span>current = ctx.props().current;
         <span class="macro">html! </span>{
             &lt;div class=<span class="string">&quot;card&quot; </span>style=<span class="string">&quot;width: 18rem;&quot;</span>&gt;
             &lt;ul class=<span class="string">&quot;list-group list-group-flush&quot;</span>&gt;
+            &lt;li class=<span class="string">&quot;list-group-item&quot;</span>&gt;
+                &lt;button <span class="kw">type</span>=<span class="string">&quot;button&quot; </span>class=<span class="string">&quot;btn btn-success&quot; </span>onclick={on_add_image}&gt;
+                    { <span class="string">&quot;Add Image&quot; </span>}
+                &lt;/button&gt;
+            &lt;/li&gt;
             {
-                ctx.props().images.clone().into_iter().enumerate().map(|(i, annotations)| {
-                    <span class="macro">html!</span>{&lt;div key={<span class="macro">format!</span>(<span class="string">&quot;annotations-{}&quot;</span>,i)}&gt;
-                    &lt;img src={image_to_base64_image(<span class="kw-2">&amp;</span>annotations.get_image())} width={<span class="number">32</span>} height={<span class="number">32</span>} /&gt;
-                    { <span class="macro">format!</span>(<span class="string">&quot;count: {}&quot;</span>,annotations.len()) }
-                    &lt;/div&gt;}
+                ctx.props().images.clone().iter().enumerate().map(|(i, annotations)| {
+                    <span class="self">self</span>.create_image_element(i, annotations, current, ctx.props().onimageselected.clone())
                 }).collect::&lt;Html&gt;()
             }
             &lt;/ul&gt;

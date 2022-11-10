@@ -155,7 +155,24 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
+<span class="kw">use </span><span class="kw">super</span>::annotations_js::AnnotationsJS;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::BBox;
 <span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span>std::path::Path;
@@ -174,6 +191,8 @@
     ImageChanged((String, Vec&lt;u8&gt;)),
     AnnotationsChanged((String, Vec&lt;u8&gt;)),
     NewAnnotation(Annotation),
+    AddImage(),
+    ImageSelected(usize),
 }
 
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
@@ -273,6 +292,17 @@
                 ctx.props().images.add_annotation(<span class="self">self</span>.current, annotation);
                 <span class="bool-val">true
             </span>}
+            Msg::AddImage() =&gt; {
+                <span class="kw">let </span>img = image::DynamicImage::new_rgb8(<span class="number">1</span>, <span class="number">1</span>);
+                <span class="kw">let </span>annotations = AnnotationsJS::new();
+                annotations.set_image(img);
+                ctx.props().images.push(annotations);
+                <span class="bool-val">true
+            </span>}
+            Msg::ImageSelected(index) =&gt; {
+                <span class="self">self</span>.current = index;
+                <span class="bool-val">true
+            </span>}
         }
     }
 
@@ -290,6 +320,8 @@
         <span class="kw">let </span>on_new_annotation = ctx
             .link()
             .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
+        <span class="kw">let </span>on_add_image = ctx.link().callback(|()| Msg::AddImage());
+        <span class="kw">let </span>on_image_selected = ctx.link().callback(|index| Msg::ImageSelected(index));
         <span class="kw">let </span>images = ctx.props().images.inner().lock().unwrap().clone();
         <span class="kw">let </span>(image, annotations) = {
             <span class="kw">let </span>images = ctx.props().images.inner();
@@ -307,7 +339,7 @@
             &lt;upload_annotations::UploadAnnotations onchange={on_annotations_change}/&gt;
             &lt;labels::Labels onchange={ on_label_change } label={ label.clone()} /&gt;
             &lt;editor::Editor {label} filename={<span class="self">self</span>.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/&gt;
-            &lt;images_list::ImagesList {images} /&gt;
+            &lt;images_list::ImagesList {images} onaddimage={on_add_image} current={<span class="self">self</span>.current} onimageselected={on_image_selected} /&gt;
             &lt;/&gt;
         }
     }
