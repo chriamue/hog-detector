@@ -1,4 +1,5 @@
 use super::annotated_images_js::AnnotatedImagesJS;
+use super::annotations_js::AnnotationsJS;
 use crate::prelude::BBox;
 use crate::Annotation;
 use std::path::Path;
@@ -17,6 +18,8 @@ pub enum Msg {
     ImageChanged((String, Vec<u8>)),
     AnnotationsChanged((String, Vec<u8>)),
     NewAnnotation(Annotation),
+    AddImage(),
+    ImageSelected(usize),
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -116,6 +119,17 @@ impl Component for App {
                 ctx.props().images.add_annotation(self.current, annotation);
                 true
             }
+            Msg::AddImage() => {
+                let img = image::DynamicImage::new_rgb8(1, 1);
+                let annotations = AnnotationsJS::new();
+                annotations.set_image(img);
+                ctx.props().images.push(annotations);
+                true
+            }
+            Msg::ImageSelected(index) => {
+                self.current = index;
+                true
+            }
         }
     }
 
@@ -133,6 +147,8 @@ impl Component for App {
         let on_new_annotation = ctx
             .link()
             .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
+        let on_add_image = ctx.link().callback(|()| Msg::AddImage());
+        let on_image_selected = ctx.link().callback(|index| Msg::ImageSelected(index));
         let images = ctx.props().images.inner().lock().unwrap().clone();
         let (image, annotations) = {
             let images = ctx.props().images.inner();
@@ -150,7 +166,7 @@ impl Component for App {
             <upload_annotations::UploadAnnotations onchange={on_annotations_change}/>
             <labels::Labels onchange={ on_label_change } label={ label.clone()} />
             <editor::Editor {label} filename={self.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/>
-            <images_list::ImagesList {images} />
+            <images_list::ImagesList {images} onaddimage={on_add_image} current={self.current} onimageselected={on_image_selected} />
             </>
         }
     }
