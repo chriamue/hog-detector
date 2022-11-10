@@ -68,7 +68,7 @@
       var img = document.getElementById("img");
       var processCheckbox = document.getElementById("processCheckbox");
       var annotateCheckbox = document.getElementById("annotateCheckbox");
-      var annotations = null;
+      var annotated_images = null;
 
       annotateCheckbox.onclick = function () {
         if (annotateCheckbox.checked) {
@@ -87,17 +87,19 @@
       var processing = false;
 
       import init, {
-        AnnotationsJS,
+        AnnotatedImagesJS,
         HogDetectorJS,
+        init_images,
         init_annotation_tool,
         init_trainer,
       } from "./pkg/hog_detector.js";
       init().then(async () => {
         try {
-          annotations = new AnnotationsJS();
+          annotated_images = new AnnotatedImagesJS();
           detector = new HogDetectorJS();
-          init_annotation_tool(annotation_tool_element, annotations);
-          init_trainer(trainer_element, annotations, detector);
+          await init_images(annotated_images);
+          init_annotation_tool(annotation_tool_element, annotated_images);
+          init_trainer(trainer_element, annotated_images, detector);
         } catch (e) {
           console.error(e);
         }

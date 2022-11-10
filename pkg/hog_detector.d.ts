@@ -1,16 +1,21 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {Element} root
-* @param {AnnotationsJS} annotations
+* @param {AnnotatedImagesJS} images
+* @returns {Promise<void>}
 */
-export function init_annotation_tool(root: Element, annotations: AnnotationsJS): void;
+export function init_images(images: AnnotatedImagesJS): Promise<void>;
 /**
 * @param {Element} root
-* @param {AnnotationsJS} annotations
+* @param {AnnotatedImagesJS} images
+*/
+export function init_annotation_tool(root: Element, images: AnnotatedImagesJS): void;
+/**
+* @param {Element} root
+* @param {AnnotatedImagesJS} images
 * @param {HogDetectorJS} detector
 */
-export function init_trainer(root: Element, annotations: AnnotationsJS, detector: HogDetectorJS): void;
+export function init_trainer(root: Element, images: AnnotatedImagesJS, detector: HogDetectorJS): void;
 /**
 * Handler for `console.log` invocations.
 *
@@ -41,6 +46,14 @@ export function __wbgtest_console_warn(args: Array<any>): void;
 * @param {Array<any>} args
 */
 export function __wbgtest_console_error(args: Array<any>): void;
+/**
+*/
+export class AnnotatedImagesJS {
+  free(): void;
+/**
+*/
+  constructor();
+}
 /**
 */
 export class AnnotationsJS {
@@ -107,11 +120,14 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly __wbg_annotatedimagesjs_free: (a: number) => void;
+  readonly annotatedimagesjs_new: () => number;
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
   readonly hogdetectorjs_new: () => number;
   readonly hogdetectorjs_next: (a: number, b: number, c: number, d: number) => void;
   readonly __wbg_annotationsjs_free: (a: number) => void;
   readonly annotationsjs_new: () => number;
+  readonly init_images: (a: number) => number;
   readonly init_annotation_tool: (a: number, b: number) => void;
   readonly init_trainer: (a: number, b: number, c: number) => void;
   readonly __wbg_wasmbindgentestcontext_free: (a: number) => void;
@@ -126,7 +142,7 @@ export interface InitOutput {
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly _dyn_core__ops__function__Fn__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hfa184ab228663299: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__Fn__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h414f329a3e3e4c69: (a: number, b: number, c: number) => void;
   readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h7539a42c07ba4318: (a: number, b: number, c: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number) => void;
