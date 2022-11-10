@@ -40,7 +40,7 @@
 
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
 </span><span class="kw">pub struct </span>Props {
-    <span class="kw">pub </span>image_annotations: Vec&lt;AnnotationsJS&gt;,
+    <span class="kw">pub </span>images: Vec&lt;AnnotationsJS&gt;,
 }
 
 <span class="kw">impl </span>Component <span class="kw">for </span>ImagesList {
@@ -56,7 +56,7 @@
             &lt;div class=<span class="string">&quot;card&quot; </span>style=<span class="string">&quot;width: 18rem;&quot;</span>&gt;
             &lt;ul class=<span class="string">&quot;list-group list-group-flush&quot;</span>&gt;
             {
-                ctx.props().image_annotations.clone().into_iter().enumerate().map(|(i, annotations)| {
+                ctx.props().images.clone().into_iter().enumerate().map(|(i, annotations)| {
                     <span class="macro">html!</span>{&lt;div key={<span class="macro">format!</span>(<span class="string">&quot;annotations-{}&quot;</span>,i)}&gt;
                     &lt;img src={image_to_base64_image(<span class="kw-2">&amp;</span>annotations.get_image())} width={<span class="number">32</span>} height={<span class="number">32</span>} /&gt;
                     { <span class="macro">format!</span>(<span class="string">&quot;count: {}&quot;</span>,annotations.len()) }

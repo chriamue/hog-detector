@@ -47,7 +47,7 @@
 <span id="47">47</span>
 <span id="48">48</span>
 <span id="49">49</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::AnnotationsJS;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
 <span class="kw">use </span><span class="kw">super</span>::HogDetectorJS;
 <span class="kw">use </span>wasm_bindgen_test::console_log;
 <span class="kw">use </span>yew::prelude::<span class="kw-2">*</span>;
@@ -61,7 +61,7 @@
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
 </span><span class="kw">pub struct </span>Props {
     <span class="kw">pub </span>detector: HogDetectorJS,
-    <span class="kw">pub </span>annotations: AnnotationsJS,
+    <span class="kw">pub </span>images: AnnotatedImagesJS,
 }
 
 <span class="kw">impl </span>Component <span class="kw">for </span>TrainerApp {
@@ -76,10 +76,10 @@
         <span class="kw">match </span>msg {
             Msg::Train =&gt; {
                 <span class="macro">console_log!</span>(<span class="string">&quot;training started...&quot;</span>);
-                <span class="kw">let </span>dataset = ctx.props().annotations.create_dataset();
+                <span class="kw">let </span>dataset = ctx.props().images.create_dataset();
                 ctx.props().detector.train(<span class="kw-2">&amp;</span>dataset);
                 <span class="macro">console_log!</span>(<span class="string">&quot;training done&quot;</span>);
-                <span class="macro">console_log!</span>(<span class="string">&quot;{}&quot;</span>, ctx.props().annotations);
+                <span class="macro">console_log!</span>(<span class="string">&quot;{}&quot;</span>, ctx.props().images);
                 <span class="bool-val">true
             </span>}
         }

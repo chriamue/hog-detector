@@ -134,9 +134,29 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotations_js::AnnotationsJS;
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::BBox;
-<span class="kw">use </span><span class="kw">crate</span>::utils::image_to_base64_image;
 <span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>yew::prelude::<span class="kw-2">*</span>;
@@ -158,15 +178,14 @@
 
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
 </span><span class="kw">pub struct </span>Props {
-    <span class="kw">pub </span>annotations: AnnotationsJS,
+    <span class="kw">pub </span>images: AnnotatedImagesJS,
 }
 
 <span class="kw">pub struct </span>App {
+    current: usize,
     current_label: String,
-    current_image: String,
     current_filename: String,
     labels: Vec&lt;String&gt;,
-    annotations: Vec&lt;Annotation&gt;,
 }
 
 <span class="kw">impl </span>Component <span class="kw">for </span>App {
@@ -175,14 +194,13 @@
 
     <span class="kw">fn </span>create(_ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
+            current: <span class="number">0</span>,
             current_label: <span class="string">&quot;none&quot;</span>.to_string(),
-            current_image: <span class="string">&quot;https://picsum.photos/640/480/&quot;</span>.to_string(),
             current_filename: <span class="string">&quot;Unknown&quot;</span>.to_string(),
             labels: <span class="macro">include_str!</span>(<span class="string">&quot;../../../res/labels.txt&quot;</span>)
                 .split(<span class="string">&quot;\n&quot;</span>)
                 .map(|s| s.to_string())
                 .collect(),
-            annotations: Vec::new(),
         }
     }
 
@@ -194,17 +212,27 @@
             </span>}
             Msg::ImageChanged((filename, data)) =&gt; {
                 <span class="kw">let </span>img = image::load_from_memory(<span class="kw-2">&amp;</span>data).unwrap();
-                <span class="self">self</span>.current_image = image_to_base64_image(<span class="kw-2">&amp;</span>img);
-                <span class="self">self</span>.annotations.clear();
                 <span class="self">self</span>.current_filename = <span class="macro">format!</span>(
                     <span class="string">&quot;{}&quot;</span>,
                     Path::new(<span class="kw-2">&amp;</span>filename).with_extension(<span class="string">&quot;&quot;</span>).to_str().unwrap()
                 );
-                ctx.props().annotations.set_image(img);
+                {
+                    <span class="kw">let </span>images = ctx.props().images.inner();
+                    <span class="kw">let </span><span class="kw-2">mut </span>annotations = images.lock().unwrap();
+                    annotations.get_mut(<span class="self">self</span>.current).unwrap().set_image(img);
+                    annotations.get_mut(<span class="self">self</span>.current).unwrap().clear()
+                };
                 <span class="bool-val">true
             </span>}
             Msg::AnnotationsChanged((<span class="kw">_</span>, data)) =&gt; {
-                <span class="self">self</span>.annotations.clear();
+                ctx.props()
+                    .images
+                    .inner()
+                    .lock()
+                    .unwrap()
+                    .get_mut(<span class="self">self</span>.current)
+                    .unwrap()
+                    .clear();
                 <span class="kw">let </span>data = std::str::from_utf8(<span class="kw-2">&amp;</span>data).unwrap().to_string();
                 <span class="kw">for </span>line <span class="kw">in </span>data.split(<span class="string">&#39;\n&#39;</span>).collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;() {
                     <span class="kw">let </span><span class="kw-2">mut </span>l = line.split(<span class="string">&#39; &#39;</span>);
@@ -229,12 +257,20 @@
                         },
                         class,
                     );
-                    <span class="self">self</span>.annotations.push(annotation);
+                    ctx.props()
+                        .images
+                        .inner()
+                        .lock()
+                        .unwrap()
+                        .get_mut(<span class="self">self</span>.current)
+                        .unwrap()
+                        .get_annotations()
+                        .push(annotation);
                 }
                 <span class="bool-val">true
             </span>}
             Msg::NewAnnotation(annotation) =&gt; {
-                ctx.props().annotations.push(annotation);
+                ctx.props().images.add_annotation(<span class="self">self</span>.current, annotation);
                 <span class="bool-val">true
             </span>}
         }
@@ -254,9 +290,15 @@
         <span class="kw">let </span>on_new_annotation = ctx
             .link()
             .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
-        <span class="kw">let </span>annotation1 = AnnotationsJS::new();
-        <span class="kw">let </span>annotation2 = AnnotationsJS::new();
-        <span class="kw">let </span>image_annotations = <span class="macro">vec!</span>[annotation1, annotation2];
+        <span class="kw">let </span>images = ctx.props().images.inner().lock().unwrap().clone();
+        <span class="kw">let </span>(image, annotations) = {
+            <span class="kw">let </span>images = ctx.props().images.inner();
+            <span class="kw">let </span>image_annotations = images.lock().unwrap();
+            <span class="kw">let </span>image_annotations = image_annotations.get(<span class="self">self</span>.current).unwrap();
+            <span class="kw">let </span>image = image_annotations.get_image().clone();
+            <span class="kw">let </span>annotations = image_annotations.get_annotations();
+            (image, annotations)
+        };
         <span class="macro">html! </span>{
             &lt;&gt;
             &lt;header::Header /&gt;
@@ -264,8 +306,8 @@
             &lt;upload_image::UploadImage onchange={on_image_change.clone()}/&gt;
             &lt;upload_annotations::UploadAnnotations onchange={on_annotations_change}/&gt;
             &lt;labels::Labels onchange={ on_label_change } label={ label.clone()} /&gt;
-            &lt;editor::Editor {label} filename={<span class="self">self</span>.current_filename.to_string()} image={<span class="self">self</span>.current_image.to_string()} annotations={<span class="self">self</span>.annotations.clone()} onchange={on_new_annotation}/&gt;
-            &lt;images_list::ImagesList {image_annotations} /&gt;
+            &lt;editor::Editor {label} filename={<span class="self">self</span>.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/&gt;
+            &lt;images_list::ImagesList {images} /&gt;
             &lt;/&gt;
         }
     }

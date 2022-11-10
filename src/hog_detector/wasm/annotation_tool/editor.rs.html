@@ -181,11 +181,11 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::utils::{base64_image_to_image, image_to_base64_image};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::visualize_detections;
+<span class="kw">use </span><span class="kw">crate</span>::utils::image_to_base64_image;
 <span class="kw">use </span><span class="kw">crate</span>::wasm::download::download_bytes;
 <span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, Annotation, Class};
+<span class="kw">use </span>image::DynamicImage;
 <span class="kw">use </span>yew::{
     events::{DragEvent, MouseEvent},
     html, Callback, Component, Context, Html, Properties,
@@ -208,7 +208,7 @@
 </span><span class="kw">pub struct </span>Props {
     <span class="kw">pub </span>filename: String,
     <span class="kw">pub </span>label: String,
-    <span class="kw">pub </span>image: String,
+    <span class="kw">pub </span>image: DynamicImage,
     <span class="kw">pub </span>annotations: Vec&lt;Annotation&gt;,
     <span class="kw">pub </span>onchange: Callback&lt;Annotation&gt;,
 }
@@ -295,22 +295,18 @@
         <span class="kw">let </span>onmouseup = ctx
             .link()
             .callback(|e: MouseEvent| Msg::MouseUp(e.offset_x(), e.offset_y()));
-        <span class="kw">let </span><span class="kw-2">mut </span>url = ctx.props().image.to_string();
-        <span class="kw">if </span>url.starts_with(<span class="string">&quot;data&quot;</span>) {
-            <span class="kw">let </span>img = base64_image_to_image(<span class="kw-2">&amp;</span>url);
-            <span class="kw">let </span>detections = ctx
-                .props()
-                .annotations
-                .iter()
-                .map(|annotation| Detection {
-                    bbox: annotation.<span class="number">0</span>,
-                    confidence: <span class="number">1.0</span>,
-                    class: annotation.<span class="number">1 </span><span class="kw">as </span>usize,
-                })
-                .collect();
-            <span class="kw">let </span>img = <span class="kw">crate</span>::detector::visualize_detections(<span class="kw-2">&amp;</span>img, <span class="kw-2">&amp;</span>detections);
-            url = image_to_base64_image(<span class="kw-2">&amp;</span>img);
-        };
+        <span class="kw">let </span>detections = ctx
+            .props()
+            .annotations
+            .iter()
+            .map(|annotation| Detection {
+                bbox: annotation.<span class="number">0</span>,
+                confidence: <span class="number">1.0</span>,
+                class: annotation.<span class="number">1 </span><span class="kw">as </span>usize,
+            })
+            .collect();
+        <span class="kw">let </span>img = visualize_detections(<span class="kw-2">&amp;</span>ctx.props().image, <span class="kw-2">&amp;</span>detections);
+        <span class="kw">let </span>url = image_to_base64_image(<span class="kw-2">&amp;</span>img);
 
         <span class="macro">html! </span>{
             &lt;div class=<span class="string">&quot;flex w-screen bg-gray-100&quot; </span>{ ondrop }&gt;

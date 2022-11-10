@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["init_annotation_tool",""],["init_trainer",""]],"mod":[["annotation_tool",""],["annotations_js",""],["download",""],["hogdetector_js",""],["trainer",""]]};
+window.SIDEBAR_ITEMS = {"fn":[["init_annotation_tool",""],["init_images",""],["init_trainer",""]],"mod":[["annotated_images_js",""],["annotation_tool",""],["annotations_js",""],["download",""],["hogdetector_js",""],["trainer",""]]};

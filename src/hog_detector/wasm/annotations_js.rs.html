@@ -88,10 +88,15 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::dataset::{DataSet, MemoryDataSet};
 <span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span>image::DynamicImage;
-<span class="kw">use </span>std::ops::Deref;
 <span class="kw">use </span>std::sync::{Arc, Mutex};
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
@@ -122,8 +127,16 @@
         <span class="self">self</span>.annotations.lock().unwrap().push(annotation);
     }
 
+    <span class="kw">pub fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.annotations.lock().unwrap().clear();
+    }
+
     <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.annotations.lock().unwrap().len()
+    }
+
+    <span class="kw">pub fn </span>get_annotations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Annotation&gt; {
+        <span class="self">self</span>.annotations.lock().unwrap().clone()
     }
 
     <span class="kw">pub fn </span>get_image(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DynamicImage {
@@ -159,9 +172,8 @@
         <span class="kw">if </span>::core::ptr::eq(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>other) {
             <span class="bool-val">true
         </span>} <span class="kw">else </span>{
-            other.annotations.try_lock().unwrap().deref()
-                == <span class="self">self</span>.annotations.try_lock().unwrap().deref()
-        }
+            <span class="bool-val">false
+        </span>}
     }
 }
 
