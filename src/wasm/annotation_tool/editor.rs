@@ -68,6 +68,10 @@ impl Component for Editor {
             }
             Msg::MouseUp(x2, y2) => {
                 let (x1, y1) = self.pos;
+                let x = x1.min(x2);
+                let y = y1.min(y2);
+                let w = (x2 - x1).abs();
+                let h = (y2 - y1).abs();
                 let class = self
                     .labels
                     .iter()
@@ -75,10 +79,10 @@ impl Component for Editor {
                     .unwrap() as Class;
                 ctx.props().onchange.emit((
                     BBox {
-                        x: x1 as f32,
-                        y: y1 as f32,
-                        w: (x2 - x1) as f32,
-                        h: (y2 - y1) as f32,
+                        x: x as f32,
+                        y: y as f32,
+                        w: w as f32,
+                        h: h as f32,
                     },
                     class,
                 ));
