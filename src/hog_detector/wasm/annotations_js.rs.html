@@ -94,6 +94,8 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::dataset::{DataSet, MemoryDataSet};
 <span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span>image::DynamicImage;
@@ -169,11 +171,13 @@
 
 <span class="kw">impl </span>PartialEq <span class="kw">for </span>AnnotationsJS {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="kw">if </span>::core::ptr::eq(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>other) {
-            <span class="bool-val">true
-        </span>} <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
+        ::core::ptr::eq(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>other)
+    }
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>AnnotationsJS {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 

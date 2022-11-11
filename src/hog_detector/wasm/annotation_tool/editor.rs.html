@@ -239,7 +239,7 @@
     <span class="kw">fn </span>create(_ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             labels: <span class="macro">include_str!</span>(<span class="string">&quot;../../../res/labels.txt&quot;</span>)
-                .split(<span class="string">&quot;\n&quot;</span>)
+                .split(<span class="string">&#39;\n&#39;</span>)
                 .map(|s| s.to_string())
                 .collect(),
             pos: (<span class="number">0</span>, <span class="number">0</span>),

@@ -168,9 +168,6 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
 <span class="kw">use </span><span class="kw">super</span>::annotations_js::AnnotationsJS;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::BBox;
@@ -217,7 +214,7 @@
             current_label: <span class="string">&quot;none&quot;</span>.to_string(),
             current_filename: <span class="string">&quot;Unknown&quot;</span>.to_string(),
             labels: <span class="macro">include_str!</span>(<span class="string">&quot;../../../res/labels.txt&quot;</span>)
-                .split(<span class="string">&quot;\n&quot;</span>)
+                .split(<span class="string">&#39;\n&#39;</span>)
                 .map(|s| s.to_string())
                 .collect(),
         }
@@ -231,10 +228,11 @@
             </span>}
             Msg::ImageChanged((filename, data)) =&gt; {
                 <span class="kw">let </span>img = image::load_from_memory(<span class="kw-2">&amp;</span>data).unwrap();
-                <span class="self">self</span>.current_filename = <span class="macro">format!</span>(
-                    <span class="string">&quot;{}&quot;</span>,
-                    Path::new(<span class="kw-2">&amp;</span>filename).with_extension(<span class="string">&quot;&quot;</span>).to_str().unwrap()
-                );
+                <span class="self">self</span>.current_filename = Path::new(<span class="kw-2">&amp;</span>filename)
+                    .with_extension(<span class="string">&quot;&quot;</span>)
+                    .to_str()
+                    .unwrap()
+                    .to_string();
                 {
                     <span class="kw">let </span>images = ctx.props().images.inner();
                     <span class="kw">let </span><span class="kw-2">mut </span>annotations = images.lock().unwrap();
@@ -308,26 +306,22 @@
 
     <span class="kw">fn </span>view(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;) -&gt; Html {
         <span class="kw">let </span>label = <span class="self">self</span>.current_label.clone();
-        <span class="kw">let </span>on_label_change = ctx
-            .link()
-            .callback(|label: String| Msg::LabelChanged(label.to_string()));
+        <span class="kw">let </span>on_label_change = ctx.link().callback(Msg::LabelChanged);
         <span class="kw">let </span>on_image_change = ctx
             .link()
             .callback(|(filename, data): (String, Vec&lt;u8&gt;)| Msg::ImageChanged((filename, data)));
         <span class="kw">let </span>on_annotations_change = ctx.link().callback(|(filename, data): (String, Vec&lt;u8&gt;)| {
             Msg::AnnotationsChanged((filename, data))
         });
-        <span class="kw">let </span>on_new_annotation = ctx
-            .link()
-            .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
+        <span class="kw">let </span>on_new_annotation = ctx.link().callback(Msg::NewAnnotation);
         <span class="kw">let </span>on_add_image = ctx.link().callback(|()| Msg::AddImage());
-        <span class="kw">let </span>on_image_selected = ctx.link().callback(|index| Msg::ImageSelected(index));
+        <span class="kw">let </span>on_image_selected = ctx.link().callback(Msg::ImageSelected);
         <span class="kw">let </span>images = ctx.props().images.inner().lock().unwrap().clone();
         <span class="kw">let </span>(image, annotations) = {
             <span class="kw">let </span>images = ctx.props().images.inner();
             <span class="kw">let </span>image_annotations = images.lock().unwrap();
             <span class="kw">let </span>image_annotations = image_annotations.get(<span class="self">self</span>.current).unwrap();
-            <span class="kw">let </span>image = image_annotations.get_image().clone();
+            <span class="kw">let </span>image = image_annotations.get_image();
             <span class="kw">let </span>annotations = image_annotations.get_annotations();
             (image, annotations)
         };
@@ -335,7 +329,7 @@
             &lt;&gt;
             &lt;header::Header /&gt;
             &lt;use_webcam_image::UseWebcamImage onchange={on_image_change.clone()} /&gt;
-            &lt;upload_image::UploadImage onchange={on_image_change.clone()}/&gt;
+            &lt;upload_image::UploadImage onchange={on_image_change}/&gt;
             &lt;upload_annotations::UploadAnnotations onchange={on_annotations_change}/&gt;
             &lt;labels::Labels onchange={ on_label_change } label={ label.clone()} /&gt;
             &lt;editor::Editor {label} filename={<span class="self">self</span>.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/&gt;

@@ -290,7 +290,7 @@
 }
 
 <span class="doccomment">/// decodes base64 encoded image to dynamic image
-</span><span class="kw">pub fn </span>base64_image_to_image(b64img: <span class="kw-2">&amp;</span>String) -&gt; DynamicImage {
+</span><span class="kw">pub fn </span>base64_image_to_image(b64img: <span class="kw-2">&amp;</span>str) -&gt; DynamicImage {
     <span class="kw">let </span>b64img = b64img.replace(<span class="string">&quot;data:image/png;base64,&quot;</span>, <span class="string">&quot;&quot;</span>);
     <span class="kw">let </span>data = base64::decode(b64img).unwrap();
     image::load_from_memory(<span class="kw-2">&amp;</span>data).unwrap()

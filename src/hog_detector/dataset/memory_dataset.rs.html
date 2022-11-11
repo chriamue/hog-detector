@@ -364,8 +364,8 @@
             test_x.push(x.clone());
         }
         <span class="kw">for </span>y <span class="kw">in </span><span class="self">self</span>.y.iter() {
-            train_y.push(y.clone());
-            test_y.push(y.clone());
+            train_y.push(<span class="kw-2">*</span>y);
+            test_y.push(<span class="kw-2">*</span>y);
         }
         (train_x, train_y, test_x, test_y)
     }

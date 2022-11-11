@@ -95,7 +95,7 @@
     <span class="kw">fn </span>view(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;) -&gt; Html {
         <span class="kw">let </span>input_ref = <span class="self">self</span>.input_ref.clone();
         <span class="kw">let </span>handle_change = {
-            <span class="kw">let </span>input_ref = input_ref.clone();
+            <span class="kw">let </span>input_ref = input_ref;
             <span class="kw">let </span>onchange = ctx.props().onchange.clone();
             Callback::from(<span class="kw">move </span>|<span class="kw">_</span>| {
                 <span class="kw">let </span>input_element = input_ref
@@ -116,7 +116,7 @@
                                     .unwrap();
                             <span class="kw">let </span>file_array_buffer = Uint8Array::new(file_array_buffer.as_ref());
                             <span class="kw">let </span>file_bytes = file_array_buffer.to_vec();
-                            onchange.emit((file.name().to_string(), file_bytes));
+                            onchange.emit((file.name(), file_bytes));
                         }
                     }
                 });

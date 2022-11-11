@@ -73,6 +73,12 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotations_js::AnnotationsJS;
 <span class="kw">use crate</span>::{
     dataset::{DataSet, MemoryDataSet},
@@ -116,6 +122,12 @@
         <span class="kw">let </span><span class="kw-2">mut </span>locked = <span class="self">self</span>.images.lock().unwrap();
         <span class="kw">let </span>annotations = locked.get_mut(index).unwrap();
         annotations.push(annotation);
+    }
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>AnnotatedImagesJS {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 

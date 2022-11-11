@@ -168,8 +168,6 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
 </pre><pre class="rust"><code><span class="comment">// source: https://github.com/12101111/yolo-rs/blob/master/src/yolo.rs
 </span><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span>float_ord::FloatOrd;
@@ -190,15 +188,13 @@
 <span class="kw">impl </span>Detection {
     <span class="doccomment">/// merge other detection into this detection
     </span><span class="kw">pub fn </span>merge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Detection) {
-        <span class="kw">if </span><span class="self">self</span>.class == other.class {
-            <span class="kw">if </span><span class="self">self</span>.bbox.overlay(<span class="kw-2">&amp;</span>other.bbox) &gt; <span class="number">0.0 </span>{
-                <span class="self">self</span>.bbox.w =
-                    <span class="number">0.5 </span>* <span class="self">self</span>.bbox.w + <span class="number">0.5 </span>* other.bbox.w + (<span class="self">self</span>.bbox.x - other.bbox.x).abs();
-                <span class="self">self</span>.bbox.h =
-                    <span class="number">0.5 </span>* <span class="self">self</span>.bbox.h + <span class="number">0.5 </span>* other.bbox.h + (<span class="self">self</span>.bbox.y - other.bbox.y).abs();
-                <span class="self">self</span>.bbox.x = (<span class="self">self</span>.bbox.x + other.bbox.x) / <span class="number">2.0</span>;
-                <span class="self">self</span>.bbox.y = (<span class="self">self</span>.bbox.y + other.bbox.y) / <span class="number">2.0</span>;
-            }
+        <span class="kw">if </span><span class="self">self</span>.class == other.class &amp;&amp; <span class="self">self</span>.bbox.overlay(<span class="kw-2">&amp;</span>other.bbox) &gt; <span class="number">0.0 </span>{
+            <span class="self">self</span>.bbox.w =
+                <span class="number">0.5 </span>* <span class="self">self</span>.bbox.w + <span class="number">0.5 </span>* other.bbox.w + (<span class="self">self</span>.bbox.x - other.bbox.x).abs();
+            <span class="self">self</span>.bbox.h =
+                <span class="number">0.5 </span>* <span class="self">self</span>.bbox.h + <span class="number">0.5 </span>* other.bbox.h + (<span class="self">self</span>.bbox.y - other.bbox.y).abs();
+            <span class="self">self</span>.bbox.x = (<span class="self">self</span>.bbox.x + other.bbox.x) / <span class="number">2.0</span>;
+            <span class="self">self</span>.bbox.y = (<span class="self">self</span>.bbox.y + other.bbox.y) / <span class="number">2.0</span>;
         }
     }
 }
