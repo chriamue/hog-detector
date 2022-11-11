@@ -36,6 +36,7 @@ impl Component for Labels {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
+            <div id="labels">
             <ul class="item-list">
         { self.labels.iter().map(|label| {
 
@@ -52,6 +53,7 @@ impl Component for Labels {
 
         }).collect::<Html>() }
             </ul>
+            </div>
         }
     }
 }

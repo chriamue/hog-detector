@@ -54,8 +54,8 @@ impl Component for UploadAnnotations {
         };
 
         html! {
-            <div class="form-group">
-                <label for="upload-image">{"Upload a labels text file"}</label>
+            <div id="upload-annotations" class="form-group">
+                <label for="upload-image">{"Upload an annotations text file"}</label>
                 <input class="btn btn-success"
                     aria-description="Upload a text file"
                     type="file"

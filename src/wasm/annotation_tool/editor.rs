@@ -130,7 +130,7 @@ impl Component for Editor {
         let url = image_to_base64_image(&img);
 
         html! {
-            <div class="flex w-screen bg-gray-100" { ondrop }>
+            <div id="editor" class="flex w-screen bg-gray-100" { ondrop }>
             <img src={url} {onmousedown} {onmousemove} {onmouseup} />
             <p>
             { format_annotations(&ctx.props().annotations, &self.labels).iter().map(|annotation| {

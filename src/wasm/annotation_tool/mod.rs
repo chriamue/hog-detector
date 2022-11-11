@@ -158,12 +158,16 @@ impl Component for App {
         html! {
             <>
             <header::Header />
+            <div id="data-sources">
             <use_webcam_image::UseWebcamImage onchange={on_image_change.clone()} />
             <upload_image::UploadImage onchange={on_image_change}/>
             <upload_annotations::UploadAnnotations onchange={on_annotations_change}/>
+            </div>
             <labels::Labels onchange={ on_label_change } label={ label.clone()} />
+            <div id="annotation-tool-container">
             <editor::Editor {label} filename={self.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/>
             <images_list::ImagesList {images} onaddimage={on_add_image} current={self.current} onimageselected={on_image_selected} />
+            </div>
             </>
         }
     }

@@ -54,7 +54,7 @@ impl Component for UploadImage {
         };
 
         html! {
-            <div class="form-group">
+            <div id="upload-image" class="form-group">
                 <label for="upload-image">{"Upload an image file"}</label>
                 <input id="upload-image" class="btn btn-success"
                     aria-description="Upload an image file"

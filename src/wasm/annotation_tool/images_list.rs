@@ -31,7 +31,7 @@ impl ImagesList {
         html! {<li class="list-group-item">
         <div key={format!("annotations-{}",index)} class={border} onclick={ move |_|{ onclick.emit(index); }}>
         <img src={image_to_base64_image(&annotations.get_image())} width={32} height={32} />
-        { format!("count: {}",annotations.len()) }
+        { format!(" annotations: {}",annotations.len()) }
         </div></li>}
     }
 }
@@ -57,7 +57,7 @@ impl Component for ImagesList {
         let on_add_image = ctx.link().callback(|_| Msg::AddImage);
         let current = ctx.props().current;
         html! {
-            <div class="card" style="width: 18rem;">
+            <div id="images-list" class="card" style="width: 18rem;">
             <ul class="list-group list-group-flush">
             <li class="list-group-item">
                 <button type="button" class="btn btn-success" onclick={on_add_image}>

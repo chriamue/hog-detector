@@ -70,11 +70,11 @@ impl Component for UseWebcamImage {
         let onclick = ctx.link().callback(|_| Msg::GetWebcamImage);
 
         html! {
-            <>
+            <div id="use-webcam-image">
                 <button type="button" class="btn btn-success" {onclick}>
                     { "Get Webcam Image" }
                 </button>
-            </>
+            </div>
         }
     }
 }
