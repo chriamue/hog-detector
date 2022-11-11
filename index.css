@@ -1,0 +1,65 @@
+#container {
+    margin: 0px auto;
+    border: 1rem #333 solid;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#videoElement {
+    visibility: hidden;
+    width: 1px;
+    height: 1px;
+    background-color: #666;
+}
+
+#canvas {
+    background-color: #666;
+}
+
+#annotation-tool {
+    padding: 2rem;
+    border: 0.5rem #333 solid;
+}
+#images-list {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+#header {
+    text-align: center;
+}
+#annotation-tool-container {
+    margin: auto;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+}
+#use-webcam-image {
+    margin: auto 2rem;
+}
+#data-sources {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 1rem;
+}
+
+#labels {
+    margin: auto;
+    align-items: center;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#labels button {
+    margin: 2px;
+}
+
+#editor {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#trainer {
+    margin: 2rem;
+}
