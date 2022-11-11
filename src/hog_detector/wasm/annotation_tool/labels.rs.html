@@ -55,6 +55,8 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Msg;
 <span class="kw">use </span>yew::{html, Callback, Component, Context, Html, Properties};
 
@@ -93,6 +95,7 @@
 
     <span class="kw">fn </span>view(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;) -&gt; Html {
         <span class="macro">html! </span>{
+            &lt;div id=<span class="string">&quot;labels&quot;</span>&gt;
             &lt;ul class=<span class="string">&quot;item-list&quot;</span>&gt;
         { <span class="self">self</span>.labels.iter().map(|label| {
 
@@ -109,6 +112,7 @@
 
         }).collect::&lt;Html&gt;() }
             &lt;/ul&gt;
+            &lt;/div&gt;
         }
     }
 }

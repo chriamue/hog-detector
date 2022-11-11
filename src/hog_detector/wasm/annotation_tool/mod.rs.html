@@ -168,6 +168,10 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
 <span class="kw">use </span><span class="kw">super</span>::annotations_js::AnnotationsJS;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::BBox;
@@ -328,12 +332,16 @@
         <span class="macro">html! </span>{
             &lt;&gt;
             &lt;header::Header /&gt;
+            &lt;div id=<span class="string">&quot;data-sources&quot;</span>&gt;
             &lt;use_webcam_image::UseWebcamImage onchange={on_image_change.clone()} /&gt;
             &lt;upload_image::UploadImage onchange={on_image_change}/&gt;
             &lt;upload_annotations::UploadAnnotations onchange={on_annotations_change}/&gt;
+            &lt;/div&gt;
             &lt;labels::Labels onchange={ on_label_change } label={ label.clone()} /&gt;
+            &lt;div id=<span class="string">&quot;annotation-tool-container&quot;</span>&gt;
             &lt;editor::Editor {label} filename={<span class="self">self</span>.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/&gt;
             &lt;images_list::ImagesList {images} onaddimage={on_add_image} current={<span class="self">self</span>.current} onimageselected={on_image_selected} /&gt;
+            &lt;/div&gt;
             &lt;/&gt;
         }
     }

@@ -317,7 +317,7 @@
         <span class="kw">let </span>url = image_to_base64_image(<span class="kw-2">&amp;</span>img);
 
         <span class="macro">html! </span>{
-            &lt;div class=<span class="string">&quot;flex w-screen bg-gray-100&quot; </span>{ ondrop }&gt;
+            &lt;div id=<span class="string">&quot;editor&quot; </span>class=<span class="string">&quot;flex w-screen bg-gray-100&quot; </span>{ ondrop }&gt;
             &lt;img src={url} {onmousedown} {onmousemove} {onmouseup} /&gt;
             &lt;p&gt;
             { format_annotations(<span class="kw-2">&amp;</span>ctx.props().annotations, <span class="kw-2">&amp;</span><span class="self">self</span>.labels).iter().map(|annotation| {
