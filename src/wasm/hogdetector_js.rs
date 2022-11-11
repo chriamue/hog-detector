@@ -28,7 +28,7 @@ impl HogDetectorJS {
 
         let hog = {
             let model = include_str!("../../res/eyes_model.json");
-            serde_json::from_str::<HogDetector>(&model).unwrap()
+            serde_json::from_str::<HogDetector>(model).unwrap()
         };
 
         HogDetectorJS {
@@ -41,7 +41,7 @@ impl HogDetectorJS {
         let mut img =
             image::load_from_memory_with_format(img_data, image::ImageFormat::Png).unwrap();
 
-        img = self.hog.lock().unwrap().visualize_detections(&mut img);
+        img = self.hog.lock().unwrap().visualize_detections(&img);
 
         let mut image_data: Vec<u8> = Vec::new();
         img.write_to(
@@ -60,5 +60,11 @@ impl PartialEq for HogDetectorJS {
         } else {
             other.hog.try_lock().unwrap().deref() == self.hog.try_lock().unwrap().deref()
         }
+    }
+}
+
+impl Default for HogDetectorJS {
+    fn default() -> Self {
+        Self::new()
     }
 }

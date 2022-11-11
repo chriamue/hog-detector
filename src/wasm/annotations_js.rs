@@ -73,11 +73,13 @@ impl std::fmt::Display for AnnotationsJS {
 
 impl PartialEq for AnnotationsJS {
     fn eq(&self, other: &Self) -> bool {
-        if ::core::ptr::eq(&self, &other) {
-            true
-        } else {
-            false
-        }
+        ::core::ptr::eq(&self, &other)
+    }
+}
+
+impl Default for AnnotationsJS {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

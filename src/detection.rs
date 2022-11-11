@@ -18,15 +18,13 @@ const NMS_THRESH: f32 = 0.45;
 impl Detection {
     /// merge other detection into this detection
     pub fn merge(&mut self, other: &Detection) {
-        if self.class == other.class {
-            if self.bbox.overlay(&other.bbox) > 0.0 {
-                self.bbox.w =
-                    0.5 * self.bbox.w + 0.5 * other.bbox.w + (self.bbox.x - other.bbox.x).abs();
-                self.bbox.h =
-                    0.5 * self.bbox.h + 0.5 * other.bbox.h + (self.bbox.y - other.bbox.y).abs();
-                self.bbox.x = (self.bbox.x + other.bbox.x) / 2.0;
-                self.bbox.y = (self.bbox.y + other.bbox.y) / 2.0;
-            }
+        if self.class == other.class && self.bbox.overlay(&other.bbox) > 0.0 {
+            self.bbox.w =
+                0.5 * self.bbox.w + 0.5 * other.bbox.w + (self.bbox.x - other.bbox.x).abs();
+            self.bbox.h =
+                0.5 * self.bbox.h + 0.5 * other.bbox.h + (self.bbox.y - other.bbox.y).abs();
+            self.bbox.x = (self.bbox.x + other.bbox.x) / 2.0;
+            self.bbox.y = (self.bbox.y + other.bbox.y) / 2.0;
         }
     }
 }

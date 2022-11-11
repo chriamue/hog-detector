@@ -50,8 +50,8 @@ impl Component for UseWebcamImage {
                     .unwrap();
                 let img = context
                     .get_image_data(
-                        0.0 as f64,
-                        0.0 as f64,
+                        0.0_f64,
+                        0.0_f64,
                         canvas.width() as f64,
                         canvas.height() as f64,
                     )

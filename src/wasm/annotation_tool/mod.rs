@@ -44,7 +44,7 @@ impl Component for App {
             current_label: "none".to_string(),
             current_filename: "Unknown".to_string(),
             labels: include_str!("../../../res/labels.txt")
-                .split("\n")
+                .split('\n')
                 .map(|s| s.to_string())
                 .collect(),
         }
@@ -58,10 +58,11 @@ impl Component for App {
             }
             Msg::ImageChanged((filename, data)) => {
                 let img = image::load_from_memory(&data).unwrap();
-                self.current_filename = format!(
-                    "{}",
-                    Path::new(&filename).with_extension("").to_str().unwrap()
-                );
+                self.current_filename = Path::new(&filename)
+                    .with_extension("")
+                    .to_str()
+                    .unwrap()
+                    .to_string();
                 {
                     let images = ctx.props().images.inner();
                     let mut annotations = images.lock().unwrap();
@@ -135,26 +136,22 @@ impl Component for App {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let label = self.current_label.clone();
-        let on_label_change = ctx
-            .link()
-            .callback(|label: String| Msg::LabelChanged(label.to_string()));
+        let on_label_change = ctx.link().callback(Msg::LabelChanged);
         let on_image_change = ctx
             .link()
             .callback(|(filename, data): (String, Vec<u8>)| Msg::ImageChanged((filename, data)));
         let on_annotations_change = ctx.link().callback(|(filename, data): (String, Vec<u8>)| {
             Msg::AnnotationsChanged((filename, data))
         });
-        let on_new_annotation = ctx
-            .link()
-            .callback(|annotation: Annotation| Msg::NewAnnotation(annotation));
+        let on_new_annotation = ctx.link().callback(Msg::NewAnnotation);
         let on_add_image = ctx.link().callback(|()| Msg::AddImage());
-        let on_image_selected = ctx.link().callback(|index| Msg::ImageSelected(index));
+        let on_image_selected = ctx.link().callback(Msg::ImageSelected);
         let images = ctx.props().images.inner().lock().unwrap().clone();
         let (image, annotations) = {
             let images = ctx.props().images.inner();
             let image_annotations = images.lock().unwrap();
             let image_annotations = image_annotations.get(self.current).unwrap();
-            let image = image_annotations.get_image().clone();
+            let image = image_annotations.get_image();
             let annotations = image_annotations.get_annotations();
             (image, annotations)
         };
@@ -162,7 +159,7 @@ impl Component for App {
             <>
             <header::Header />
             <use_webcam_image::UseWebcamImage onchange={on_image_change.clone()} />
-            <upload_image::UploadImage onchange={on_image_change.clone()}/>
+            <upload_image::UploadImage onchange={on_image_change}/>
             <upload_annotations::UploadAnnotations onchange={on_annotations_change}/>
             <labels::Labels onchange={ on_label_change } label={ label.clone()} />
             <editor::Editor {label} filename={self.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/>

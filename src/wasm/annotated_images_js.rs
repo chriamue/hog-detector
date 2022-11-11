@@ -44,6 +44,12 @@ impl AnnotatedImagesJS {
     }
 }
 
+impl Default for AnnotatedImagesJS {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[wasm_bindgen]
 impl AnnotatedImagesJS {
     #[wasm_bindgen(constructor)]

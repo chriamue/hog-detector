@@ -144,8 +144,8 @@ impl DataSet for MemoryDataSet {
             test_x.push(x.clone());
         }
         for y in self.y.iter() {
-            train_y.push(y.clone());
-            test_y.push(y.clone());
+            train_y.push(*y);
+            test_y.push(*y);
         }
         (train_x, train_y, test_x, test_y)
     }

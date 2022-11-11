@@ -18,7 +18,7 @@ impl Component for Labels {
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
             labels: include_str!("../../../res/labels.txt")
-                .split("\n")
+                .split('\n')
                 .map(|s| s.to_string())
                 .collect(),
         }
@@ -27,7 +27,7 @@ impl Component for Labels {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::LabelChanged(label) => {
-                ctx.props().onchange.emit(label.clone());
+                ctx.props().onchange.emit(label);
                 true
             }
             _ => false,
@@ -41,9 +41,13 @@ impl Component for Labels {
 
             let l = label.clone();
             if l == ctx.props().label {
-                html!{<button type="button" class="btn btn-primary" onclick={ctx.link().callback(move |_| Msg::LabelChanged(l.clone()))}>{ format!("{}",label) }</button>}
+                html!{<button type="button" class="btn btn-primary" onclick={
+                    ctx.link().callback(move |_| Msg::LabelChanged(l.clone()))
+                }>{ label.to_string() }</button>}
             } else {
-                html!{<button type="button" class="btn btn-secondary" onclick={ctx.link().callback(move |_| Msg::LabelChanged(l.clone()))}>{ format!("{}",label) }</button>}
+                html!{<button type="button" class="btn btn-secondary" onclick={
+                    ctx.link().callback(move |_| Msg::LabelChanged(l.clone()))
+                }>{ label.to_string() }</button>}
             }
 
         }).collect::<Html>() }

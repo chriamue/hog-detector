@@ -116,7 +116,7 @@ pub fn image_to_base64_image(img: &DynamicImage) -> String {
 }
 
 /// decodes base64 encoded image to dynamic image
-pub fn base64_image_to_image(b64img: &String) -> DynamicImage {
+pub fn base64_image_to_image(b64img: &str) -> DynamicImage {
     let b64img = b64img.replace("data:image/png;base64,", "");
     let data = base64::decode(b64img).unwrap();
     image::load_from_memory(&data).unwrap()

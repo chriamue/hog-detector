@@ -25,7 +25,7 @@ impl Component for UploadAnnotations {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let input_ref = self.input_ref.clone();
         let handle_change = {
-            let input_ref = input_ref.clone();
+            let input_ref = input_ref;
             let onchange = ctx.props().onchange.clone();
             Callback::from(move |_| {
                 let input_element = input_ref
@@ -46,7 +46,7 @@ impl Component for UploadAnnotations {
                                     .unwrap();
                             let file_array_buffer = Uint8Array::new(file_array_buffer.as_ref());
                             let file_bytes = file_array_buffer.to_vec();
-                            onchange.emit((file.name().to_string(), file_bytes));
+                            onchange.emit((file.name(), file_bytes));
                         }
                     }
                 });

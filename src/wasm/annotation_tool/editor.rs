@@ -52,7 +52,7 @@ impl Component for Editor {
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
             labels: include_str!("../../../res/labels.txt")
-                .split("\n")
+                .split('\n')
                 .map(|s| s.to_string())
                 .collect(),
             pos: (0, 0),
