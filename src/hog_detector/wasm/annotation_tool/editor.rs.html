@@ -181,6 +181,10 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::visualize_detections;
 <span class="kw">use </span><span class="kw">crate</span>::utils::image_to_base64_image;
 <span class="kw">use </span><span class="kw">crate</span>::wasm::download::download_bytes;
@@ -251,6 +255,10 @@
             </span>}
             Msg::MouseUp(x2, y2) =&gt; {
                 <span class="kw">let </span>(x1, y1) = <span class="self">self</span>.pos;
+                <span class="kw">let </span>x = x1.min(x2);
+                <span class="kw">let </span>y = y1.min(y2);
+                <span class="kw">let </span>w = (x2 - x1).abs();
+                <span class="kw">let </span>h = (y2 - y1).abs();
                 <span class="kw">let </span>class = <span class="self">self
                     </span>.labels
                     .iter()
@@ -258,10 +266,10 @@
                     .unwrap() <span class="kw">as </span>Class;
                 ctx.props().onchange.emit((
                     BBox {
-                        x: x1 <span class="kw">as </span>f32,
-                        y: y1 <span class="kw">as </span>f32,
-                        w: (x2 - x1) <span class="kw">as </span>f32,
-                        h: (y2 - y1) <span class="kw">as </span>f32,
+                        x: x <span class="kw">as </span>f32,
+                        y: y <span class="kw">as </span>f32,
+                        w: w <span class="kw">as </span>f32,
+                        h: h <span class="kw">as </span>f32,
                     },
                     class,
                 ));
