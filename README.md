@@ -2,6 +2,7 @@
 
 [![Github Repo](https://img.shields.io/badge/github-repo-green)](https://github.com/chriamue/hog-detector/)
 [![Github Pages Build](https://github.com/chriamue/hog-detector/actions/workflows/gh-pages.yml/badge.svg)](https://chriamue.github.io/hog-detector/)
+[![Benchmarks](https://github.com/chriamue/hog-detector/actions/workflows/bench.yml/badge.svg)](https://github.com/chriamue/hog-detector/actions/workflows/bench.yml)
 [![Demo](https://img.shields.io/badge/Demo-online-green.svg)](https://chriamue.github.io/hog-detector/)
 [![Doc](https://img.shields.io/badge/Docs-online-green.svg)](https://chriamue.github.io/hog-detector/hog_detector/)
 
@@ -33,6 +34,20 @@ cargo run --features mnist --example mnist
 ```sh
 wasm-pack build --target web
 python3 -m http.server
+```
+
+## run tests
+
+You can run tests
+
+```sh
+cargo test
+```
+
+and you can run benchmarks
+
+```sh
+cargo bench
 ```
 
 ## train data preparation
