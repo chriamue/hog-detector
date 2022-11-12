@@ -55,3 +55,13 @@ web-sys = { version = "0.3.59", features = [
 js-sys = "0.3.55"
 yew = "0.19"
 #reqwest = { version = "0.11", features = ["blocking", "json"] }
+
+[profile.release]
+debug = true
+
+[dev-dependencies]
+criterion = "0.4"
+
+[[bench]]
+name = "benchmark"
+harness = false
