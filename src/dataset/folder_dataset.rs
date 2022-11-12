@@ -285,6 +285,10 @@ mod tests {
         );
         dataset.load(false);
         assert_eq!(dataset.samples(), ANNOTATIONS);
+        let (train_x, train_y, test_x, test_y) = dataset.get();
+        assert_eq!(train_x.len(), ANNOTATIONS);
+        assert_eq!(train_y.len(), ANNOTATIONS);
+        
     }
 
     #[test]
