@@ -23,9 +23,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("scaled_frames 20", |b| {
         b.iter(|| scaled_frames(black_box(32)))
     });
-    c.bench_function("window_crop 20", |b| {
-        b.iter(|| window_crop(black_box(32)))
-    });
+    c.bench_function("window_crop 20", |b| b.iter(|| window_crop(black_box(32))));
 }
 
 criterion_group!(benches, criterion_benchmark);

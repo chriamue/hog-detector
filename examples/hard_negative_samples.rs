@@ -22,6 +22,6 @@ fn main() {
 
     model.train_class(&dataset, 5);
     assert_eq!(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL);
-    dataset.generate_hard_negative_samples(&model, 5);
+    dataset.generate_hard_negative_samples(&model, 5, None);
     assert!(dataset.samples() > ANNOTATIONS * IMAGES_PER_LABEL);
 }

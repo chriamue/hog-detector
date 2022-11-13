@@ -61,6 +61,7 @@ debug = true
 
 [dev-dependencies]
 criterion = "0.4"
+mockall = "0.11.3"
 
 [[bench]]
 name = "benchmark"

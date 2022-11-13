@@ -17,7 +17,7 @@ fn main() {
     model.train_class(&dataset, 5);
     println!("evaluated: {:?} %", model.evaluate(&dataset, 5) * 100.0);
 
-    dataset.generate_hard_negative_samples(&model, 5);
+    dataset.generate_hard_negative_samples(&model, 5, None);
     model.train_class(&dataset, 5);
     println!(
         "evaluated after training with hard negative samples: {:?} %",

@@ -34,7 +34,7 @@ fn main() {
         .save("out/test_visualize_detections_2.png")
         .unwrap();
     model.train_class(&dataset, 5);
-    dataset.generate_hard_negative_samples(&model, 5);
+    dataset.generate_hard_negative_samples(&model, 5, None);
     let webcam10 = image::open("res/training/webcam01.jpg").unwrap();
     model
         .visualize_detections(&webcam10)

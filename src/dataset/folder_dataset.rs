@@ -113,12 +113,21 @@ impl FolderDataSet {
         annotations
     }
 
-    fn get_negative_samples(&self, detector: &dyn Detector, class: u32) -> Vec<(String, RgbImage)> {
+    fn get_negative_samples(
+        &self,
+        detector: &dyn Detector,
+        class: u32,
+        max_images: Option<usize>,
+    ) -> Vec<(String, RgbImage)> {
         let mut annotations = Vec::new();
         let pathes = Self::list_pathes(&self.path);
         let class_label = self.names[class as usize].clone();
+        let pathes: Vec<(String, String)> = match max_images {
+            Some(number) => pathes[0..number].to_vec(),
+            None => pathes,
+        };
         for path in pathes {
-            let file = File::open(path.0).unwrap();
+            let file = File::open(&path.0).unwrap();
             let mut pos_bboxes = Vec::new();
             for line in io::BufReader::new(file).lines() {
                 match line {
@@ -141,11 +150,9 @@ impl FolderDataSet {
                     _ => (),
                 }
             }
-
-            let img_path = path.1;
+            let img_path = &path.1;
             let img = open(img_path.clone()).unwrap();
             let detections = detector.detect_objects(&img);
-
             detections.iter().for_each(|detection| {
                 let mut false_pos = true;
                 pos_bboxes.iter().for_each(|bbox| {
@@ -168,8 +175,13 @@ impl FolderDataSet {
     }
 
     /// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)
-    pub fn generate_hard_negative_samples(&mut self, detector: &dyn Detector, class: u32) {
-        let annotations = self.get_negative_samples(detector, class);
+    pub fn generate_hard_negative_samples(
+        &mut self,
+        detector: &dyn Detector,
+        class: u32,
+        max_images: Option<usize>,
+    ) {
+        let annotations = self.get_negative_samples(detector, class, max_images);
         self.data.extend(annotations);
     }
 
@@ -285,10 +297,9 @@ mod tests {
         );
         dataset.load(false);
         assert_eq!(dataset.samples(), ANNOTATIONS);
-        let (train_x, train_y, test_x, test_y) = dataset.get();
+        let (train_x, train_y, _, _) = dataset.get();
         assert_eq!(train_x.len(), ANNOTATIONS);
         assert_eq!(train_y.len(), ANNOTATIONS);
-        
     }
 
     #[test]
@@ -342,5 +353,44 @@ mod tests {
         );
         dataset.load(true);
         dataset.export("out/export");
+    }
+
+    #[ignore = "takes some seconds"]
+    #[test]
+    fn test_hard_negative_samples() {
+        use crate::prelude::Detection;
+        use mockall::*;
+
+        mock! {
+            HogDetector {}
+            impl Detector for HogDetector {
+                fn detect_objects(&self, image: &image::DynamicImage) -> Vec<crate::prelude::Detection>;
+                fn visualize_detections(&self, image: &image::DynamicImage) -> image::DynamicImage;
+            }
+        }
+
+        let mut model = MockHogDetector::new();
+        model.expect_detect_objects().returning(move |_| {
+            vec![Detection {
+                bbox: BBox {
+                    x: 0.0,
+                    y: 0.0,
+                    w: 32.0,
+                    h: 32.0,
+                },
+                class: 5,
+                confidence: 1.0,
+            }]
+        });
+
+        let mut dataset = FolderDataSet::new(
+            "res/training/".to_string(),
+            "res/labels.txt".to_string(),
+            32,
+        );
+        dataset.load(false);
+        let samples = dataset.samples();
+        dataset.generate_hard_negative_samples(&model, 5, Some(1));
+        assert!(dataset.samples() > samples);
     }
 }
