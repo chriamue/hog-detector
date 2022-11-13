@@ -344,6 +344,56 @@
 <span id="344">344</span>
 <span id="345">345</span>
 <span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span><span class="kw">crate</span>::dataset::DataSet;
 <span class="kw">use </span><span class="kw">crate</span>::utils::{rotated_frames, scaled_frames, window_crop};
@@ -459,12 +509,21 @@
         annotations
     }
 
-    <span class="kw">fn </span>get_negative_samples(<span class="kw-2">&amp;</span><span class="self">self</span>, detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector, class: u32) -&gt; Vec&lt;(String, RgbImage)&gt; {
+    <span class="kw">fn </span>get_negative_samples(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector,
+        class: u32,
+        max_images: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    ) -&gt; Vec&lt;(String, RgbImage)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>annotations = Vec::new();
         <span class="kw">let </span>pathes = <span class="self">Self</span>::list_pathes(<span class="kw-2">&amp;</span><span class="self">self</span>.path);
         <span class="kw">let </span>class_label = <span class="self">self</span>.names[class <span class="kw">as </span>usize].clone();
+        <span class="kw">let </span>pathes: Vec&lt;(String, String)&gt; = <span class="kw">match </span>max_images {
+            <span class="prelude-val">Some</span>(number) =&gt; pathes[<span class="number">0</span>..number].to_vec(),
+            <span class="prelude-val">None </span>=&gt; pathes,
+        };
         <span class="kw">for </span>path <span class="kw">in </span>pathes {
-            <span class="kw">let </span>file = File::open(path.<span class="number">0</span>).unwrap();
+            <span class="kw">let </span>file = File::open(<span class="kw-2">&amp;</span>path.<span class="number">0</span>).unwrap();
             <span class="kw">let </span><span class="kw-2">mut </span>pos_bboxes = Vec::new();
             <span class="kw">for </span>line <span class="kw">in </span>io::BufReader::new(file).lines() {
                 <span class="kw">match </span>line {
@@ -487,11 +546,9 @@
                     <span class="kw">_ </span>=&gt; (),
                 }
             }
-
-            <span class="kw">let </span>img_path = path.<span class="number">1</span>;
+            <span class="kw">let </span>img_path = <span class="kw-2">&amp;</span>path.<span class="number">1</span>;
             <span class="kw">let </span>img = open(img_path.clone()).unwrap();
             <span class="kw">let </span>detections = detector.detect_objects(<span class="kw-2">&amp;</span>img);
-
             detections.iter().for_each(|detection| {
                 <span class="kw">let </span><span class="kw-2">mut </span>false_pos = <span class="bool-val">true</span>;
                 pos_bboxes.iter().for_each(|bbox| {
@@ -514,8 +571,13 @@
     }
 
     <span class="doccomment">/// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)
-    </span><span class="kw">pub fn </span>generate_hard_negative_samples(<span class="kw-2">&amp;mut </span><span class="self">self</span>, detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector, class: u32) {
-        <span class="kw">let </span>annotations = <span class="self">self</span>.get_negative_samples(detector, class);
+    </span><span class="kw">pub fn </span>generate_hard_negative_samples(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector,
+        class: u32,
+        max_images: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    ) {
+        <span class="kw">let </span>annotations = <span class="self">self</span>.get_negative_samples(detector, class, max_images);
         <span class="self">self</span>.data.extend(annotations);
     }
 
@@ -631,10 +693,9 @@
         );
         dataset.load(<span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(dataset.samples(), ANNOTATIONS);
-        <span class="kw">let </span>(train_x, train_y, test_x, test_y) = dataset.get();
+        <span class="kw">let </span>(train_x, train_y, <span class="kw">_</span>, <span class="kw">_</span>) = dataset.get();
         <span class="macro">assert_eq!</span>(train_x.len(), ANNOTATIONS);
         <span class="macro">assert_eq!</span>(train_y.len(), ANNOTATIONS);
-        
     }
 
     <span class="attribute">#[test]
@@ -688,6 +749,45 @@
         );
         dataset.load(<span class="bool-val">true</span>);
         dataset.export(<span class="string">&quot;out/export&quot;</span>);
+    }
+
+    <span class="attribute">#[ignore = <span class="string">&quot;takes some seconds&quot;</span>]
+    #[test]
+    </span><span class="kw">fn </span>test_hard_negative_samples() {
+        <span class="kw">use </span><span class="kw">crate</span>::prelude::Detection;
+        <span class="kw">use </span>mockall::<span class="kw-2">*</span>;
+
+        <span class="macro">mock! </span>{
+            HogDetector {}
+            <span class="kw">impl </span>Detector <span class="kw">for </span>HogDetector {
+                <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>image::DynamicImage) -&gt; Vec&lt;<span class="kw">crate</span>::prelude::Detection&gt;;
+                <span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>image::DynamicImage) -&gt; image::DynamicImage;
+            }
+        }
+
+        <span class="kw">let </span><span class="kw-2">mut </span>model = MockHogDetector::new();
+        model.expect_detect_objects().returning(<span class="kw">move </span>|<span class="kw">_</span>| {
+            <span class="macro">vec!</span>[Detection {
+                bbox: BBox {
+                    x: <span class="number">0.0</span>,
+                    y: <span class="number">0.0</span>,
+                    w: <span class="number">32.0</span>,
+                    h: <span class="number">32.0</span>,
+                },
+                class: <span class="number">5</span>,
+                confidence: <span class="number">1.0</span>,
+            }]
+        });
+
+        <span class="kw">let </span><span class="kw-2">mut </span>dataset = FolderDataSet::new(
+            <span class="string">&quot;res/training/&quot;</span>.to_string(),
+            <span class="string">&quot;res/labels.txt&quot;</span>.to_string(),
+            <span class="number">32</span>,
+        );
+        dataset.load(<span class="bool-val">false</span>);
+        <span class="kw">let </span>samples = dataset.samples();
+        dataset.generate_hard_negative_samples(<span class="kw-2">&amp;</span>model, <span class="number">5</span>, <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        <span class="macro">assert!</span>(dataset.samples() &gt; samples);
     }
 }
 </code></pre></div>
