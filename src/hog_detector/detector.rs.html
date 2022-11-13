@@ -264,7 +264,7 @@
     </span><span class="kw">fn </span>test_detector() {
         <span class="kw">let </span>img = DynamicImage::ImageRgb8(test_image());
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
         <span class="kw">let </span><span class="kw-2">mut </span>detector = HogDetector::default();
         detector.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="kw">let </span>detections = detector.detect_objects(<span class="kw-2">&amp;</span>img);

@@ -216,8 +216,6 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DataSet;
 <span class="kw">use </span><span class="kw">crate</span>::utils::generate_random_subimages;
 <span class="kw">use </span><span class="kw">crate</span>::Annotation;
@@ -307,7 +305,7 @@
 }
 
 <span class="kw">impl </span>DataSet <span class="kw">for </span>MemoryDataSet {
-    <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _augment: bool) {
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.x.clear();
         <span class="self">self</span>.y.clear();
         <span class="kw">for </span>(img, annotations) <span class="kw">in </span><span class="self">self</span>.samples.iter() {
@@ -379,7 +377,7 @@
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_new_test() {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
         <span class="macro">assert_eq!</span>(<span class="number">4</span>, dataset.samples());
     }
 
@@ -397,9 +395,7 @@
         <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
         dataset.add(sample);
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, dataset.samples());
-        dataset.load(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">1</span>, dataset.samples());
-        dataset.load(<span class="bool-val">true</span>);
+        dataset.load();
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, dataset.samples());
     }
 
@@ -409,7 +405,7 @@
         <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
         dataset.add(sample);
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, dataset.samples());
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, dataset.samples());
         dataset.generate_random_annotations(<span class="number">10</span>);
         <span class="macro">assert_eq!</span>(<span class="number">11</span>, dataset.samples());
@@ -429,7 +425,7 @@
         );
         <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[annotation]);
         dataset.add(sample);
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
         <span class="kw">let </span>(train_x, train_y, test_x, test_y) = dataset.get();
         <span class="macro">assert_eq!</span>(train_x.len(), train_y.len());
         <span class="macro">assert_eq!</span>(train_x.len(), test_x.len());

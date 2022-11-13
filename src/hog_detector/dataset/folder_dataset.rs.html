@@ -391,10 +391,8 @@
 <span id="391">391</span>
 <span id="392">392</span>
 <span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
+<span class="kw">use </span><span class="kw">crate</span>::data_augmentation::DataAugmentation;
 <span class="kw">use </span><span class="kw">crate</span>::dataset::DataSet;
 <span class="kw">use </span><span class="kw">crate</span>::utils::{rotated_frames, scaled_frames, window_crop};
 <span class="kw">use </span><span class="kw">crate</span>::Detector;
@@ -461,7 +459,6 @@
     <span class="kw">fn </span>load_annotations(
         pathes: Vec&lt;(String, String)&gt;,
         window_size: u32,
-        augment: bool,
     ) -&gt; Vec&lt;(String, RgbImage)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>annotations = Vec::new();
         <span class="kw">for </span>path <span class="kw">in </span>pathes {
@@ -473,34 +470,13 @@
                         <span class="kw">let </span>label = l.next().unwrap();
                         <span class="kw">let </span>x: u32 = l.next().unwrap().parse().unwrap();
                         <span class="kw">let </span>y: u32 = l.next().unwrap().parse().unwrap();
-                        <span class="kw">match </span>augment {
-                            <span class="bool-val">true </span>=&gt; {
-                                <span class="kw">let </span>annotation = <span class="self">Self</span>::load_annotation(
-                                    path.<span class="number">1</span>.clone(),
-                                    label.to_string(),
-                                    x,
-                                    y,
-                                    window_size,
-                                );
-                                <span class="kw">let </span>frame = annotation.<span class="number">1</span>.clone();
-                                <span class="kw">let </span>frames = std::iter::once(<span class="kw-2">&amp;</span>frame)
-                                    .cloned()
-                                    .chain(rotated_frames(<span class="kw-2">&amp;</span>frame))
-                                    .chain(scaled_frames(<span class="kw-2">&amp;</span>frame));
-                                <span class="kw">let </span>augmented_annotations =
-                                    frames.map(|f| (annotation.<span class="number">0</span>.clone(), f));
-                                annotations.extend(augmented_annotations);
-                            }
-                            <span class="bool-val">false </span>=&gt; {
-                                annotations.push(<span class="self">Self</span>::load_annotation(
-                                    path.<span class="number">1</span>.clone(),
-                                    label.to_string(),
-                                    x,
-                                    y,
-                                    window_size,
-                                ));
-                            }
-                        };
+                        annotations.push(<span class="self">Self</span>::load_annotation(
+                            path.<span class="number">1</span>.clone(),
+                            label.to_string(),
+                            x,
+                            y,
+                            window_size,
+                        ));
                     }
                     <span class="kw">_ </span>=&gt; (),
                 }
@@ -618,9 +594,9 @@
 }
 
 <span class="kw">impl </span>DataSet <span class="kw">for </span>FolderDataSet {
-    <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>, augment: bool) {
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">let </span>pathes = <span class="self">Self</span>::list_pathes(<span class="kw-2">&amp;</span><span class="self">self</span>.path);
-        <span class="kw">let </span>annotations = <span class="self">Self</span>::load_annotations(pathes, <span class="self">self</span>.window_size, augment);
+        <span class="kw">let </span>annotations = <span class="self">Self</span>::load_annotations(pathes, <span class="self">self</span>.window_size);
         <span class="self">self</span>.data = annotations;
     }
 
@@ -660,6 +636,19 @@
     }
 }
 
+<span class="kw">impl </span>DataAugmentation <span class="kw">for </span>FolderDataSet {
+    <span class="kw">fn </span>augment(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>annotations = <span class="macro">vec!</span>[];
+        <span class="kw">for </span>annotation <span class="kw">in </span><span class="self">self</span>.data.iter() {
+            <span class="kw">let </span>frame = annotation.<span class="number">1</span>.clone();
+            <span class="kw">let </span>frames = rotated_frames(<span class="kw-2">&amp;</span>frame).chain(scaled_frames(<span class="kw-2">&amp;</span>frame));
+            <span class="kw">let </span>augmented_annotations = frames.map(|f| (annotation.<span class="number">0</span>.clone(), f));
+            annotations.extend(augmented_annotations);
+        }
+        <span class="self">self</span>.data.extend(annotations);
+    }
+}
+
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
@@ -680,7 +669,7 @@
             <span class="string">&quot;res/training/webcam01.txt&quot;</span>.to_string(),
             <span class="string">&quot;res/training/webcam01.jpg&quot;</span>.to_string(),
         )];
-        <span class="kw">let </span>annotations = FolderDataSet::load_annotations(pathes, <span class="number">28</span>, <span class="bool-val">false</span>);
+        <span class="kw">let </span>annotations = FolderDataSet::load_annotations(pathes, <span class="number">28</span>);
         <span class="macro">assert_eq!</span>(annotations.len(), <span class="number">9</span>);
     }
 
@@ -691,7 +680,7 @@
             <span class="string">&quot;res/labels.txt&quot;</span>.to_string(),
             <span class="number">28</span>,
         );
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
         <span class="macro">assert_eq!</span>(dataset.samples(), ANNOTATIONS);
         <span class="kw">let </span>(train_x, train_y, <span class="kw">_</span>, <span class="kw">_</span>) = dataset.get();
         <span class="macro">assert_eq!</span>(train_x.len(), ANNOTATIONS);
@@ -713,8 +702,11 @@
             <span class="string">&quot;res/labels.txt&quot;</span>.to_string(),
             <span class="number">28</span>,
         );
-        dataset.load(<span class="bool-val">true</span>);
+        <span class="kw">let </span>samples = dataset.samples();
+        dataset.load();
+        dataset.augment();
         <span class="macro">assert_eq!</span>(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL);
+        <span class="macro">assert!</span>(dataset.samples() &gt; samples);
     }
 
     <span class="attribute">#[test]
@@ -734,7 +726,8 @@
             <span class="string">&quot;res/labels.txt&quot;</span>.to_string(),
             <span class="number">28</span>,
         );
-        dataset.load(<span class="bool-val">true</span>);
+        dataset.load();
+        dataset.augment();
         <span class="macro">assert_eq!</span>(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL);
         dataset.generate_random_annotations(<span class="number">1</span>);
         <span class="macro">assert_eq!</span>(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL + <span class="number">4</span>);
@@ -747,7 +740,8 @@
             <span class="string">&quot;res/labels.txt&quot;</span>.to_string(),
             <span class="number">28</span>,
         );
-        dataset.load(<span class="bool-val">true</span>);
+        dataset.load();
+        dataset.augment();
         dataset.export(<span class="string">&quot;out/export&quot;</span>);
     }
 
@@ -784,7 +778,7 @@
             <span class="string">&quot;res/labels.txt&quot;</span>.to_string(),
             <span class="number">32</span>,
         );
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
         <span class="kw">let </span>samples = dataset.samples();
         dataset.generate_hard_negative_samples(<span class="kw-2">&amp;</span>model, <span class="number">5</span>, <span class="prelude-val">Some</span>(<span class="number">1</span>));
         <span class="macro">assert!</span>(dataset.samples() &gt; samples);

@@ -134,7 +134,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::default();
 
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
 
         model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="macro">assert!</span>(model.svc.is_some());
@@ -145,7 +145,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::default();
 
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
 
         model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="macro">assert!</span>(model.svc.is_some());

@@ -46,7 +46,7 @@
 <span class="doccomment">/// trait for a dataset
 </span><span class="kw">pub trait </span>DataSet {
     <span class="doccomment">/// loads the dataset
-    </span><span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>, augment: bool);
+    </span><span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
     <span class="doccomment">/// generates random annotations
     </span><span class="kw">fn </span>generate_random_annotations(<span class="kw-2">&amp;mut </span><span class="self">self</span>, count_each: usize);
     <span class="doccomment">/// number of samples in dataset

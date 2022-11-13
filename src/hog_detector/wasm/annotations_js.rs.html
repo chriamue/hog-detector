@@ -120,7 +120,7 @@
             <span class="self">self</span>.image.lock().unwrap().to_rgb8(),
             <span class="self">self</span>.annotations.lock().unwrap().clone(),
         ));
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
         dataset.generate_random_annotations(<span class="number">10</span>);
         dataset
     }

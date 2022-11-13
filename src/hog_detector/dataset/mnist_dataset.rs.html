@@ -143,7 +143,7 @@
 }
 
 <span class="kw">impl </span>DataSet <span class="kw">for </span>MnistDataSet {
-    <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _augment: bool) {
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.mnist = <span class="prelude-val">Some</span>(
             MnistBuilder::new()
                 .label_format_digit()
@@ -206,7 +206,7 @@
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_default() {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MnistDataSet::default();
-        dataset.load(<span class="bool-val">false</span>);
+        dataset.load();
         <span class="macro">assert_eq!</span>(dataset.samples(), <span class="number">100</span>);
         <span class="macro">assert_eq!</span>(dataset.get().<span class="number">0</span>.len(), dataset.samples());
         <span class="macro">assert_eq!</span>(dataset.get().<span class="number">2</span>.len(), dataset.samples());
