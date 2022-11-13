@@ -36,7 +36,7 @@ fn bw_ndarray2_to_rgb_image(arr: Array2<f32>) -> RgbImage {
 }
 
 impl DataSet for MnistDataSet {
-    fn load(&mut self, _augment: bool) {
+    fn load(&mut self) {
         self.mnist = Some(
             MnistBuilder::new()
                 .label_format_digit()
@@ -99,7 +99,7 @@ mod tests {
     #[test]
     fn test_default() {
         let mut dataset = MnistDataSet::default();
-        dataset.load(false);
+        dataset.load();
         assert_eq!(dataset.samples(), 100);
         assert_eq!(dataset.get().0.len(), dataset.samples());
         assert_eq!(dataset.get().2.len(), dataset.samples());

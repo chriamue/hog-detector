@@ -3,6 +3,8 @@
 
 /// bounding box struct and functions
 pub mod bbox;
+/// data augmentation trait
+pub mod data_augmentation;
 /// functionality for loading train datasets
 pub mod dataset;
 /// detection struct module

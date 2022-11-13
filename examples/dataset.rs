@@ -4,7 +4,10 @@ fn main() {
 }
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
-    use hog_detector::{dataset::FolderDataSet, DataSet, HogDetector, Trainable};
+    use hog_detector::{
+        data_augmentation::DataAugmentation, dataset::FolderDataSet, DataSet, HogDetector,
+        Trainable,
+    };
     let mut model = HogDetector::default();
 
     let mut dataset = FolderDataSet::new(
@@ -12,7 +15,8 @@ fn main() {
         "res/labels.txt".to_string(),
         32,
     );
-    dataset.load(true);
+    dataset.load();
+    dataset.augment();
 
     model.train_class(&dataset, 5);
     println!("evaluated: {:?} %", model.evaluate(&dataset, 5) * 100.0);

@@ -22,7 +22,7 @@ impl AnnotationsJS {
             self.image.lock().unwrap().to_rgb8(),
             self.annotations.lock().unwrap().clone(),
         ));
-        dataset.load(false);
+        dataset.load();
         dataset.generate_random_annotations(10);
         dataset
     }

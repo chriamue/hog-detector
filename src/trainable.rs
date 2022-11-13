@@ -57,7 +57,7 @@ mod tests {
         let mut model = HogDetector::default();
 
         let mut dataset = MemoryDataSet::new_test();
-        dataset.load(false);
+        dataset.load();
 
         model.train_class(&dataset, 1);
         assert!(model.svc.is_some());
@@ -68,7 +68,7 @@ mod tests {
         let mut model = HogDetector::default();
 
         let mut dataset = MemoryDataSet::new_test();
-        dataset.load(false);
+        dataset.load();
 
         model.train_class(&dataset, 1);
         assert!(model.svc.is_some());

@@ -4,6 +4,7 @@ fn main() {
 }
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
+    use hog_detector::data_augmentation::DataAugmentation;
     use hog_detector::dataset::{DataSet, FolderDataSet};
     use hog_detector::HogDetector;
     use hog_detector::Trainable;
@@ -14,7 +15,8 @@ fn main() {
         "res/labels.txt".to_string(),
         32,
     );
-    dataset.load(true);
+    dataset.load();
+    dataset.augment();
 
     model.train_class(&dataset, 5);
     assert!(model.svc.is_some());

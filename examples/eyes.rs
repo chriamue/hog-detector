@@ -10,7 +10,7 @@ fn main() {
 
     let mut dataset = EyesDataSet::default();
     println!("downloading eyes dataset");
-    dataset.load(true);
+    dataset.load();
     println!("training eyes detector model");
     model.train_class(&dataset, 1);
     assert!(model.svc.is_some());

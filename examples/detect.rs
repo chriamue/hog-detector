@@ -15,7 +15,7 @@ fn main() {
         "res/labels.txt".to_string(),
         32,
     );
-    dataset.load(false);
+    dataset.load();
 
     model.train_class(&dataset, 5);
     assert!(model.svc.is_some());

@@ -132,7 +132,7 @@ impl EyesDataSet {
 }
 
 impl DataSet for EyesDataSet {
-    fn load(&mut self, _augment: bool) {
+    fn load(&mut self) {
         self.unzip();
     }
 
@@ -200,7 +200,7 @@ mod tests {
         let mut model = HogDetector::default();
 
         let mut dataset = EyesDataSet::default();
-        dataset.load(false);
+        dataset.load();
         model.train_class(&dataset, 1);
         assert!(model.svc.is_some());
 

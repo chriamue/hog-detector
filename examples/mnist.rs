@@ -10,7 +10,7 @@ fn main() {
     let mut model = HogDetector::default();
 
     let mut dataset = MnistDataSet::default();
-    dataset.load(false);
+    dataset.load();
 
     model.train_class(&dataset, 1);
     assert!(model.svc.is_some());

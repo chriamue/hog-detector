@@ -124,7 +124,7 @@ mod tests {
     fn test_detector() {
         let img = DynamicImage::ImageRgb8(test_image());
         let mut dataset = MemoryDataSet::new_test();
-        dataset.load(false);
+        dataset.load();
         let mut detector = HogDetector::default();
         detector.train_class(&dataset, 1);
         let detections = detector.detect_objects(&img);

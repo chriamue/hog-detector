@@ -13,7 +13,7 @@ mod mnist_dataset;
 /// trait for a dataset
 pub trait DataSet {
     /// loads the dataset
-    fn load(&mut self, augment: bool);
+    fn load(&mut self);
     /// generates random annotations
     fn generate_random_annotations(&mut self, count_each: usize);
     /// number of samples in dataset

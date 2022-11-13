@@ -16,7 +16,7 @@ fn main() {
         "res/labels.txt".to_string(),
         32,
     );
-    dataset.load(false);
+    dataset.load();
     dataset.generate_random_annotations(10);
 
     model.train_class(&dataset, 1);

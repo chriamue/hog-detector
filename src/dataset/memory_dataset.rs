@@ -87,7 +87,7 @@ impl MemoryDataSet {
 }
 
 impl DataSet for MemoryDataSet {
-    fn load(&mut self, _augment: bool) {
+    fn load(&mut self) {
         self.x.clear();
         self.y.clear();
         for (img, annotations) in self.samples.iter() {
@@ -159,7 +159,7 @@ mod tests {
     #[test]
     fn test_new_test() {
         let mut dataset = MemoryDataSet::new_test();
-        dataset.load(false);
+        dataset.load();
         assert_eq!(4, dataset.samples());
     }
 
@@ -177,9 +177,7 @@ mod tests {
         let sample = (test_image(), vec![(BBox::default(), 0)]);
         dataset.add(sample);
         assert_eq!(0, dataset.samples());
-        dataset.load(false);
-        assert_eq!(1, dataset.samples());
-        dataset.load(true);
+        dataset.load();
         assert_eq!(1, dataset.samples());
     }
 
@@ -189,7 +187,7 @@ mod tests {
         let sample = (test_image(), vec![(BBox::default(), 0)]);
         dataset.add(sample);
         assert_eq!(0, dataset.samples());
-        dataset.load(false);
+        dataset.load();
         assert_eq!(1, dataset.samples());
         dataset.generate_random_annotations(10);
         assert_eq!(11, dataset.samples());
@@ -209,7 +207,7 @@ mod tests {
         );
         let sample = (test_image(), vec![annotation]);
         dataset.add(sample);
-        dataset.load(false);
+        dataset.load();
         let (train_x, train_y, test_x, test_y) = dataset.get();
         assert_eq!(train_x.len(), train_y.len());
         assert_eq!(train_x.len(), test_x.len());

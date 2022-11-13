@@ -32,7 +32,7 @@ impl AnnotatedImagesJS {
                 annotations.get_annotations(),
             ));
         }
-        dataset.load(false);
+        dataset.load();
         dataset.generate_random_annotations(10);
         dataset
     }

@@ -1,4 +1,5 @@
 use crate::bbox::BBox;
+use crate::data_augmentation::DataAugmentation;
 use crate::dataset::DataSet;
 use crate::utils::{rotated_frames, scaled_frames, window_crop};
 use crate::Detector;
@@ -65,7 +66,6 @@ impl FolderDataSet {
     fn load_annotations(
         pathes: Vec<(String, String)>,
         window_size: u32,
-        augment: bool,
     ) -> Vec<(String, RgbImage)> {
         let mut annotations = Vec::new();
         for path in pathes {
@@ -77,34 +77,13 @@ impl FolderDataSet {
                         let label = l.next().unwrap();
                         let x: u32 = l.next().unwrap().parse().unwrap();
                         let y: u32 = l.next().unwrap().parse().unwrap();
-                        match augment {
-                            true => {
-                                let annotation = Self::load_annotation(
-                                    path.1.clone(),
-                                    label.to_string(),
-                                    x,
-                                    y,
-                                    window_size,
-                                );
-                                let frame = annotation.1.clone();
-                                let frames = std::iter::once(&frame)
-                                    .cloned()
-                                    .chain(rotated_frames(&frame))
-                                    .chain(scaled_frames(&frame));
-                                let augmented_annotations =
-                                    frames.map(|f| (annotation.0.clone(), f));
-                                annotations.extend(augmented_annotations);
-                            }
-                            false => {
-                                annotations.push(Self::load_annotation(
-                                    path.1.clone(),
-                                    label.to_string(),
-                                    x,
-                                    y,
-                                    window_size,
-                                ));
-                            }
-                        };
+                        annotations.push(Self::load_annotation(
+                            path.1.clone(),
+                            label.to_string(),
+                            x,
+                            y,
+                            window_size,
+                        ));
                     }
                     _ => (),
                 }
@@ -222,9 +201,9 @@ impl FolderDataSet {
 }
 
 impl DataSet for FolderDataSet {
-    fn load(&mut self, augment: bool) {
+    fn load(&mut self) {
         let pathes = Self::list_pathes(&self.path);
-        let annotations = Self::load_annotations(pathes, self.window_size, augment);
+        let annotations = Self::load_annotations(pathes, self.window_size);
         self.data = annotations;
     }
 
@@ -264,6 +243,19 @@ impl DataSet for FolderDataSet {
     }
 }
 
+impl DataAugmentation for FolderDataSet {
+    fn augment(&mut self) {
+        let mut annotations = vec![];
+        for annotation in self.data.iter() {
+            let frame = annotation.1.clone();
+            let frames = rotated_frames(&frame).chain(scaled_frames(&frame));
+            let augmented_annotations = frames.map(|f| (annotation.0.clone(), f));
+            annotations.extend(augmented_annotations);
+        }
+        self.data.extend(annotations);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -284,7 +276,7 @@ mod tests {
             "res/training/webcam01.txt".to_string(),
             "res/training/webcam01.jpg".to_string(),
         )];
-        let annotations = FolderDataSet::load_annotations(pathes, 28, false);
+        let annotations = FolderDataSet::load_annotations(pathes, 28);
         assert_eq!(annotations.len(), 9);
     }
 
@@ -295,7 +287,7 @@ mod tests {
             "res/labels.txt".to_string(),
             28,
         );
-        dataset.load(false);
+        dataset.load();
         assert_eq!(dataset.samples(), ANNOTATIONS);
         let (train_x, train_y, _, _) = dataset.get();
         assert_eq!(train_x.len(), ANNOTATIONS);
@@ -317,8 +309,11 @@ mod tests {
             "res/labels.txt".to_string(),
             28,
         );
-        dataset.load(true);
+        let samples = dataset.samples();
+        dataset.load();
+        dataset.augment();
         assert_eq!(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL);
+        assert!(dataset.samples() > samples);
     }
 
     #[test]
@@ -338,7 +333,8 @@ mod tests {
             "res/labels.txt".to_string(),
             28,
         );
-        dataset.load(true);
+        dataset.load();
+        dataset.augment();
         assert_eq!(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL);
         dataset.generate_random_annotations(1);
         assert_eq!(dataset.samples(), ANNOTATIONS * IMAGES_PER_LABEL + 4);
@@ -351,7 +347,8 @@ mod tests {
             "res/labels.txt".to_string(),
             28,
         );
-        dataset.load(true);
+        dataset.load();
+        dataset.augment();
         dataset.export("out/export");
     }
 
@@ -388,7 +385,7 @@ mod tests {
             "res/labels.txt".to_string(),
             32,
         );
-        dataset.load(false);
+        dataset.load();
         let samples = dataset.samples();
         dataset.generate_hard_negative_samples(&model, 5, Some(1));
         assert!(dataset.samples() > samples);
