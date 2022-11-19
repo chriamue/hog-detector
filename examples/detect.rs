@@ -18,7 +18,7 @@ fn main() {
     dataset.load();
 
     model.train_class(&dataset, 5);
-    assert!(model.svc.is_some());
+    assert!(model.classifier.is_some());
     let webcam01 = image::open("res/training/webcam01.jpg").unwrap();
     let detections = model.detect_objects(&webcam01);
     println!("{:?}", detections);

@@ -1,3 +1,4 @@
+use crate::classifier::SVMClassifier;
 use crate::{DataSet, HogDetector, Predictable};
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 use smartcore::svm::svc::{SVCParameters, SVC};
@@ -12,7 +13,7 @@ pub trait Trainable {
     fn evaluate(&mut self, dataset: &dyn DataSet, class: u32) -> f32;
 }
 
-impl Trainable for HogDetector {
+impl Trainable for HogDetector<SVMClassifier> {
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<f32>) {
         let svc = SVC::fit(
             &x_train,
@@ -20,7 +21,8 @@ impl Trainable for HogDetector {
             SVCParameters::default().with_c(10.0).with_epoch(3),
         )
         .unwrap();
-        self.svc = Some(svc);
+        let classifier = SVMClassifier { svc: Some(svc) };
+        self.classifier = Some(classifier);
     }
 
     fn train_class(&mut self, dataset: &dyn DataSet, class: u32) {
@@ -50,28 +52,28 @@ impl Trainable for HogDetector {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::dataset::MemoryDataSet;
+    use crate::{classifier::SVMClassifier, dataset::MemoryDataSet};
 
     #[test]
     fn test_train() {
-        let mut model = HogDetector::default();
+        let mut model = HogDetector::<SVMClassifier>::default();
 
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
 
         model.train_class(&dataset, 1);
-        assert!(model.svc.is_some());
+        assert!(model.classifier.is_some());
     }
 
     #[test]
     fn test_evaluate() {
-        let mut model = HogDetector::default();
+        let mut model = HogDetector::<SVMClassifier>::default();
 
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
 
         model.train_class(&dataset, 1);
-        assert!(model.svc.is_some());
+        assert!(model.classifier.is_some());
         assert!(model.evaluate(&dataset, 1) > 0.0);
     }
 }

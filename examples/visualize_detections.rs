@@ -20,7 +20,7 @@ fn main() {
     dataset.generate_random_annotations(10);
 
     model.train_class(&dataset, 1);
-    assert!(model.svc.is_some());
+    assert!(model.classifier.is_some());
     let webcam01 = image::open("res/training/webcam01.jpg").unwrap();
     model
         .visualize_detections(&webcam01)

@@ -19,7 +19,7 @@ fn main() {
     dataset.augment();
 
     model.train_class(&dataset, 5);
-    assert!(model.svc.is_some());
+    assert!(model.classifier.is_some());
     println!("{:?}", model.evaluate(&dataset, 5));
     assert!(model.evaluate(&dataset, 5) > 0.0);
 }

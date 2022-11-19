@@ -165,6 +165,7 @@ impl Default for EyesDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::classifier::SVMClassifier;
     use crate::Detector;
     use crate::HogDetector;
     use crate::Trainable;
@@ -202,7 +203,7 @@ mod tests {
         let mut dataset = EyesDataSet::default();
         dataset.load();
         model.train_class(&dataset, 1);
-        assert!(model.svc.is_some());
+        assert!(model.classifier.is_some());
 
         std::fs::write(
             "res/eyes_model.json",
@@ -215,9 +216,9 @@ mod tests {
     fn test_detect() {
         let model = {
             let model = std::fs::read_to_string("res/eyes_model.json").unwrap();
-            serde_json::from_str::<HogDetector>(&model).unwrap()
+            serde_json::from_str::<HogDetector<SVMClassifier>>(&model).unwrap()
         };
-        assert!(model.svc.is_some());
+        assert!(model.classifier.is_some());
         let lenna = image::open("res/lenna.png").unwrap();
         model
             .visualize_detections(&lenna)

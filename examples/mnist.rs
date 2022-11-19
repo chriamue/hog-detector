@@ -13,7 +13,7 @@ fn main() {
     dataset.load();
 
     model.train_class(&dataset, 1);
-    assert!(model.svc.is_some());
+    assert!(model.classifier.is_some());
     println!("class 1: {:?} %", model.evaluate(&dataset, 1) * 100.0);
     assert!(model.evaluate(&dataset, 1) > 0.0);
 

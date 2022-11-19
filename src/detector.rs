@@ -1,4 +1,5 @@
 use crate::bbox::BBox;
+use crate::classifier::SVMClassifier;
 use crate::detection::{merge, nms_sort, Detection};
 use crate::utils::{pyramid, sliding_window};
 use crate::HogDetector;
@@ -70,7 +71,7 @@ pub trait Detector {
     fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage;
 }
 
-impl Detector for HogDetector {
+impl Detector for HogDetector<SVMClassifier> {
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
         let step_size = 8;
         let window_size = 32;
@@ -95,6 +96,7 @@ impl Detector for HogDetector {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::classifier::SVMClassifier;
     use crate::dataset::{DataSet, MemoryDataSet};
     use crate::tests::test_image;
     use crate::Trainable;
@@ -125,7 +127,7 @@ mod tests {
         let img = DynamicImage::ImageRgb8(test_image());
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
-        let mut detector = HogDetector::default();
+        let mut detector = HogDetector::<SVMClassifier>::default();
         detector.train_class(&dataset, 1);
         let detections = detector.detect_objects(&img);
         assert_eq!(1, detections.len());
