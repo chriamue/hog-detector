@@ -77,30 +77,34 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
+<span id="80">80</span>
+<span id="81">81</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::svm::{SVCParametersType, SVCType};
+<span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
 <span class="kw">use crate</span>::{DataSet, HogDetector, Predictable};
-<span class="kw">use </span>smartcore::linalg::naive::dense_matrix::DenseMatrix;
+<span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
 <span class="kw">use </span>smartcore::svm::svc::{SVCParameters, SVC};
 
 <span class="doccomment">/// trainable trait
 </span><span class="kw">pub trait </span>Trainable {
     <span class="doccomment">/// trains on given data
-    </span><span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;f32&gt;);
+    </span><span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;u32&gt;);
     <span class="doccomment">/// train class on given dataset
     </span><span class="kw">fn </span>train_class(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: u32);
     <span class="doccomment">/// evaluate class on dataset
     </span><span class="kw">fn </span>evaluate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: u32) -&gt; f32;
 }
 
-<span class="kw">impl </span>Trainable <span class="kw">for </span>HogDetector&lt;SVMClassifier&gt; {
-    <span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;f32&gt;) {
-        <span class="kw">let </span>svc = SVC::fit(
-            <span class="kw-2">&amp;</span>x_train,
-            <span class="kw-2">&amp;</span>y_train,
-            SVCParameters::default().with_c(<span class="number">10.0</span>).with_epoch(<span class="number">3</span>),
-        )
-        .unwrap();
-        <span class="kw">let </span>classifier = SVMClassifier { svc: <span class="prelude-val">Some</span>(svc) };
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Trainable <span class="kw">for </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;u32&gt;) {
+        <span class="kw">let </span>parameters: SVCParametersType = SVCParameters::default();
+
+        <span class="kw">let </span>svc = SVC::fit(<span class="kw-2">&amp;</span>x_train, <span class="kw-2">&amp;</span>y_train, <span class="kw-2">&amp;</span>parameters).unwrap();
+        <span class="kw">let </span>deserialized_svc: SVCType&lt;<span class="lifetime">&#39;a</span>&gt; =
+            serde_json::from_str(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>svc).unwrap()).unwrap();
+        <span class="kw">let </span>classifier = SVMClassifier {
+            svc: <span class="prelude-val">Some</span>(deserialized_svc),
+        };
         <span class="self">self</span>.classifier = <span class="prelude-val">Some</span>(classifier);
     }
 
@@ -109,7 +113,7 @@
         <span class="kw">let </span>x_train = <span class="self">self</span>.preprocess_matrix(x_train);
         <span class="kw">let </span>y_train = y_train
             .iter()
-            .map(|y| <span class="kw">if </span><span class="kw-2">*</span>y <span class="kw">as </span>u32 == class { <span class="kw-2">*</span>y <span class="kw">as </span>f32 } <span class="kw">else </span>{ <span class="number">0.0 </span>})
+            .map(|y| <span class="kw">if </span><span class="kw-2">*</span>y <span class="kw">as </span>u32 == class { <span class="kw-2">*</span>y } <span class="kw">else </span>{ <span class="number">0u32 </span>})
             .collect();
         <span class="self">self</span>.train(x_train, y_train);
     }

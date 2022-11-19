@@ -46,30 +46,38 @@
 <span id="46">46</span>
 <span id="47">47</span>
 <span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="kw">use </span>smartcore::linalg::naive::dense_matrix::DenseMatrix;
-<span class="kw">use </span>smartcore::svm::svc::SVC;
-<span class="kw">use </span>smartcore::svm::LinearKernel;
+<span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
+<span class="kw">use </span>smartcore::svm::svc::{SVCParameters, SVC};
 
 <span class="kw">use </span><span class="kw">super</span>::Classifier;
 
+<span class="doccomment">/// svc type for float x and unsigned integer y
+</span><span class="kw">pub type </span>SVCType&lt;<span class="lifetime">&#39;a</span>&gt; = SVC&lt;<span class="lifetime">&#39;a</span>, f32, u32, DenseMatrix&lt;f32&gt;, Vec&lt;u32&gt;&gt;;
+<span class="doccomment">/// svc parameters type for float x and unsigned integer y
+</span><span class="kw">pub type </span>SVCParametersType = SVCParameters&lt;f32, u32, DenseMatrix&lt;f32&gt;, Vec&lt;u32&gt;&gt;;
+
 <span class="doccomment">/// A Support Vector Machine classifier
 </span><span class="attribute">#[derive(Serialize, Deserialize, Debug)]
-</span><span class="kw">pub struct </span>SVMClassifier {
+</span><span class="kw">pub struct </span>SVMClassifier&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// svc classifier
-    </span><span class="kw">pub </span>svc: <span class="prelude-ty">Option</span>&lt;SVC&lt;f32, DenseMatrix&lt;f32&gt;, LinearKernel&gt;&gt;,
+    </span><span class="kw">pub </span>svc: <span class="prelude-ty">Option</span>&lt;SVCType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl </span>Classifier <span class="kw">for </span>SVMClassifier {}
+<span class="kw">impl </span>Classifier <span class="kw">for </span>SVMClassifier&lt;<span class="lifetime">&#39;_</span>&gt; {}
 
-<span class="kw">impl </span>PartialEq <span class="kw">for </span>SVMClassifier {
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>SVMClassifier&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>SVMClassifier) -&gt; bool {
         <span class="self">self</span>.svc.is_none() &amp;&amp; other.svc.is_none()
             || <span class="self">self</span>.svc.is_some() &amp;&amp; other.svc.is_some() &amp;&amp; <span class="self">self</span>.svc.eq(<span class="kw-2">&amp;</span>other.svc)
     }
 }
 
-<span class="kw">impl </span>Default <span class="kw">for </span>SVMClassifier {
+<span class="kw">impl </span>Default <span class="kw">for </span>SVMClassifier&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         SVMClassifier { svc: <span class="prelude-val">None </span>}
     }

@@ -83,13 +83,10 @@
 <span id="83">83</span>
 <span id="84">84</span>
 <span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-<span id="88">88</span>
 </pre><pre class="rust"><code><span class="kw">use </span>image::{DynamicImage, RgbImage};
 <span class="kw">use </span>imageproc::hog::{hog, HogOptions};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="kw">use </span>smartcore::linalg::naive::dense_matrix::DenseMatrix;
+<span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
 
 <span class="kw">use </span><span class="kw">crate</span>::classifier::Classifier;
 
@@ -136,10 +133,7 @@
     </span><span class="kw">pub fn </span>preprocess_matrix(<span class="kw-2">&amp;</span><span class="self">self</span>, images: Vec&lt;RgbImage&gt;) -&gt; DenseMatrix&lt;f32&gt; {
         <span class="kw">let </span>descriptors: Vec&lt;Vec&lt;f32&gt;&gt; =
             images.iter().map(|image| <span class="self">self</span>.preprocess(image)).collect();
-        <span class="kw">let </span>samples = descriptors.len();
-        <span class="kw">let </span>features = descriptors.first().unwrap().len();
-        <span class="kw">let </span>descriptors: Vec&lt;f32&gt; = descriptors.into_iter().flatten().collect();
-        DenseMatrix::from_vec(samples, features, <span class="kw-2">&amp;</span>descriptors)
+        DenseMatrix::from_2d_vec(<span class="kw-2">&amp;</span>descriptors)
     }
 }
 

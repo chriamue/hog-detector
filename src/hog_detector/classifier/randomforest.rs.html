@@ -161,6 +161,7 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
+<span id="164">164</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     detector::{detect_objects, visualize_detections},
     prelude::Detection,
@@ -173,14 +174,15 @@
 };
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>smartcore::ensemble::random_forest_classifier::RandomForestClassifier <span class="kw">as </span>RFC;
-<span class="kw">use </span>smartcore::linalg::naive::dense_matrix::<span class="kw-2">*</span>;
+<span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
 
 <span class="kw">use </span><span class="kw">super</span>::Classifier;
+<span class="kw">type </span>RFCType = RFC&lt;f32, u32, DenseMatrix&lt;f32&gt;, Vec&lt;u32&gt;&gt;;
 
 <span class="doccomment">/// A Random Forrest classifier
 </span><span class="attribute">#[derive(Serialize, Deserialize, Debug)]
 </span><span class="kw">pub struct </span>RandomForestClassifier {
-    inner: <span class="prelude-ty">Option</span>&lt;RFC&lt;f32&gt;&gt;,
+    inner: <span class="prelude-ty">Option</span>&lt;RFCType&gt;,
 }
 
 <span class="kw">impl </span>Classifier <span class="kw">for </span>RandomForestClassifier {}
@@ -206,7 +208,7 @@
 }
 
 <span class="kw">impl </span>Trainable <span class="kw">for </span>HogDetector&lt;RandomForestClassifier&gt; {
-    <span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;f32&gt;) {
+    <span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;u32&gt;) {
         <span class="kw">let </span>rfc = RFC::fit(<span class="kw-2">&amp;</span>x_train, <span class="kw-2">&amp;</span>y_train, Default::default()).unwrap();
         <span class="kw">let </span>classifier = RandomForestClassifier { inner: <span class="prelude-val">Some</span>(rfc) };
         <span class="self">self</span>.classifier = <span class="prelude-val">Some</span>(classifier);
@@ -217,7 +219,7 @@
         <span class="kw">let </span>x_train = <span class="self">self</span>.preprocess_matrix(x_train);
         <span class="kw">let </span>y_train = y_train
             .iter()
-            .map(|y| <span class="kw">if </span><span class="kw-2">*</span>y <span class="kw">as </span>u32 == class { <span class="kw-2">*</span>y <span class="kw">as </span>f32 } <span class="kw">else </span>{ <span class="number">0.0 </span>})
+            .map(|y| <span class="kw">if </span><span class="kw-2">*</span>y <span class="kw">as </span>u32 == class { <span class="kw-2">*</span>y } <span class="kw">else </span>{ <span class="number">0u32 </span>})
             .collect();
         <span class="self">self</span>.train(x_train, y_train);
     }
@@ -243,8 +245,8 @@
             FilterType::Gaussian,
         );
         <span class="kw">let </span>image = DynamicImage::ImageRgba8(image).to_rgb8();
-        <span class="kw">let </span>x = <span class="self">self</span>.preprocess(<span class="kw-2">&amp;</span>image);
-        <span class="kw">let </span>x = DenseMatrix::from_vec(<span class="number">1</span>, x.len(), <span class="kw-2">&amp;</span>x);
+        <span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="self">self</span>.preprocess(<span class="kw-2">&amp;</span>image)];
+        <span class="kw">let </span>x = DenseMatrix::from_2d_vec(<span class="kw-2">&amp;</span>x);
         <span class="kw">let </span>y = <span class="self">self
             </span>.classifier
             .as_ref()
