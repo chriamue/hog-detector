@@ -226,6 +226,24 @@
 <span id="226">226</span>
 <span id="227">227</span>
 <span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
 </pre><pre class="rust"><code><span class="comment">// source: https://github.com/tiruss/eye_detector
 // https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip
 
@@ -393,6 +411,7 @@
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::classifier::RandomForestClassifier;
     <span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
     <span class="kw">use </span><span class="kw">crate</span>::Detector;
     <span class="kw">use </span><span class="kw">crate</span>::HogDetector;
@@ -426,7 +445,7 @@
     <span class="attribute">#[ignore = <span class="string">&quot;takes more than 200s in debug mode&quot;</span>]
     #[test]
     </span><span class="kw">fn </span>test_train() {
-        <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::random_forest();
 
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = EyesDataSet::default();
         dataset.load();
@@ -435,6 +454,23 @@
 
         std::fs::write(
             <span class="string">&quot;res/eyes_model.json&quot;</span>,
+            serde_json::to_string(<span class="kw-2">&amp;</span>model).unwrap(),
+        )
+        .unwrap();
+    }
+
+    <span class="attribute">#[ignore = <span class="string">&quot;takes more than 200s in debug mode&quot;</span>]
+    #[test]
+    </span><span class="kw">fn </span>test_train_random_forest_model() {
+        <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::&lt;RandomForestClassifier&gt;::default();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>dataset = EyesDataSet::default();
+        dataset.load();
+        model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
+        <span class="macro">assert!</span>(model.classifier.is_some());
+
+        std::fs::write(
+            <span class="string">&quot;res/eyes_random_forest_model.json&quot;</span>,
             serde_json::to_string(<span class="kw-2">&amp;</span>model).unwrap(),
         )
         .unwrap();

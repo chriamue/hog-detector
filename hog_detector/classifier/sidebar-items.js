@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["SVMClassifier","A Support Vector Machine classifier"]],"trait":[["Classifier","A classifier trait"]]};
+window.SIDEBAR_ITEMS = {"struct":[["RandomForestClassifier","A Random Forrest classifier"],["SVMClassifier","A Support Vector Machine classifier"]],"trait":[["Classifier","A classifier trait"]]};
