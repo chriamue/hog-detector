@@ -1,4 +1,4 @@
-use crate::classifier::SVMClassifier;
+use crate::classifier::RandomForestClassifier;
 use crate::DataSet;
 use crate::Detector;
 use crate::HogDetector;
@@ -10,7 +10,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct HogDetectorJS {
-    hog: Arc<Mutex<HogDetector<SVMClassifier>>>,
+    hog: Arc<Mutex<HogDetector<RandomForestClassifier>>>,
 }
 
 impl HogDetectorJS {
@@ -28,8 +28,8 @@ impl HogDetectorJS {
         console_error_panic_hook::set_once();
 
         let hog = {
-            let model = include_str!("../../res/eyes_model.json");
-            serde_json::from_str::<HogDetector<SVMClassifier>>(model).unwrap()
+            let model = include_str!("../../res/eyes_random_forest_model.json");
+            serde_json::from_str::<HogDetector<RandomForestClassifier>>(model).unwrap()
         };
 
         HogDetectorJS {

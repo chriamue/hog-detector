@@ -5,10 +5,10 @@ fn main() {
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
     use hog_detector::{
-        data_augmentation::DataAugmentation, dataset::FolderDataSet, DataSet, HogDetector,
-        Trainable,
+        classifier::SVMClassifier, data_augmentation::DataAugmentation, dataset::FolderDataSet,
+        DataSet, HogDetector, Trainable,
     };
-    let mut model = HogDetector::default();
+    let mut model: HogDetector<SVMClassifier> = HogDetector::default();
 
     let mut dataset = FolderDataSet::new(
         "res/training/".to_string(),
