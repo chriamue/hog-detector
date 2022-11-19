@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["SVMClassifier","A Support Vector Machine classifier"]],"trait":[["Classifier","A classifier trait"]]};

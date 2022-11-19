@@ -138,7 +138,10 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
+<span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
 <span class="kw">use </span><span class="kw">crate</span>::detection::{merge, nms_sort, Detection};
 <span class="kw">use </span><span class="kw">crate</span>::utils::{pyramid, sliding_window};
 <span class="kw">use </span><span class="kw">crate</span>::HogDetector;
@@ -210,7 +213,7 @@
     </span><span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; DynamicImage;
 }
 
-<span class="kw">impl </span>Detector <span class="kw">for </span>HogDetector {
+<span class="kw">impl </span>Detector <span class="kw">for </span>HogDetector&lt;SVMClassifier&gt; {
     <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt; {
         <span class="kw">let </span>step_size = <span class="number">8</span>;
         <span class="kw">let </span>window_size = <span class="number">32</span>;
@@ -235,6 +238,7 @@
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
     <span class="kw">use </span><span class="kw">crate</span>::dataset::{DataSet, MemoryDataSet};
     <span class="kw">use </span><span class="kw">crate</span>::tests::test_image;
     <span class="kw">use </span><span class="kw">crate</span>::Trainable;
@@ -265,7 +269,7 @@
         <span class="kw">let </span>img = DynamicImage::ImageRgb8(test_image());
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
         dataset.load();
-        <span class="kw">let </span><span class="kw-2">mut </span>detector = HogDetector::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>detector = HogDetector::&lt;SVMClassifier&gt;::default();
         detector.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="kw">let </span>detections = detector.detect_objects(<span class="kw-2">&amp;</span>img);
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, detections.len());

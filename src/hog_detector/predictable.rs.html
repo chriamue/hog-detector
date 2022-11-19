@@ -27,7 +27,17 @@
 <span id="27">27</span>
 <span id="28">28</span>
 <span id="29">29</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::HogDetector;
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
+<span class="kw">use </span><span class="kw">crate</span>::HogDetector;
 <span class="kw">use </span>image::{imageops::resize, imageops::FilterType};
 <span class="kw">use </span>image::{DynamicImage, RgbImage};
 <span class="kw">use </span>smartcore::linalg::naive::dense_matrix::DenseMatrix;
@@ -37,7 +47,7 @@
     </span><span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; u32;
 }
 
-<span class="kw">impl </span>Predictable <span class="kw">for </span>HogDetector {
+<span class="kw">impl </span>Predictable <span class="kw">for </span>HogDetector&lt;SVMClassifier&gt; {
     <span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; u32 {
         <span class="kw">let </span>image = resize(
             <span class="kw-2">&amp;</span>DynamicImage::ImageRgb8(image.clone()),
@@ -48,7 +58,15 @@
         <span class="kw">let </span>image = DynamicImage::ImageRgba8(image).to_rgb8();
         <span class="kw">let </span>x = <span class="self">self</span>.preprocess(<span class="kw-2">&amp;</span>image);
         <span class="kw">let </span>x = DenseMatrix::from_vec(<span class="number">1</span>, x.len(), <span class="kw-2">&amp;</span>x);
-        <span class="kw">let </span>y = <span class="self">self</span>.svc.as_ref().unwrap().predict(<span class="kw-2">&amp;</span>x).unwrap();
+        <span class="kw">let </span>y = <span class="self">self
+            </span>.classifier
+            .as_ref()
+            .unwrap()
+            .svc
+            .as_ref()
+            .unwrap()
+            .predict(<span class="kw-2">&amp;</span>x)
+            .unwrap();
         <span class="kw-2">*</span>y.first().unwrap() <span class="kw">as </span>u32
     }
 }

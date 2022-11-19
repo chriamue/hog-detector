@@ -78,34 +78,48 @@
 <span id="78">78</span>
 <span id="79">79</span>
 <span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
 </pre><pre class="rust"><code><span class="kw">use </span>image::{DynamicImage, RgbImage};
 <span class="kw">use </span>imageproc::hog::{hog, HogOptions};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>smartcore::linalg::naive::dense_matrix::DenseMatrix;
-<span class="kw">use </span>smartcore::svm::svc::SVC;
-<span class="kw">use </span>smartcore::svm::LinearKernel;
+
+<span class="kw">use </span><span class="kw">crate</span>::classifier::Classifier;
 
 <span class="doccomment">/// Hog Detector struct
 </span><span class="attribute">#[derive(Serialize, Deserialize, Debug)]
-</span><span class="kw">pub struct </span>HogDetector {
+</span><span class="kw">pub struct </span>HogDetector&lt;C: Classifier&gt; {
     <span class="doccomment">/// support vector classifier
-    </span><span class="kw">pub </span>svc: <span class="prelude-ty">Option</span>&lt;SVC&lt;f32, DenseMatrix&lt;f32&gt;, LinearKernel&gt;&gt;,
+    </span><span class="kw">pub </span>classifier: <span class="prelude-ty">Option</span>&lt;C&gt;,
 }
 
-<span class="kw">impl </span>PartialEq <span class="kw">for </span>HogDetector {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>HogDetector) -&gt; bool {
-        <span class="self">self</span>.svc.is_none() &amp;&amp; other.svc.is_none()
-            || <span class="self">self</span>.svc.is_some() &amp;&amp; other.svc.is_some() &amp;&amp; <span class="self">self</span>.svc.eq(<span class="kw-2">&amp;</span>other.svc)
+<span class="kw">impl</span>&lt;C: Classifier&gt; PartialEq <span class="kw">for </span>HogDetector&lt;C&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>HogDetector&lt;C&gt;) -&gt; bool {
+        <span class="self">self</span>.classifier.is_none() &amp;&amp; other.classifier.is_none()
+            || <span class="self">self</span>.classifier.is_some()
+                &amp;&amp; other.classifier.is_some()
+                &amp;&amp; <span class="self">self</span>.classifier.eq(<span class="kw-2">&amp;</span>other.classifier)
+    }
+
+    <span class="kw">fn </span>ne(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        !<span class="self">self</span>.eq(other)
     }
 }
 
-<span class="kw">impl </span>Default <span class="kw">for </span>HogDetector {
+<span class="kw">impl</span>&lt;C: Classifier&gt; Default <span class="kw">for </span>HogDetector&lt;C&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        HogDetector { svc: <span class="prelude-val">None </span>}
+        HogDetector::&lt;C&gt; { classifier: <span class="prelude-val">None </span>}
     }
 }
 
-<span class="kw">impl </span>HogDetector {
+<span class="kw">impl</span>&lt;C: Classifier&gt; HogDetector&lt;C&gt; {
     <span class="doccomment">/// preprocesses image to vector
     </span><span class="kw">pub fn </span>preprocess(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; Vec&lt;f32&gt; {
         <span class="kw">let </span>luma = DynamicImage::ImageRgb8(image.clone()).to_luma8();
@@ -131,27 +145,29 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
+
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>image::{imageops::resize, imageops::FilterType, open};
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_default() {
-        <span class="kw">let </span>model = HogDetector::default();
-        <span class="macro">assert!</span>(model.svc.is_none());
+        <span class="kw">let </span>model = HogDetector::&lt;SVMClassifier&gt;::default();
+        <span class="macro">assert!</span>(model.classifier.is_none());
     }
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_part_eq() {
-        <span class="kw">let </span>model1 = HogDetector::default();
-        <span class="kw">let </span>model2 = HogDetector::default();
-        <span class="macro">assert!</span>(model1.svc.is_none());
+        <span class="kw">let </span>model1 = HogDetector::&lt;SVMClassifier&gt;::default();
+        <span class="kw">let </span>model2 = HogDetector::&lt;SVMClassifier&gt;::default();
+        <span class="macro">assert!</span>(model1.classifier.is_none());
         <span class="macro">assert!</span>(model1.eq(<span class="kw-2">&amp;</span>model2));
         <span class="macro">assert!</span>(model1.eq(<span class="kw-2">&amp;</span>model1));
     }
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_hog() {
-        <span class="kw">let </span>model = HogDetector::default();
+        <span class="kw">let </span>model = HogDetector::&lt;SVMClassifier&gt;::default();
         <span class="kw">let </span>loco03 = open(<span class="string">&quot;res/loco03.jpg&quot;</span>).unwrap().to_rgb8();
         <span class="kw">let </span>loco03 = resize(<span class="kw-2">&amp;</span>loco03, <span class="number">32</span>, <span class="number">32</span>, FilterType::Nearest);
         <span class="kw">let </span>descriptor = model.preprocess(<span class="kw-2">&amp;</span>loco03);

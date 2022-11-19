@@ -75,7 +75,10 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{DataSet, HogDetector, Predictable};
+<span id="78">78</span>
+<span id="79">79</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
+<span class="kw">use crate</span>::{DataSet, HogDetector, Predictable};
 <span class="kw">use </span>smartcore::linalg::naive::dense_matrix::DenseMatrix;
 <span class="kw">use </span>smartcore::svm::svc::{SVCParameters, SVC};
 
@@ -89,7 +92,7 @@
     </span><span class="kw">fn </span>evaluate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: u32) -&gt; f32;
 }
 
-<span class="kw">impl </span>Trainable <span class="kw">for </span>HogDetector {
+<span class="kw">impl </span>Trainable <span class="kw">for </span>HogDetector&lt;SVMClassifier&gt; {
     <span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;f32&gt;) {
         <span class="kw">let </span>svc = SVC::fit(
             <span class="kw-2">&amp;</span>x_train,
@@ -97,7 +100,8 @@
             SVCParameters::default().with_c(<span class="number">10.0</span>).with_epoch(<span class="number">3</span>),
         )
         .unwrap();
-        <span class="self">self</span>.svc = <span class="prelude-val">Some</span>(svc);
+        <span class="kw">let </span>classifier = SVMClassifier { svc: <span class="prelude-val">Some</span>(svc) };
+        <span class="self">self</span>.classifier = <span class="prelude-val">Some</span>(classifier);
     }
 
     <span class="kw">fn </span>train_class(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: u32) {
@@ -127,28 +131,28 @@
 #[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::dataset::MemoryDataSet;
+    <span class="kw">use crate</span>::{classifier::SVMClassifier, dataset::MemoryDataSet};
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_train() {
-        <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::&lt;SVMClassifier&gt;::default();
 
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
         dataset.load();
 
         model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
-        <span class="macro">assert!</span>(model.svc.is_some());
+        <span class="macro">assert!</span>(model.classifier.is_some());
     }
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_evaluate() {
-        <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::&lt;SVMClassifier&gt;::default();
 
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
         dataset.load();
 
         model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
-        <span class="macro">assert!</span>(model.svc.is_some());
+        <span class="macro">assert!</span>(model.classifier.is_some());
         <span class="macro">assert!</span>(model.evaluate(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>) &gt; <span class="number">0.0</span>);
     }
 }

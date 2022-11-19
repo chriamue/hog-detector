@@ -225,6 +225,7 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
 </pre><pre class="rust"><code><span class="comment">// source: https://github.com/tiruss/eye_detector
 // https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip
 
@@ -392,6 +393,7 @@
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
     <span class="kw">use </span><span class="kw">crate</span>::Detector;
     <span class="kw">use </span><span class="kw">crate</span>::HogDetector;
     <span class="kw">use </span><span class="kw">crate</span>::Trainable;
@@ -429,7 +431,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = EyesDataSet::default();
         dataset.load();
         model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
-        <span class="macro">assert!</span>(model.svc.is_some());
+        <span class="macro">assert!</span>(model.classifier.is_some());
 
         std::fs::write(
             <span class="string">&quot;res/eyes_model.json&quot;</span>,
@@ -442,9 +444,9 @@
     </span><span class="kw">fn </span>test_detect() {
         <span class="kw">let </span>model = {
             <span class="kw">let </span>model = std::fs::read_to_string(<span class="string">&quot;res/eyes_model.json&quot;</span>).unwrap();
-            serde_json::from_str::&lt;HogDetector&gt;(<span class="kw-2">&amp;</span>model).unwrap()
+            serde_json::from_str::&lt;HogDetector&lt;SVMClassifier&gt;&gt;(<span class="kw-2">&amp;</span>model).unwrap()
         };
-        <span class="macro">assert!</span>(model.svc.is_some());
+        <span class="macro">assert!</span>(model.classifier.is_some());
         <span class="kw">let </span>lenna = image::open(<span class="string">&quot;res/lenna.png&quot;</span>).unwrap();
         model
             .visualize_detections(<span class="kw-2">&amp;</span>lenna)

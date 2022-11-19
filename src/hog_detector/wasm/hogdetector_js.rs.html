@@ -68,7 +68,9 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::DataSet;
+<span id="71">71</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
+<span class="kw">use </span><span class="kw">crate</span>::DataSet;
 <span class="kw">use </span><span class="kw">crate</span>::Detector;
 <span class="kw">use </span><span class="kw">crate</span>::HogDetector;
 <span class="kw">use </span><span class="kw">crate</span>::Trainable;
@@ -79,7 +81,7 @@
 <span class="attribute">#[wasm_bindgen]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>HogDetectorJS {
-    hog: Arc&lt;Mutex&lt;HogDetector&gt;&gt;,
+    hog: Arc&lt;Mutex&lt;HogDetector&lt;SVMClassifier&gt;&gt;&gt;,
 }
 
 <span class="kw">impl </span>HogDetectorJS {
@@ -98,7 +100,7 @@
 
         <span class="kw">let </span>hog = {
             <span class="kw">let </span>model = <span class="macro">include_str!</span>(<span class="string">&quot;../../res/eyes_model.json&quot;</span>);
-            serde_json::from_str::&lt;HogDetector&gt;(model).unwrap()
+            serde_json::from_str::&lt;HogDetector&lt;SVMClassifier&gt;&gt;(model).unwrap()
         };
 
         HogDetectorJS {
