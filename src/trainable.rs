@@ -1,27 +1,29 @@
+use crate::classifier::svm::{SVCParametersType, SVCType};
 use crate::classifier::SVMClassifier;
 use crate::{DataSet, HogDetector, Predictable};
-use smartcore::linalg::naive::dense_matrix::DenseMatrix;
+use smartcore::linalg::basic::matrix::DenseMatrix;
 use smartcore::svm::svc::{SVCParameters, SVC};
 
 /// trainable trait
 pub trait Trainable {
     /// trains on given data
-    fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<f32>);
+    fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>);
     /// train class on given dataset
     fn train_class(&mut self, dataset: &dyn DataSet, class: u32);
     /// evaluate class on dataset
     fn evaluate(&mut self, dataset: &dyn DataSet, class: u32) -> f32;
 }
 
-impl Trainable for HogDetector<SVMClassifier> {
-    fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<f32>) {
-        let svc = SVC::fit(
-            &x_train,
-            &y_train,
-            SVCParameters::default().with_c(10.0).with_epoch(3),
-        )
-        .unwrap();
-        let classifier = SVMClassifier { svc: Some(svc) };
+impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
+    fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {
+        let parameters: SVCParametersType = SVCParameters::default();
+
+        let svc = SVC::fit(&x_train, &y_train, &parameters).unwrap();
+        let deserialized_svc: SVCType<'a> =
+            serde_json::from_str(&serde_json::to_string(&svc).unwrap()).unwrap();
+        let classifier = SVMClassifier {
+            svc: Some(deserialized_svc),
+        };
         self.classifier = Some(classifier);
     }
 
@@ -30,7 +32,7 @@ impl Trainable for HogDetector<SVMClassifier> {
         let x_train = self.preprocess_matrix(x_train);
         let y_train = y_train
             .iter()
-            .map(|y| if *y as u32 == class { *y as f32 } else { 0.0 })
+            .map(|y| if *y as u32 == class { *y } else { 0u32 })
             .collect();
         self.train(x_train, y_train);
     }

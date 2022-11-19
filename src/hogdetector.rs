@@ -1,7 +1,7 @@
 use image::{DynamicImage, RgbImage};
 use imageproc::hog::{hog, HogOptions};
 use serde::{Deserialize, Serialize};
-use smartcore::linalg::naive::dense_matrix::DenseMatrix;
+use smartcore::linalg::basic::matrix::DenseMatrix;
 
 use crate::classifier::Classifier;
 
@@ -48,10 +48,7 @@ impl<C: Classifier> HogDetector<C> {
     pub fn preprocess_matrix(&self, images: Vec<RgbImage>) -> DenseMatrix<f32> {
         let descriptors: Vec<Vec<f32>> =
             images.iter().map(|image| self.preprocess(image)).collect();
-        let samples = descriptors.len();
-        let features = descriptors.first().unwrap().len();
-        let descriptors: Vec<f32> = descriptors.into_iter().flatten().collect();
-        DenseMatrix::from_vec(samples, features, &descriptors)
+        DenseMatrix::from_2d_vec(&descriptors)
     }
 }
 

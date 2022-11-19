@@ -71,7 +71,7 @@ pub trait Detector {
     fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage;
 }
 
-impl Detector for HogDetector<SVMClassifier> {
+impl<'a> Detector for HogDetector<SVMClassifier<'a>> {
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
         let step_size = 8;
         let window_size = 32;

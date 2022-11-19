@@ -10,14 +10,15 @@ use image::{
 };
 use serde::{Deserialize, Serialize};
 use smartcore::ensemble::random_forest_classifier::RandomForestClassifier as RFC;
-use smartcore::linalg::naive::dense_matrix::*;
+use smartcore::linalg::basic::matrix::DenseMatrix;
 
 use super::Classifier;
+type RFCType = RFC<f32, u32, DenseMatrix<f32>, Vec<u32>>;
 
 /// A Random Forrest classifier
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RandomForestClassifier {
-    inner: Option<RFC<f32>>,
+    inner: Option<RFCType>,
 }
 
 impl Classifier for RandomForestClassifier {}
@@ -43,7 +44,7 @@ impl HogDetector<RandomForestClassifier> {
 }
 
 impl Trainable for HogDetector<RandomForestClassifier> {
-    fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<f32>) {
+    fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {
         let rfc = RFC::fit(&x_train, &y_train, Default::default()).unwrap();
         let classifier = RandomForestClassifier { inner: Some(rfc) };
         self.classifier = Some(classifier);
@@ -54,7 +55,7 @@ impl Trainable for HogDetector<RandomForestClassifier> {
         let x_train = self.preprocess_matrix(x_train);
         let y_train = y_train
             .iter()
-            .map(|y| if *y as u32 == class { *y as f32 } else { 0.0 })
+            .map(|y| if *y as u32 == class { *y } else { 0u32 })
             .collect();
         self.train(x_train, y_train);
     }
@@ -80,8 +81,8 @@ impl Predictable for HogDetector<RandomForestClassifier> {
             FilterType::Gaussian,
         );
         let image = DynamicImage::ImageRgba8(image).to_rgb8();
-        let x = self.preprocess(&image);
-        let x = DenseMatrix::from_vec(1, x.len(), &x);
+        let x = vec![self.preprocess(&image)];
+        let x = DenseMatrix::from_2d_vec(&x);
         let y = self
             .classifier
             .as_ref()

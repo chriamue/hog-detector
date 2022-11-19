@@ -1,6 +1,8 @@
-mod svm;
+/// svm classifier module
+pub mod svm;
 pub use svm::SVMClassifier;
-mod randomforest;
+/// random forest classifier module
+pub mod randomforest;
 pub use randomforest::RandomForestClassifier;
 
 /// A classifier trait
