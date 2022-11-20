@@ -1,4 +1,4 @@
-use crate::classifier::Classifier;
+use crate::{classifier::Classifier, Detector, Trainable};
 use image::{DynamicImage, RgbImage};
 use imageproc::hog::{hog, HogOptions};
 use serde::{Deserialize, Serialize};
@@ -10,6 +10,9 @@ pub struct HogDetector<C: Classifier> {
     /// support vector classifier
     pub classifier: Option<C>,
 }
+
+/// trait of an hog detector
+pub trait HogDetectorTrait: Trainable + Detector {}
 
 impl<C: Classifier> PartialEq for HogDetector<C> {
     fn eq(&self, other: &HogDetector<C>) -> bool {

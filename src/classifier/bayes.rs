@@ -1,5 +1,6 @@
 use crate::{
     detector::{detect_objects, visualize_detections},
+    hogdetector::HogDetectorTrait,
     prelude::Detection,
     utils::{pyramid, sliding_window},
     DataSet, Detector, HogDetector, Predictable, Trainable,
@@ -42,6 +43,8 @@ impl HogDetector<BayesClassifier> {
         HogDetector::<BayesClassifier> { classifier: None }
     }
 }
+
+impl HogDetectorTrait for HogDetector<BayesClassifier> {}
 
 impl Trainable for HogDetector<BayesClassifier> {
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {

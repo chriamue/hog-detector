@@ -7,6 +7,8 @@ pub struct TrainerApp {}
 
 pub enum Msg {
     Train,
+    SwitchBayesClassifier,
+    SwitchRandomForestClassifier,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -33,17 +35,33 @@ impl Component for TrainerApp {
                 console_log!("{}", ctx.props().images);
                 true
             }
+            Msg::SwitchBayesClassifier => {
+                ctx.props().detector.init_bayes_classifier();
+                true
+            }
+            Msg::SwitchRandomForestClassifier => {
+                ctx.props().detector.init_random_forest_classifier();
+                true
+            }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let onclick = ctx.link().callback(|_| Msg::Train);
+        let onclick_train = ctx.link().callback(|_| Msg::Train);
+        let onclick_bayes = ctx.link().callback(|_| Msg::SwitchBayesClassifier);
+        let onclick_random_forest = ctx.link().callback(|_| Msg::SwitchRandomForestClassifier);
         html! {
-            <>
-                <button type="button" class="btn btn-success" {onclick}>
-                    { "Train Detector" }
-                </button>
-            </>
+            <div id="train-classifier-buttons">
+        <button type="button" class="btn btn-success" onclick={onclick_train}>
+        { "Train Detector" }
+        </button>
+        <button type="button" class="btn btn-success" onclick={onclick_bayes}>
+        { "Switch to Naive Bayes Classifier" }
+        </button>
+        <button type="button" class="btn btn-success" onclick={onclick_random_forest}>
+        { "Switch to Random Forest Classifier" }
+        </button>
+            </div>
         }
     }
 }

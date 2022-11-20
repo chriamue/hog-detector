@@ -1,16 +1,15 @@
+use crate::classifier::BayesClassifier;
 use crate::classifier::RandomForestClassifier;
+use crate::hogdetector::HogDetectorTrait;
 use crate::DataSet;
-use crate::Detector;
 use crate::HogDetector;
-use crate::Trainable;
-use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct HogDetectorJS {
-    hog: Arc<Mutex<HogDetector<RandomForestClassifier>>>,
+    hog: Arc<Mutex<Box<dyn HogDetectorTrait>>>,
 }
 
 impl HogDetectorJS {
@@ -33,8 +32,26 @@ impl HogDetectorJS {
         };
 
         HogDetectorJS {
-            hog: Arc::new(Mutex::new(hog)),
+            hog: Arc::new(Mutex::new(Box::new(hog))),
         }
+    }
+
+    #[wasm_bindgen]
+    pub fn init_random_forest_classifier(&self) {
+        let hog = {
+            let model = include_str!("../../res/eyes_random_forest_model.json");
+            serde_json::from_str::<HogDetector<RandomForestClassifier>>(model).unwrap()
+        };
+        *self.hog.lock().unwrap() = Box::new(hog);
+    }
+
+    #[wasm_bindgen]
+    pub fn init_bayes_classifier(&self) {
+        let hog = {
+            let model = include_str!("../../res/eyes_bayes_model.json");
+            serde_json::from_str::<HogDetector<BayesClassifier>>(model).unwrap()
+        };
+        *self.hog.lock().unwrap() = Box::new(hog);
     }
 
     #[wasm_bindgen]
@@ -56,11 +73,7 @@ impl HogDetectorJS {
 
 impl PartialEq for HogDetectorJS {
     fn eq(&self, other: &Self) -> bool {
-        if ::core::ptr::eq(&self, &other) {
-            true
-        } else {
-            other.hog.try_lock().unwrap().deref() == self.hog.try_lock().unwrap().deref()
-        }
+        ::core::ptr::eq(&self, &other)
     }
 }
 

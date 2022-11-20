@@ -1,4 +1,5 @@
 use crate::detector::{detect_objects, visualize_detections};
+use crate::hogdetector::HogDetectorTrait;
 use crate::prelude::Detection;
 use crate::utils::{pyramid, sliding_window};
 use crate::{DataSet, Detector, HogDetector, Predictable, Trainable};
@@ -44,6 +45,8 @@ impl HogDetector<SVMClassifier<'_>> {
         HogDetector::<SVMClassifier> { classifier: None }
     }
 }
+
+impl HogDetectorTrait for HogDetector<SVMClassifier<'_>> {}
 
 impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {
