@@ -1,68 +1,52 @@
-use crate::detector::{detect_objects, visualize_detections};
-use crate::prelude::Detection;
-use crate::utils::{pyramid, sliding_window};
-use crate::{DataSet, Detector, HogDetector, Predictable, Trainable};
-use image::imageops::{resize, FilterType};
-use image::{DynamicImage, RgbImage};
+use crate::{
+    detector::{detect_objects, visualize_detections},
+    prelude::Detection,
+    utils::{pyramid, sliding_window},
+    DataSet, Detector, HogDetector, Predictable, Trainable,
+};
+use image::{
+    imageops::{resize, FilterType},
+    DynamicImage, RgbImage,
+};
 use serde::{Deserialize, Serialize};
 use smartcore::linalg::basic::matrix::DenseMatrix;
-use smartcore::svm::svc::{SVCParameters, SVC};
-use smartcore::svm::Kernels;
+use smartcore::naive_bayes::gaussian::GaussianNB;
 
 use super::Classifier;
+type BayesType = GaussianNB<f32, u32, DenseMatrix<f32>, Vec<u32>>;
 
-/// svc type for float x and unsigned integer y
-pub type SVCType<'a> = SVC<'a, f32, i32, DenseMatrix<f32>, Vec<i32>>;
-/// svc parameters type for float x and unsigned integer y
-pub type SVCParametersType = SVCParameters<f32, i32, DenseMatrix<f32>, Vec<i32>>;
-
-/// A Support Vector Machine classifier
+/// A naive bayes classifier
 #[derive(Serialize, Deserialize, Debug)]
-pub struct SVMClassifier<'a> {
-    /// svc classifier
-    pub svc: Option<SVCType<'a>>,
+pub struct BayesClassifier {
+    inner: Option<BayesType>,
 }
 
-impl Classifier for SVMClassifier<'_> {}
+impl Classifier for BayesClassifier {}
 
-impl PartialEq for SVMClassifier<'_> {
-    fn eq(&self, other: &SVMClassifier) -> bool {
-        self.svc.is_none() && other.svc.is_none()
-            || self.svc.is_some() && other.svc.is_some() && self.svc.eq(&other.svc)
+impl PartialEq for BayesClassifier {
+    fn eq(&self, other: &BayesClassifier) -> bool {
+        self.inner.is_none() && other.inner.is_none()
+            || self.inner.is_some() && other.inner.is_some()
     }
 }
 
-impl Default for SVMClassifier<'_> {
+impl Default for BayesClassifier {
     fn default() -> Self {
-        SVMClassifier { svc: None }
+        BayesClassifier { inner: None }
     }
 }
 
-impl HogDetector<SVMClassifier<'_>> {
+impl HogDetector<BayesClassifier> {
     /// new default random forest
-    pub fn svm() -> Self {
-        HogDetector::<SVMClassifier> { classifier: None }
+    pub fn bayes() -> Self {
+        HogDetector::<BayesClassifier> { classifier: None }
     }
 }
 
-impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
+impl Trainable for HogDetector<BayesClassifier> {
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {
-        let kernel = Kernels::linear();
-        let parameters: SVCParametersType = SVCParameters::default()
-            .with_c(10.0)
-            .with_epoch(3)
-            .with_kernel(kernel);
-        let y_train: Vec<i32> = y_train
-            .iter()
-            .map(|y| if *y as u32 == 1 { 1 } else { -1 })
-            .collect();
-
-        let svc = SVC::fit(&x_train, &y_train, &parameters).unwrap();
-        let deserialized_svc: SVCType<'a> =
-            serde_json::from_str(&serde_json::to_string(&svc).unwrap()).unwrap();
-        let classifier = SVMClassifier {
-            svc: Some(deserialized_svc),
-        };
+        let nb = GaussianNB::fit(&x_train, &y_train, Default::default()).unwrap();
+        let classifier = BayesClassifier { inner: Some(nb) };
         self.classifier = Some(classifier);
     }
 
@@ -75,7 +59,6 @@ impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
             .collect();
         self.train(x_train, y_train);
     }
-
     fn evaluate(&mut self, dataset: &dyn DataSet, class: u32) -> f32 {
         let mut i = 0;
         let (x_train, y_train, _, _) = dataset.get();
@@ -89,7 +72,7 @@ impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
     }
 }
 
-impl<'a> Predictable for HogDetector<SVMClassifier<'a>> {
+impl Predictable for HogDetector<BayesClassifier> {
     fn predict(&self, image: &RgbImage) -> u32 {
         let image = resize(
             &DynamicImage::ImageRgb8(image.clone()),
@@ -104,7 +87,7 @@ impl<'a> Predictable for HogDetector<SVMClassifier<'a>> {
             .classifier
             .as_ref()
             .unwrap()
-            .svc
+            .inner
             .as_ref()
             .unwrap()
             .predict(&x)
@@ -113,7 +96,7 @@ impl<'a> Predictable for HogDetector<SVMClassifier<'a>> {
     }
 }
 
-impl<'a> Detector for HogDetector<SVMClassifier<'a>> {
+impl Detector for HogDetector<BayesClassifier> {
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
         let step_size = 8;
         let window_size = 32;
@@ -145,35 +128,15 @@ mod tests {
 
     #[test]
     fn test_default() {
-        let classifier = SVMClassifier::default();
-        assert!(classifier.svc.is_none());
+        let classifier = BayesClassifier::default();
+        assert!(classifier.inner.is_none());
     }
 
-    #[test]
-    fn test_part_eq() {
-        let classifier1 = SVMClassifier::default();
-        let classifier2 = SVMClassifier::default();
-        assert!(classifier1.svc.is_none());
-        assert!(classifier1.eq(&classifier2));
-        assert!(classifier1.eq(&classifier1));
-    }
-
-    #[test]
-    fn test_train() {
-        let mut model = HogDetector::<SVMClassifier>::default();
-
-        let mut dataset = MemoryDataSet::new_test();
-        dataset.load();
-
-        model.train_class(&dataset, 1);
-        assert!(model.classifier.is_some());
-    }
-
-    // #[ignore = "deserializing not working for svm kernel"]
+    // "smartcore log likelihood returns NaN"
     #[should_panic = "called `Option::unwrap()` on a `None` value"]
     #[test]
     fn test_evaluate() {
-        let mut model = HogDetector::<SVMClassifier>::default();
+        let mut model = HogDetector::<BayesClassifier>::default();
 
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
@@ -183,17 +146,17 @@ mod tests {
         assert!(model.evaluate(&dataset, 1) > 0.0);
     }
 
-    // #[ignore = "deserializing not working for svm kernel"]
+    // "smartcore log likelihood returns NaN"
     #[should_panic = "called `Option::unwrap()` on a `None` value"]
     #[test]
     fn test_detector() {
         let img = DynamicImage::ImageRgb8(test_image());
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
-        let mut detector = HogDetector::<SVMClassifier>::default();
+        let mut detector = HogDetector::<BayesClassifier>::default();
         detector.train_class(&dataset, 1);
         let detections = detector.detect_objects(&img);
-        assert_eq!(1, detections.len());
+        assert!(detections.len() > 0);
         assert!(detections[0].bbox.x < 75.0);
         assert!(detections[0].bbox.x > 25.0);
         assert!(detections[0].bbox.y < 25.0);

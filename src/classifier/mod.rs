@@ -1,3 +1,6 @@
+/// naive bayes classifier module
+pub mod bayes;
+pub use bayes::BayesClassifier;
 /// svm classifier module
 pub mod svm;
 pub use svm::SVMClassifier;

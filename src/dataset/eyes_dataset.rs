@@ -165,6 +165,7 @@ impl Default for EyesDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::classifier::BayesClassifier;
     use crate::classifier::RandomForestClassifier;
     use crate::Detector;
     use crate::HogDetector;
@@ -224,6 +225,23 @@ mod tests {
 
         std::fs::write(
             "res/eyes_random_forest_model.json",
+            serde_json::to_string(&model).unwrap(),
+        )
+        .unwrap();
+    }
+
+    #[ignore = "takes more than 200s in debug mode"]
+    #[test]
+    fn test_train_bayes_model() {
+        let mut model = HogDetector::<BayesClassifier>::default();
+
+        let mut dataset = EyesDataSet::default();
+        dataset.load();
+        model.train_class(&dataset, 1);
+        assert!(model.classifier.is_some());
+
+        std::fs::write(
+            "res/eyes_bayes_model.json",
             serde_json::to_string(&model).unwrap(),
         )
         .unwrap();
