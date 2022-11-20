@@ -1,9 +1,8 @@
+use crate::classifier::Classifier;
 use image::{DynamicImage, RgbImage};
 use imageproc::hog::{hog, HogOptions};
 use serde::{Deserialize, Serialize};
 use smartcore::linalg::basic::matrix::DenseMatrix;
-
-use crate::classifier::Classifier;
 
 /// Hog Detector struct
 #[derive(Serialize, Deserialize, Debug)]

@@ -8,7 +8,7 @@ fn main() {
     use hog_detector::{
         classifier::SVMClassifier, dataset::EyesDataSet, DataSet, Detector, HogDetector, Trainable,
     };
-    let mut model = HogDetector::default();
+    let mut model = HogDetector::<SVMClassifier>::default();
 
     let mut dataset = EyesDataSet::default();
     println!("downloading eyes dataset");

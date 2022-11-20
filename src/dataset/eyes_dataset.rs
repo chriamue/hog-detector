@@ -166,7 +166,6 @@ impl Default for EyesDataSet {
 mod tests {
     use super::*;
     use crate::classifier::RandomForestClassifier;
-    use crate::classifier::SVMClassifier;
     use crate::Detector;
     use crate::HogDetector;
     use crate::Trainable;
@@ -198,8 +197,8 @@ mod tests {
 
     #[ignore = "takes more than 200s in debug mode"]
     #[test]
-    fn test_train() {
-        let mut model = HogDetector::random_forest();
+    fn test_train_svm_model() {
+        let mut model = HogDetector::svm();
 
         let mut dataset = EyesDataSet::default();
         dataset.load();
@@ -207,7 +206,7 @@ mod tests {
         assert!(model.classifier.is_some());
 
         std::fs::write(
-            "res/eyes_model.json",
+            "res/eyes_svm_model.json",
             serde_json::to_string(&model).unwrap(),
         )
         .unwrap();
@@ -233,8 +232,8 @@ mod tests {
     #[test]
     fn test_detect() {
         let model = {
-            let model = std::fs::read_to_string("res/eyes_model.json").unwrap();
-            serde_json::from_str::<HogDetector<SVMClassifier>>(&model).unwrap()
+            let model = std::fs::read_to_string("res/eyes_random_forest_model.json").unwrap();
+            serde_json::from_str::<HogDetector<RandomForestClassifier>>(&model).unwrap()
         };
         assert!(model.classifier.is_some());
         let lenna = image::open("res/lenna.png").unwrap();
