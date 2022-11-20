@@ -70,6 +70,12 @@ export class HogDetectorJS {
 */
   constructor();
 /**
+*/
+  init_random_forest_classifier(): void;
+/**
+*/
+  init_bayes_classifier(): void;
+/**
 * @param {Uint8Array} img_data
 * @returns {Uint8Array}
 */
@@ -120,16 +126,18 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_annotationsjs_free: (a: number) => void;
-  readonly annotationsjs_new: () => number;
   readonly init_images: (a: number) => number;
   readonly init_annotation_tool: (a: number, b: number) => void;
   readonly init_trainer: (a: number, b: number, c: number) => void;
-  readonly __wbg_annotatedimagesjs_free: (a: number) => void;
-  readonly annotatedimagesjs_new: () => number;
+  readonly __wbg_annotationsjs_free: (a: number) => void;
+  readonly annotationsjs_new: () => number;
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
   readonly hogdetectorjs_new: () => number;
+  readonly hogdetectorjs_init_random_forest_classifier: (a: number) => void;
+  readonly hogdetectorjs_init_bayes_classifier: (a: number) => void;
   readonly hogdetectorjs_next: (a: number, b: number, c: number, d: number) => void;
+  readonly __wbg_annotatedimagesjs_free: (a: number) => void;
+  readonly annotatedimagesjs_new: () => number;
   readonly __wbg_wasmbindgentestcontext_free: (a: number) => void;
   readonly wasmbindgentestcontext_new: () => number;
   readonly wasmbindgentestcontext_args: (a: number, b: number, c: number) => void;

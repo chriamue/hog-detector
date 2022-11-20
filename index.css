@@ -37,6 +37,12 @@
 #use-webcam-image {
     margin: auto 2rem;
 }
+#train-classifier-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 1rem;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
 #data-sources {
     display: flex;
     justify-content: space-evenly;
