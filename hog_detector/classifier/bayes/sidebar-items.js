@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["BayesClassifier","A naive bayes classifier"]]};
