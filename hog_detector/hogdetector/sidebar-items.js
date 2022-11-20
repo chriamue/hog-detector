@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["HogDetector","Hog Detector struct"]]};
+window.SIDEBAR_ITEMS = {"struct":[["HogDetector","Hog Detector struct"]],"trait":[["HogDetectorTrait","trait of an hog detector"]]};

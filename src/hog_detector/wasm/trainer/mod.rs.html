@@ -47,6 +47,24 @@
 <span id="47">47</span>
 <span id="48">48</span>
 <span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
 <span class="kw">use </span><span class="kw">super</span>::HogDetectorJS;
 <span class="kw">use </span>wasm_bindgen_test::console_log;
@@ -56,6 +74,8 @@
 
 <span class="kw">pub enum </span>Msg {
     Train,
+    SwitchBayesClassifier,
+    SwitchRandomForestClassifier,
 }
 
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
@@ -82,17 +102,33 @@
                 <span class="macro">console_log!</span>(<span class="string">&quot;{}&quot;</span>, ctx.props().images);
                 <span class="bool-val">true
             </span>}
+            Msg::SwitchBayesClassifier =&gt; {
+                ctx.props().detector.init_bayes_classifier();
+                <span class="bool-val">true
+            </span>}
+            Msg::SwitchRandomForestClassifier =&gt; {
+                ctx.props().detector.init_random_forest_classifier();
+                <span class="bool-val">true
+            </span>}
         }
     }
 
     <span class="kw">fn </span>view(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;) -&gt; Html {
-        <span class="kw">let </span>onclick = ctx.link().callback(|<span class="kw">_</span>| Msg::Train);
+        <span class="kw">let </span>onclick_train = ctx.link().callback(|<span class="kw">_</span>| Msg::Train);
+        <span class="kw">let </span>onclick_bayes = ctx.link().callback(|<span class="kw">_</span>| Msg::SwitchBayesClassifier);
+        <span class="kw">let </span>onclick_random_forest = ctx.link().callback(|<span class="kw">_</span>| Msg::SwitchRandomForestClassifier);
         <span class="macro">html! </span>{
-            &lt;&gt;
-                &lt;button <span class="kw">type</span>=<span class="string">&quot;button&quot; </span>class=<span class="string">&quot;btn btn-success&quot; </span>{onclick}&gt;
-                    { <span class="string">&quot;Train Detector&quot; </span>}
-                &lt;/button&gt;
-            &lt;/&gt;
+            &lt;div id=<span class="string">&quot;train-classifier-buttons&quot;</span>&gt;
+        &lt;button <span class="kw">type</span>=<span class="string">&quot;button&quot; </span>class=<span class="string">&quot;btn btn-success&quot; </span>onclick={onclick_train}&gt;
+        { <span class="string">&quot;Train Detector&quot; </span>}
+        &lt;/button&gt;
+        &lt;button <span class="kw">type</span>=<span class="string">&quot;button&quot; </span>class=<span class="string">&quot;btn btn-success&quot; </span>onclick={onclick_bayes}&gt;
+        { <span class="string">&quot;Switch to Naive Bayes Classifier&quot; </span>}
+        &lt;/button&gt;
+        &lt;button <span class="kw">type</span>=<span class="string">&quot;button&quot; </span>class=<span class="string">&quot;btn btn-success&quot; </span>onclick={onclick_random_forest}&gt;
+        { <span class="string">&quot;Switch to Random Forest Classifier&quot; </span>}
+        &lt;/button&gt;
+            &lt;/div&gt;
         }
     }
 }

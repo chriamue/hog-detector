@@ -69,19 +69,31 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::RandomForestClassifier;
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::BayesClassifier;
+<span class="kw">use </span><span class="kw">crate</span>::classifier::RandomForestClassifier;
+<span class="kw">use </span><span class="kw">crate</span>::hogdetector::HogDetectorTrait;
 <span class="kw">use </span><span class="kw">crate</span>::DataSet;
-<span class="kw">use </span><span class="kw">crate</span>::Detector;
 <span class="kw">use </span><span class="kw">crate</span>::HogDetector;
-<span class="kw">use </span><span class="kw">crate</span>::Trainable;
-<span class="kw">use </span>std::ops::Deref;
 <span class="kw">use </span>std::sync::{Arc, Mutex};
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attribute">#[wasm_bindgen]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>HogDetectorJS {
-    hog: Arc&lt;Mutex&lt;HogDetector&lt;RandomForestClassifier&gt;&gt;&gt;,
+    hog: Arc&lt;Mutex&lt;Box&lt;<span class="kw">dyn </span>HogDetectorTrait&gt;&gt;&gt;,
 }
 
 <span class="kw">impl </span>HogDetectorJS {
@@ -104,8 +116,26 @@
         };
 
         HogDetectorJS {
-            hog: Arc::new(Mutex::new(hog)),
+            hog: Arc::new(Mutex::new(Box::new(hog))),
         }
+    }
+
+    <span class="attribute">#[wasm_bindgen]
+    </span><span class="kw">pub fn </span>init_random_forest_classifier(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span>hog = {
+            <span class="kw">let </span>model = <span class="macro">include_str!</span>(<span class="string">&quot;../../res/eyes_random_forest_model.json&quot;</span>);
+            serde_json::from_str::&lt;HogDetector&lt;RandomForestClassifier&gt;&gt;(model).unwrap()
+        };
+        <span class="kw-2">*</span><span class="self">self</span>.hog.lock().unwrap() = Box::new(hog);
+    }
+
+    <span class="attribute">#[wasm_bindgen]
+    </span><span class="kw">pub fn </span>init_bayes_classifier(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span>hog = {
+            <span class="kw">let </span>model = <span class="macro">include_str!</span>(<span class="string">&quot;../../res/eyes_bayes_model.json&quot;</span>);
+            serde_json::from_str::&lt;HogDetector&lt;BayesClassifier&gt;&gt;(model).unwrap()
+        };
+        <span class="kw-2">*</span><span class="self">self</span>.hog.lock().unwrap() = Box::new(hog);
     }
 
     <span class="attribute">#[wasm_bindgen]
@@ -127,11 +157,7 @@
 
 <span class="kw">impl </span>PartialEq <span class="kw">for </span>HogDetectorJS {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="kw">if </span>::core::ptr::eq(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>other) {
-            <span class="bool-val">true
-        </span>} <span class="kw">else </span>{
-            other.hog.try_lock().unwrap().deref() == <span class="self">self</span>.hog.try_lock().unwrap().deref()
-        }
+        ::core::ptr::eq(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>other)
     }
 }
 

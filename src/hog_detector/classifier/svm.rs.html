@@ -203,7 +203,11 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::{detect_objects, visualize_detections};
+<span class="kw">use </span><span class="kw">crate</span>::hogdetector::HogDetectorTrait;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Detection;
 <span class="kw">use </span><span class="kw">crate</span>::utils::{pyramid, sliding_window};
 <span class="kw">use crate</span>::{DataSet, Detector, HogDetector, Predictable, Trainable};
@@ -249,6 +253,8 @@
         HogDetector::&lt;SVMClassifier&gt; { classifier: <span class="prelude-val">None </span>}
     }
 }
+
+<span class="kw">impl </span>HogDetectorTrait <span class="kw">for </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {}
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Trainable <span class="kw">for </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
     <span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;u32&gt;) {

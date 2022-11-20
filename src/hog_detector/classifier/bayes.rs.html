@@ -166,8 +166,12 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     detector::{detect_objects, visualize_detections},
+    hogdetector::HogDetectorTrait,
     prelude::Detection,
     utils::{pyramid, sliding_window},
     DataSet, Detector, HogDetector, Predictable, Trainable,
@@ -210,6 +214,8 @@
         HogDetector::&lt;BayesClassifier&gt; { classifier: <span class="prelude-val">None </span>}
     }
 }
+
+<span class="kw">impl </span>HogDetectorTrait <span class="kw">for </span>HogDetector&lt;BayesClassifier&gt; {}
 
 <span class="kw">impl </span>Trainable <span class="kw">for </span>HogDetector&lt;BayesClassifier&gt; {
     <span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;u32&gt;) {

@@ -82,7 +82,10 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::Classifier;
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{classifier::Classifier, Detector, Trainable};
 <span class="kw">use </span>image::{DynamicImage, RgbImage};
 <span class="kw">use </span>imageproc::hog::{hog, HogOptions};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -94,6 +97,9 @@
     <span class="doccomment">/// support vector classifier
     </span><span class="kw">pub </span>classifier: <span class="prelude-ty">Option</span>&lt;C&gt;,
 }
+
+<span class="doccomment">/// trait of an hog detector
+</span><span class="kw">pub trait </span>HogDetectorTrait: Trainable + Detector {}
 
 <span class="kw">impl</span>&lt;C: Classifier&gt; PartialEq <span class="kw">for </span>HogDetector&lt;C&gt; {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>HogDetector&lt;C&gt;) -&gt; bool {
