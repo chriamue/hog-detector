@@ -93,59 +93,8 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
-<span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
 <span class="kw">use </span><span class="kw">crate</span>::detection::{merge, nms_sort, Detection};
-<span class="kw">use </span><span class="kw">crate</span>::utils::{pyramid, sliding_window};
-<span class="kw">use </span><span class="kw">crate</span>::HogDetector;
-<span class="kw">use </span><span class="kw">crate</span>::Predictable;
 <span class="kw">use </span>image::{DynamicImage, Rgba};
 <span class="kw">use </span>imageproc::drawing::{draw_hollow_rect_mut, draw_text_mut};
 <span class="kw">use </span>imageproc::rect::Rect;
@@ -213,35 +162,10 @@
     </span><span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; DynamicImage;
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Detector <span class="kw">for </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-    <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt; {
-        <span class="kw">let </span>step_size = <span class="number">8</span>;
-        <span class="kw">let </span>window_size = <span class="number">32</span>;
-        <span class="kw">let </span>image = image.to_rgb8();
-        <span class="kw">let </span><span class="kw-2">mut </span>windows = sliding_window(<span class="kw-2">&amp;</span>image, step_size, window_size);
-        windows.extend(pyramid(<span class="kw-2">&amp;</span>image, <span class="number">1.3</span>, step_size, window_size));
-        windows.extend(pyramid(<span class="kw-2">&amp;</span>image, <span class="number">1.5</span>, step_size, window_size));
-
-        <span class="kw">let </span>predictions: Vec&lt;(u32, u32, u32)&gt; = windows
-            .iter()
-            .map(|(x, y, window)| (<span class="kw-2">*</span>x, <span class="kw-2">*</span>y, <span class="self">self</span>.predict(window)))
-            .collect();
-        detect_objects(predictions, window_size)
-    }
-
-    <span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; DynamicImage {
-        <span class="kw">let </span>detections = <span class="self">self</span>.detect_objects(image);
-        visualize_detections(image, <span class="kw-2">&amp;</span>detections)
-    }
-}
-
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
-    <span class="kw">use </span><span class="kw">crate</span>::dataset::{DataSet, MemoryDataSet};
     <span class="kw">use </span><span class="kw">crate</span>::tests::test_image;
-    <span class="kw">use </span><span class="kw">crate</span>::Trainable;
     <span class="kw">use </span>image::Rgb;
 
     <span class="attribute">#[test]
@@ -262,24 +186,6 @@
 
         img.save(<span class="string">&quot;out/test_image2.png&quot;</span>).unwrap();
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">125</span>, <span class="number">255</span>, <span class="number">0</span>]), img.get_pixel(<span class="number">8</span>, <span class="number">8</span>));
-    }
-
-    <span class="attribute">#[test]
-    </span><span class="kw">fn </span>test_detector() {
-        <span class="kw">let </span>img = DynamicImage::ImageRgb8(test_image());
-        <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
-        dataset.load();
-        <span class="kw">let </span><span class="kw-2">mut </span>detector = HogDetector::&lt;SVMClassifier&gt;::default();
-        detector.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
-        <span class="kw">let </span>detections = detector.detect_objects(<span class="kw-2">&amp;</span>img);
-        <span class="macro">assert_eq!</span>(<span class="number">1</span>, detections.len());
-        <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.x &lt; <span class="number">75.0</span>);
-        <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.x &gt; <span class="number">25.0</span>);
-        <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.y &lt; <span class="number">25.0</span>);
-        <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.y &gt;= <span class="number">0.0</span>);
-        <span class="kw">let </span>visualization = detector.visualize_detections(<span class="kw-2">&amp;</span>img).to_rgb8();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">125</span>, <span class="number">255</span>, <span class="number">0</span>]), visualization.get_pixel(<span class="number">55</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">125</span>, <span class="number">255</span>, <span class="number">0</span>]), visualization.get_pixel(<span class="number">75</span>, <span class="number">0</span>));
     }
 }
 </code></pre></div>

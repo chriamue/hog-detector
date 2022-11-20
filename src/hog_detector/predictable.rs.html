@@ -4,75 +4,11 @@
 <span id="4">4</span>
 <span id="5">5</span>
 <span id="6">6</span>
-<span id="7">7</span>
-<span id="8">8</span>
-<span id="9">9</span>
-<span id="10">10</span>
-<span id="11">11</span>
-<span id="12">12</span>
-<span id="13">13</span>
-<span id="14">14</span>
-<span id="15">15</span>
-<span id="16">16</span>
-<span id="17">17</span>
-<span id="18">18</span>
-<span id="19">19</span>
-<span id="20">20</span>
-<span id="21">21</span>
-<span id="22">22</span>
-<span id="23">23</span>
-<span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
-<span class="kw">use </span><span class="kw">crate</span>::HogDetector;
-<span class="kw">use </span>image::{imageops::resize, imageops::FilterType};
-<span class="kw">use </span>image::{DynamicImage, RgbImage};
-<span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
+</pre><pre class="rust"><code><span class="kw">use </span>image::RgbImage;
 <span class="doccomment">/// predictable trait
 </span><span class="kw">pub trait </span>Predictable {
     <span class="doccomment">/// predicts class of image
     </span><span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; u32;
 }
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Predictable <span class="kw">for </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-    <span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; u32 {
-        <span class="kw">let </span>image = resize(
-            <span class="kw-2">&amp;</span>DynamicImage::ImageRgb8(image.clone()),
-            <span class="number">32</span>,
-            <span class="number">32</span>,
-            FilterType::Gaussian,
-        );
-        <span class="kw">let </span>image = DynamicImage::ImageRgba8(image).to_rgb8();
-        <span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="self">self</span>.preprocess(<span class="kw-2">&amp;</span>image)];
-        <span class="kw">let </span>x = DenseMatrix::from_2d_vec(<span class="kw-2">&amp;</span>x);
-        <span class="kw">let </span>y = <span class="self">self
-            </span>.classifier
-            .as_ref()
-            .unwrap()
-            .svc
-            .as_ref()
-            .unwrap()
-            .predict(<span class="kw-2">&amp;</span>x)
-            .unwrap();
-        <span class="kw-2">*</span>y.first().unwrap() <span class="kw">as </span>u32
-    }
-}
-
-<span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
-#[cfg(test)]
-</span><span class="kw">mod </span>tests {}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hog_detector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

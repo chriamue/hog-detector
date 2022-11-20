@@ -316,7 +316,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>detector = HogDetector::&lt;RandomForestClassifier&gt;::default();
         detector.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="kw">let </span>detections = detector.detect_objects(<span class="kw-2">&amp;</span>img);
-        <span class="macro">assert_eq!</span>(<span class="number">1</span>, detections.len());
+        <span class="macro">assert!</span>(detections.len() &gt; <span class="number">0</span>);
         <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.x &lt; <span class="number">75.0</span>);
         <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.x &gt; <span class="number">25.0</span>);
         <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.y &lt; <span class="number">25.0</span>);

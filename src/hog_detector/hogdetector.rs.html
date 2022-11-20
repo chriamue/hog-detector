@@ -82,13 +82,11 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
-<span id="85">85</span>
-</pre><pre class="rust"><code><span class="kw">use </span>image::{DynamicImage, RgbImage};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::Classifier;
+<span class="kw">use </span>image::{DynamicImage, RgbImage};
 <span class="kw">use </span>imageproc::hog::{hog, HogOptions};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
-
-<span class="kw">use </span><span class="kw">crate</span>::classifier::Classifier;
 
 <span class="doccomment">/// Hog Detector struct
 </span><span class="attribute">#[derive(Serialize, Deserialize, Debug)]
