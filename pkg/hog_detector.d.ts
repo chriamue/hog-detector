@@ -120,11 +120,11 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly __wbg_annotationsjs_free: (a: number) => void;
+  readonly annotationsjs_new: () => number;
   readonly init_images: (a: number) => number;
   readonly init_annotation_tool: (a: number, b: number) => void;
   readonly init_trainer: (a: number, b: number, c: number) => void;
-  readonly __wbg_annotationsjs_free: (a: number) => void;
-  readonly annotationsjs_new: () => number;
   readonly __wbg_annotatedimagesjs_free: (a: number) => void;
   readonly annotatedimagesjs_new: () => number;
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
