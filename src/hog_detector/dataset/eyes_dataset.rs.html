@@ -251,16 +251,6 @@
 <span id="251">251</span>
 <span id="252">252</span>
 <span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
 </pre><pre class="rust"><code><span class="comment">// source: https://github.com/tiruss/eye_detector
 // https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip
 
@@ -430,6 +420,7 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::classifier::BayesClassifier;
     <span class="kw">use </span><span class="kw">crate</span>::classifier::RandomForestClassifier;
+    <span class="kw">use </span><span class="kw">crate</span>::hogdetector::HogDetectorTrait;
     <span class="kw">use </span><span class="kw">crate</span>::Detector;
     <span class="kw">use </span><span class="kw">crate</span>::HogDetector;
     <span class="kw">use </span><span class="kw">crate</span>::Trainable;
@@ -469,11 +460,7 @@
         model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="macro">assert!</span>(model.classifier.is_some());
 
-        std::fs::write(
-            <span class="string">&quot;res/eyes_svm_model.json&quot;</span>,
-            serde_json::to_string(<span class="kw-2">&amp;</span>model).unwrap(),
-        )
-        .unwrap();
+        std::fs::write(<span class="string">&quot;res/eyes_svm_model.json&quot;</span>, model.save()).unwrap();
     }
 
     <span class="attribute">#[ignore = <span class="string">&quot;takes more than 200s in debug mode&quot;</span>]
@@ -486,11 +473,7 @@
         model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="macro">assert!</span>(model.classifier.is_some());
 
-        std::fs::write(
-            <span class="string">&quot;res/eyes_random_forest_model.json&quot;</span>,
-            serde_json::to_string(<span class="kw-2">&amp;</span>model).unwrap(),
-        )
-        .unwrap();
+        std::fs::write(<span class="string">&quot;res/eyes_random_forest_model.json&quot;</span>, model.save()).unwrap();
     }
 
     <span class="attribute">#[ignore = <span class="string">&quot;takes more than 200s in debug mode&quot;</span>]
@@ -503,18 +486,15 @@
         model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="macro">assert!</span>(model.classifier.is_some());
 
-        std::fs::write(
-            <span class="string">&quot;res/eyes_bayes_model.json&quot;</span>,
-            serde_json::to_string(<span class="kw-2">&amp;</span>model).unwrap(),
-        )
-        .unwrap();
+        std::fs::write(<span class="string">&quot;res/eyes_bayes_model.json&quot;</span>, model.save()).unwrap();
     }
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_detect() {
         <span class="kw">let </span>model = {
-            <span class="kw">let </span>model = std::fs::read_to_string(<span class="string">&quot;res/eyes_random_forest_model.json&quot;</span>).unwrap();
-            serde_json::from_str::&lt;HogDetector&lt;RandomForestClassifier&gt;&gt;(<span class="kw-2">&amp;</span>model).unwrap()
+            <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::&lt;RandomForestClassifier&gt;::default();
+            model.load(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">&quot;res/eyes_random_forest_model.json&quot;</span>).unwrap());
+            model
         };
         <span class="macro">assert!</span>(model.classifier.is_some());
         <span class="kw">let </span>lenna = image::open(<span class="string">&quot;res/lenna.png&quot;</span>).unwrap();

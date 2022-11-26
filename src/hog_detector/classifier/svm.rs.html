@@ -200,7 +200,32 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::{detect_objects, visualize_detections};
+<span class="kw">use </span><span class="kw">crate</span>::feature_descriptor::HogFeatureDescriptor;
 <span class="kw">use </span><span class="kw">crate</span>::hogdetector::HogDetectorTrait;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Detection;
 <span class="kw">use </span><span class="kw">crate</span>::utils::{pyramid, sliding_window};
@@ -238,11 +263,22 @@
 <span class="kw">impl </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
     <span class="doccomment">/// new default support vector machine detector
     </span><span class="kw">pub fn </span>svm() -&gt; <span class="self">Self </span>{
-        HogDetector::&lt;SVMClassifier&gt; { classifier: <span class="prelude-val">None </span>}
+        HogDetector::&lt;SVMClassifier&gt; {
+            classifier: <span class="prelude-val">None</span>,
+            feature_descriptor: Box::new(HogFeatureDescriptor::default()),
+        }
     }
 }
 
-<span class="kw">impl </span>HogDetectorTrait <span class="kw">for </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {}
+<span class="kw">impl </span>HogDetectorTrait <span class="kw">for </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    <span class="kw">fn </span>save(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.classifier).unwrap()
+    }
+
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.classifier = <span class="prelude-val">Some</span>(serde_json::from_str::&lt;SVMClassifier&gt;(model).unwrap());
+    }
+}
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Trainable <span class="kw">for </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
     <span class="kw">fn </span>train(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x_train: DenseMatrix&lt;f32&gt;, y_train: Vec&lt;u32&gt;) {
@@ -355,6 +391,18 @@
         <span class="macro">assert!</span>(classifier1.svc.is_none());
         <span class="macro">assert!</span>(classifier1.eq(<span class="kw-2">&amp;</span>classifier2));
         <span class="macro">assert!</span>(classifier1.eq(<span class="kw-2">&amp;</span>classifier1));
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_save_load() {
+        <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::&lt;SVMClassifier&gt;::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
+        dataset.load();
+        model.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
+        <span class="kw">let </span>serialized = model.save();
+        <span class="kw">let </span><span class="kw-2">mut </span>model2 = HogDetector::&lt;SVMClassifier&gt;::default();
+        model2.load(<span class="kw-2">&amp;</span>serialized);
+        <span class="macro">assert_eq!</span>(model, model2);
     }
 
     <span class="attribute">#[test]

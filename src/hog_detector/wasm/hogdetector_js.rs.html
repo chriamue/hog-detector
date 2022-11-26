@@ -79,9 +79,6 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::BayesClassifier;
 <span class="kw">use </span><span class="kw">crate</span>::classifier::RandomForestClassifier;
 <span class="kw">use </span><span class="kw">crate</span>::hogdetector::HogDetectorTrait;
@@ -110,10 +107,9 @@
         <span class="kw">use </span>console_error_panic_hook;
         console_error_panic_hook::set_once();
 
-        <span class="kw">let </span>hog = {
-            <span class="kw">let </span>model = <span class="macro">include_str!</span>(<span class="string">&quot;../../res/eyes_random_forest_model.json&quot;</span>);
-            serde_json::from_str::&lt;HogDetector&lt;RandomForestClassifier&gt;&gt;(model).unwrap()
-        };
+        <span class="kw">let </span><span class="kw-2">mut </span>hog = HogDetector::&lt;RandomForestClassifier&gt;::default();
+        <span class="kw">let </span>model = <span class="macro">include_str!</span>(<span class="string">&quot;../../res/eyes_random_forest_model.json&quot;</span>);
+        hog.load(model);
 
         HogDetectorJS {
             hog: Arc::new(Mutex::new(Box::new(hog))),
@@ -122,19 +118,17 @@
 
     <span class="attribute">#[wasm_bindgen]
     </span><span class="kw">pub fn </span>init_random_forest_classifier(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let </span>hog = {
-            <span class="kw">let </span>model = <span class="macro">include_str!</span>(<span class="string">&quot;../../res/eyes_random_forest_model.json&quot;</span>);
-            serde_json::from_str::&lt;HogDetector&lt;RandomForestClassifier&gt;&gt;(model).unwrap()
-        };
+        <span class="kw">let </span><span class="kw-2">mut </span>hog = HogDetector::&lt;RandomForestClassifier&gt;::default();
+        <span class="kw">let </span>model = <span class="macro">include_str!</span>(<span class="string">&quot;../../res/eyes_random_forest_model.json&quot;</span>);
+        hog.load(model);
         <span class="kw-2">*</span><span class="self">self</span>.hog.lock().unwrap() = Box::new(hog);
     }
 
     <span class="attribute">#[wasm_bindgen]
     </span><span class="kw">pub fn </span>init_bayes_classifier(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let </span>hog = {
-            <span class="kw">let </span>model = <span class="macro">include_str!</span>(<span class="string">&quot;../../res/eyes_bayes_model.json&quot;</span>);
-            serde_json::from_str::&lt;HogDetector&lt;BayesClassifier&gt;&gt;(model).unwrap()
-        };
+        <span class="kw">let </span><span class="kw-2">mut </span>hog = HogDetector::&lt;BayesClassifier&gt;::default();
+        <span class="kw">let </span>model = <span class="macro">include_str!</span>(<span class="string">&quot;../../res/eyes_bayes_model.json&quot;</span>);
+        hog.load(model);
         <span class="kw-2">*</span><span class="self">self</span>.hog.lock().unwrap() = Box::new(hog);
     }
 
