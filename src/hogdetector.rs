@@ -4,18 +4,24 @@ use crate::{
     Detector, Trainable,
 };
 use image::{DynamicImage, RgbImage};
-use serde::{Deserialize, Serialize};
 use smartcore::linalg::basic::matrix::DenseMatrix;
 
 /// Hog Detector struct
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct HogDetector<C: Classifier> {
     /// support vector classifier
     pub classifier: Option<C>,
+    /// the feature descriptor
+    pub feature_descriptor: Box<dyn FeatureDescriptor>,
 }
 
 /// trait of an hog detector
-pub trait HogDetectorTrait: Trainable + Detector {}
+pub trait HogDetectorTrait: Trainable + Detector {
+    /// save to string
+    fn save(&self) -> String;
+    /// load from string
+    fn load(&mut self, model: &str);
+}
 
 impl<C: Classifier> PartialEq for HogDetector<C> {
     fn eq(&self, other: &HogDetector<C>) -> bool {
@@ -32,7 +38,10 @@ impl<C: Classifier> PartialEq for HogDetector<C> {
 
 impl<C: Classifier> Default for HogDetector<C> {
     fn default() -> Self {
-        HogDetector::<C> { classifier: None }
+        HogDetector::<C> {
+            classifier: None,
+            feature_descriptor: Box::new(HogFeatureDescriptor::default()),
+        }
     }
 }
 

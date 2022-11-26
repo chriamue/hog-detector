@@ -1,4 +1,5 @@
 use crate::detector::{detect_objects, visualize_detections};
+use crate::feature_descriptor::HogFeatureDescriptor;
 use crate::hogdetector::HogDetectorTrait;
 use crate::prelude::Detection;
 use crate::utils::{pyramid, sliding_window};
@@ -36,11 +37,22 @@ impl PartialEq for SVMClassifier<'_> {
 impl HogDetector<SVMClassifier<'_>> {
     /// new default support vector machine detector
     pub fn svm() -> Self {
-        HogDetector::<SVMClassifier> { classifier: None }
+        HogDetector::<SVMClassifier> {
+            classifier: None,
+            feature_descriptor: Box::new(HogFeatureDescriptor::default()),
+        }
     }
 }
 
-impl HogDetectorTrait for HogDetector<SVMClassifier<'_>> {}
+impl HogDetectorTrait for HogDetector<SVMClassifier<'_>> {
+    fn save(&self) -> String {
+        serde_json::to_string(&self.classifier).unwrap()
+    }
+
+    fn load(&mut self, model: &str) {
+        self.classifier = Some(serde_json::from_str::<SVMClassifier>(model).unwrap());
+    }
+}
 
 impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {
@@ -153,6 +165,18 @@ mod tests {
         assert!(classifier1.svc.is_none());
         assert!(classifier1.eq(&classifier2));
         assert!(classifier1.eq(&classifier1));
+    }
+
+    #[test]
+    fn test_save_load() {
+        let mut model = HogDetector::<SVMClassifier>::default();
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load();
+        model.train_class(&dataset, 1);
+        let serialized = model.save();
+        let mut model2 = HogDetector::<SVMClassifier>::default();
+        model2.load(&serialized);
+        assert_eq!(model, model2);
     }
 
     #[test]

@@ -1,5 +1,6 @@
 use crate::{
     detector::{detect_objects, visualize_detections},
+    feature_descriptor::HogFeatureDescriptor,
     hogdetector::HogDetectorTrait,
     prelude::Detection,
     utils::{pyramid, sliding_window},
@@ -40,11 +41,22 @@ impl Default for BayesClassifier {
 impl HogDetector<BayesClassifier> {
     /// new default bayes
     pub fn bayes() -> Self {
-        HogDetector::<BayesClassifier> { classifier: None }
+        HogDetector::<BayesClassifier> {
+            classifier: None,
+            feature_descriptor: Box::new(HogFeatureDescriptor::default()),
+        }
     }
 }
 
-impl HogDetectorTrait for HogDetector<BayesClassifier> {}
+impl HogDetectorTrait for HogDetector<BayesClassifier> {
+    fn save(&self) -> String {
+        serde_json::to_string(&self.classifier).unwrap()
+    }
+
+    fn load(&mut self, model: &str) {
+        self.classifier = Some(serde_json::from_str::<BayesClassifier>(model).unwrap());
+    }
+}
 
 impl Trainable for HogDetector<BayesClassifier> {
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {
@@ -140,6 +152,18 @@ mod tests {
         let detector1 = HogDetector::default();
         let detector2 = HogDetector::bayes();
         assert!(detector1.eq(&detector2));
+    }
+
+    #[test]
+    fn test_save_load() {
+        let mut model = HogDetector::<BayesClassifier>::default();
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load();
+        model.train_class(&dataset, 1);
+        let serialized = model.save();
+        let mut model2 = HogDetector::<BayesClassifier>::default();
+        model2.load(&serialized);
+        assert_eq!(model, model2);
     }
 
     #[test]

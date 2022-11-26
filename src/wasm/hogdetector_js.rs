@@ -26,10 +26,9 @@ impl HogDetectorJS {
         use console_error_panic_hook;
         console_error_panic_hook::set_once();
 
-        let hog = {
-            let model = include_str!("../../res/eyes_random_forest_model.json");
-            serde_json::from_str::<HogDetector<RandomForestClassifier>>(model).unwrap()
-        };
+        let mut hog = HogDetector::<RandomForestClassifier>::default();
+        let model = include_str!("../../res/eyes_random_forest_model.json");
+        hog.load(model);
 
         HogDetectorJS {
             hog: Arc::new(Mutex::new(Box::new(hog))),
@@ -38,19 +37,17 @@ impl HogDetectorJS {
 
     #[wasm_bindgen]
     pub fn init_random_forest_classifier(&self) {
-        let hog = {
-            let model = include_str!("../../res/eyes_random_forest_model.json");
-            serde_json::from_str::<HogDetector<RandomForestClassifier>>(model).unwrap()
-        };
+        let mut hog = HogDetector::<RandomForestClassifier>::default();
+        let model = include_str!("../../res/eyes_random_forest_model.json");
+        hog.load(model);
         *self.hog.lock().unwrap() = Box::new(hog);
     }
 
     #[wasm_bindgen]
     pub fn init_bayes_classifier(&self) {
-        let hog = {
-            let model = include_str!("../../res/eyes_bayes_model.json");
-            serde_json::from_str::<HogDetector<BayesClassifier>>(model).unwrap()
-        };
+        let mut hog = HogDetector::<BayesClassifier>::default();
+        let model = include_str!("../../res/eyes_bayes_model.json");
+        hog.load(model);
         *self.hog.lock().unwrap() = Box::new(hog);
     }
 

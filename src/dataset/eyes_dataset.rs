@@ -167,6 +167,7 @@ mod tests {
     use super::*;
     use crate::classifier::BayesClassifier;
     use crate::classifier::RandomForestClassifier;
+    use crate::hogdetector::HogDetectorTrait;
     use crate::Detector;
     use crate::HogDetector;
     use crate::Trainable;
@@ -206,11 +207,7 @@ mod tests {
         model.train_class(&dataset, 1);
         assert!(model.classifier.is_some());
 
-        std::fs::write(
-            "res/eyes_svm_model.json",
-            serde_json::to_string(&model).unwrap(),
-        )
-        .unwrap();
+        std::fs::write("res/eyes_svm_model.json", model.save()).unwrap();
     }
 
     #[ignore = "takes more than 200s in debug mode"]
@@ -223,11 +220,7 @@ mod tests {
         model.train_class(&dataset, 1);
         assert!(model.classifier.is_some());
 
-        std::fs::write(
-            "res/eyes_random_forest_model.json",
-            serde_json::to_string(&model).unwrap(),
-        )
-        .unwrap();
+        std::fs::write("res/eyes_random_forest_model.json", model.save()).unwrap();
     }
 
     #[ignore = "takes more than 200s in debug mode"]
@@ -240,18 +233,15 @@ mod tests {
         model.train_class(&dataset, 1);
         assert!(model.classifier.is_some());
 
-        std::fs::write(
-            "res/eyes_bayes_model.json",
-            serde_json::to_string(&model).unwrap(),
-        )
-        .unwrap();
+        std::fs::write("res/eyes_bayes_model.json", model.save()).unwrap();
     }
 
     #[test]
     fn test_detect() {
         let model = {
-            let model = std::fs::read_to_string("res/eyes_random_forest_model.json").unwrap();
-            serde_json::from_str::<HogDetector<RandomForestClassifier>>(&model).unwrap()
+            let mut model = HogDetector::<RandomForestClassifier>::default();
+            model.load(&std::fs::read_to_string("res/eyes_random_forest_model.json").unwrap());
+            model
         };
         assert!(model.classifier.is_some());
         let lenna = image::open("res/lenna.png").unwrap();

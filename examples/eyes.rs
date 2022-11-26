@@ -6,7 +6,8 @@ fn main() {
 #[cfg(feature = "eyes")]
 fn main() {
     use hog_detector::{
-        classifier::SVMClassifier, dataset::EyesDataSet, DataSet, Detector, HogDetector, Trainable,
+        classifier::SVMClassifier, dataset::EyesDataSet, hogdetector::HogDetectorTrait, DataSet,
+        Detector, HogDetector, Trainable,
     };
     let mut model = HogDetector::<SVMClassifier>::default();
 
@@ -17,11 +18,12 @@ fn main() {
     model.train_class(&dataset, 1);
     assert!(model.classifier.is_some());
     let eyes_model_file = "res/eyes_model.json";
-    std::fs::write(eyes_model_file, serde_json::to_string(&model).unwrap()).unwrap();
+    std::fs::write(eyes_model_file, model.save()).unwrap();
     println!("saving model to {}", eyes_model_file);
     let model = {
-        let model = std::fs::read_to_string(eyes_model_file).unwrap();
-        serde_json::from_str::<HogDetector<SVMClassifier>>(&model).unwrap()
+        let mut model = HogDetector::<SVMClassifier>::default();
+        model.load(&std::fs::read_to_string(eyes_model_file).unwrap());
+        model
     };
     assert!(model.classifier.is_some());
     let image_file = "res/lenna.png";
