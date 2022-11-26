@@ -81,13 +81,12 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{classifier::Classifier, Detector, Trainable};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    classifier::Classifier,
+    feature_descriptor::{FeatureDescriptor, HogFeatureDescriptor},
+    Detector, Trainable,
+};
 <span class="kw">use </span>image::{DynamicImage, RgbImage};
-<span class="kw">use </span>imageproc::hog::{hog, HogOptions};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
 
@@ -124,14 +123,8 @@
     <span class="doccomment">/// preprocesses image to vector
     </span><span class="kw">pub fn </span>preprocess(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; Vec&lt;f32&gt; {
         <span class="kw">let </span>luma = DynamicImage::ImageRgb8(image.clone()).to_luma8();
-        <span class="kw">let </span>options = HogOptions {
-            orientations: <span class="number">8</span>,
-            signed: <span class="bool-val">true</span>,
-            cell_side: <span class="number">4</span>,
-            block_side: <span class="number">2</span>,
-            block_stride: <span class="number">1</span>,
-        };
-        hog(<span class="kw-2">&amp;</span>luma, options).unwrap()
+        <span class="kw">let </span>descriptor = HogFeatureDescriptor::default();
+        descriptor.calculate_feature(luma).unwrap()
     }
     <span class="doccomment">/// preprocesses images into dense matrix
     </span><span class="kw">pub fn </span>preprocess_matrix(<span class="kw-2">&amp;</span><span class="self">self</span>, images: Vec&lt;RgbImage&gt;) -&gt; DenseMatrix&lt;f32&gt; {
@@ -143,9 +136,8 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
-
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::classifier::SVMClassifier;
     <span class="kw">use </span>image::{imageops::resize, imageops::FilterType, open};
 
     <span class="attribute">#[test]
