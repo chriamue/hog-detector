@@ -165,6 +165,13 @@
 <span id="165">165</span>
 <span id="166">166</span>
 <span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     detector::{detect_objects, visualize_detections},
     hogdetector::HogDetectorTrait,
@@ -183,7 +190,7 @@
 <span class="kw">use </span><span class="kw">super</span>::Classifier;
 <span class="kw">type </span>RFCType = RFC&lt;f32, u32, DenseMatrix&lt;f32&gt;, Vec&lt;u32&gt;&gt;;
 
-<span class="doccomment">/// A Random Forrest classifier
+<span class="doccomment">/// A Random Forest classifier
 </span><span class="attribute">#[derive(Serialize, Deserialize, Debug)]
 </span><span class="kw">pub struct </span>RandomForestClassifier {
     inner: <span class="prelude-ty">Option</span>&lt;RFCType&gt;,
@@ -303,6 +310,13 @@
     }
 
     <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_partial_eq() {
+        <span class="kw">let </span>detector1 = HogDetector::default();
+        <span class="kw">let </span>detector2 = HogDetector::random_forest();
+        <span class="macro">assert!</span>(detector1.eq(<span class="kw-2">&amp;</span>detector2));
+    }
+
+    <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_evaluate() {
         <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::&lt;RandomForestClassifier&gt;::default();
 
@@ -322,7 +336,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>detector = HogDetector::&lt;RandomForestClassifier&gt;::default();
         detector.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="kw">let </span>detections = detector.detect_objects(<span class="kw-2">&amp;</span>img);
-        <span class="macro">assert!</span>(detections.len() &gt; <span class="number">0</span>);
+        <span class="macro">assert!</span>(!detections.is_empty());
         <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.x &lt; <span class="number">75.0</span>);
         <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.x &gt; <span class="number">25.0</span>);
         <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.y &lt; <span class="number">25.0</span>);

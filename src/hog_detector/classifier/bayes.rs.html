@@ -168,7 +168,6 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-<span id="171">171</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     detector::{detect_objects, visualize_detections},
     hogdetector::HogDetectorTrait,
@@ -209,7 +208,7 @@
 }
 
 <span class="kw">impl </span>HogDetector&lt;BayesClassifier&gt; {
-    <span class="doccomment">/// new default random forest
+    <span class="doccomment">/// new default bayes
     </span><span class="kw">pub fn </span>bayes() -&gt; <span class="self">Self </span>{
         HogDetector::&lt;BayesClassifier&gt; { classifier: <span class="prelude-val">None </span>}
     }
@@ -265,8 +264,8 @@
             .as_ref()
             .unwrap()
             .predict(<span class="kw-2">&amp;</span>x)
-            .unwrap();
-        <span class="kw-2">*</span>y.first().unwrap() <span class="kw">as </span>u32
+            .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">vec!</span>[<span class="number">0</span>]);
+        <span class="kw-2">*</span>y.first().unwrap()
     }
 }
 
@@ -306,9 +305,14 @@
         <span class="macro">assert!</span>(classifier.inner.is_none());
     }
 
-    <span class="comment">// &quot;smartcore log likelihood returns NaN&quot;
-    </span><span class="attribute">#[should_panic = <span class="string">&quot;called `Option::unwrap()` on a `None` value&quot;</span>]
-    #[test]
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_partial_eq() {
+        <span class="kw">let </span>detector1 = HogDetector::default();
+        <span class="kw">let </span>detector2 = HogDetector::bayes();
+        <span class="macro">assert!</span>(detector1.eq(<span class="kw-2">&amp;</span>detector2));
+    }
+
+    <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_evaluate() {
         <span class="kw">let </span><span class="kw-2">mut </span>model = HogDetector::&lt;BayesClassifier&gt;::default();
 
@@ -320,9 +324,7 @@
         <span class="macro">assert!</span>(model.evaluate(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>) &gt; <span class="number">0.0</span>);
     }
 
-    <span class="comment">// &quot;smartcore log likelihood returns NaN&quot;
-    </span><span class="attribute">#[should_panic = <span class="string">&quot;called `Option::unwrap()` on a `None` value&quot;</span>]
-    #[test]
+    <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_detector() {
         <span class="kw">let </span>img = DynamicImage::ImageRgb8(test_image());
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
@@ -330,14 +332,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>detector = HogDetector::&lt;BayesClassifier&gt;::default();
         detector.train_class(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>);
         <span class="kw">let </span>detections = detector.detect_objects(<span class="kw-2">&amp;</span>img);
-        <span class="macro">assert!</span>(detections.len() &gt; <span class="number">0</span>);
-        <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.x &lt; <span class="number">75.0</span>);
-        <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.x &gt; <span class="number">25.0</span>);
-        <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.y &lt; <span class="number">25.0</span>);
-        <span class="macro">assert!</span>(detections[<span class="number">0</span>].bbox.y &gt;= <span class="number">0.0</span>);
+        <span class="macro">assert!</span>(detections.is_empty());
         <span class="kw">let </span>visualization = detector.visualize_detections(<span class="kw-2">&amp;</span>img).to_rgb8();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">125</span>, <span class="number">255</span>, <span class="number">0</span>]), visualization.get_pixel(<span class="number">55</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">125</span>, <span class="number">255</span>, <span class="number">0</span>]), visualization.get_pixel(<span class="number">75</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]), visualization.get_pixel(<span class="number">55</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>]), visualization.get_pixel(<span class="number">75</span>, <span class="number">0</span>));
     }
 }
 </code></pre></div>

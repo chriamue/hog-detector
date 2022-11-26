@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["RandomForestClassifier","A Random Forrest classifier"]]};
+window.SIDEBAR_ITEMS = {"struct":[["RandomForestClassifier","A Random Forest classifier"]]};
