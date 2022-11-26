@@ -23,5 +23,5 @@ fn main() {
     let webcam01 = image::open("res/training/webcam01.jpg").unwrap();
     let detections = model.detect_objects(&webcam01);
     println!("{:?}", detections);
-    assert!(detections.len() > 0);
+    assert!(!detections.is_empty());
 }

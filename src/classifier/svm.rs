@@ -18,7 +18,7 @@ pub type SVCType<'a> = SVC<'a, f32, i32, DenseMatrix<f32>, Vec<i32>>;
 pub type SVCParametersType = SVCParameters<f32, i32, DenseMatrix<f32>, Vec<i32>>;
 
 /// A Support Vector Machine classifier
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Default, Serialize, Deserialize, Debug)]
 pub struct SVMClassifier<'a> {
     /// svc classifier
     pub svc: Option<SVCType<'a>>,
@@ -33,14 +33,8 @@ impl PartialEq for SVMClassifier<'_> {
     }
 }
 
-impl Default for SVMClassifier<'_> {
-    fn default() -> Self {
-        SVMClassifier { svc: None }
-    }
-}
-
 impl HogDetector<SVMClassifier<'_>> {
-    /// new default random forest
+    /// new default support vector machine detector
     pub fn svm() -> Self {
         HogDetector::<SVMClassifier> { classifier: None }
     }
@@ -153,7 +147,7 @@ mod tests {
     }
 
     #[test]
-    fn test_part_eq() {
+    fn test_partial_eq() {
         let classifier1 = SVMClassifier::default();
         let classifier2 = SVMClassifier::default();
         assert!(classifier1.svc.is_none());

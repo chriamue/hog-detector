@@ -16,7 +16,7 @@ use smartcore::linalg::basic::matrix::DenseMatrix;
 use super::Classifier;
 type RFCType = RFC<f32, u32, DenseMatrix<f32>, Vec<u32>>;
 
-/// A Random Forrest classifier
+/// A Random Forest classifier
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RandomForestClassifier {
     inner: Option<RFCType>,
@@ -136,6 +136,13 @@ mod tests {
     }
 
     #[test]
+    fn test_partial_eq() {
+        let detector1 = HogDetector::default();
+        let detector2 = HogDetector::random_forest();
+        assert!(detector1.eq(&detector2));
+    }
+
+    #[test]
     fn test_evaluate() {
         let mut model = HogDetector::<RandomForestClassifier>::default();
 
@@ -155,7 +162,7 @@ mod tests {
         let mut detector = HogDetector::<RandomForestClassifier>::default();
         detector.train_class(&dataset, 1);
         let detections = detector.detect_objects(&img);
-        assert!(detections.len() > 0);
+        assert!(!detections.is_empty());
         assert!(detections[0].bbox.x < 75.0);
         assert!(detections[0].bbox.x > 25.0);
         assert!(detections[0].bbox.y < 25.0);
