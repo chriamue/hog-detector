@@ -1,6 +1,9 @@
-use crate::{classifier::Classifier, Detector, Trainable};
+use crate::{
+    classifier::Classifier,
+    feature_descriptor::{FeatureDescriptor, HogFeatureDescriptor},
+    Detector, Trainable,
+};
 use image::{DynamicImage, RgbImage};
-use imageproc::hog::{hog, HogOptions};
 use serde::{Deserialize, Serialize};
 use smartcore::linalg::basic::matrix::DenseMatrix;
 
@@ -37,14 +40,8 @@ impl<C: Classifier> HogDetector<C> {
     /// preprocesses image to vector
     pub fn preprocess(&self, image: &RgbImage) -> Vec<f32> {
         let luma = DynamicImage::ImageRgb8(image.clone()).to_luma8();
-        let options = HogOptions {
-            orientations: 8,
-            signed: true,
-            cell_side: 4,
-            block_side: 2,
-            block_stride: 1,
-        };
-        hog(&luma, options).unwrap()
+        let descriptor = HogFeatureDescriptor::default();
+        descriptor.calculate_feature(luma).unwrap()
     }
     /// preprocesses images into dense matrix
     pub fn preprocess_matrix(&self, images: Vec<RgbImage>) -> DenseMatrix<f32> {
@@ -56,9 +53,8 @@ impl<C: Classifier> HogDetector<C> {
 
 #[cfg(test)]
 mod tests {
-    use crate::classifier::SVMClassifier;
-
     use super::*;
+    use crate::classifier::SVMClassifier;
     use image::{imageops::resize, imageops::FilterType, open};
 
     #[test]

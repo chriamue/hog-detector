@@ -13,6 +13,8 @@ pub mod dataset;
 pub mod detection;
 /// detector functionality
 pub mod detector;
+/// feature descriptors
+pub mod feature_descriptor;
 /// hogdetector struct module
 pub mod hogdetector;
 /// predict functionality
