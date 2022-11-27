@@ -183,12 +183,10 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::io::Cursor;
 
-<span class="kw">use </span>image::ImageOutputFormat;
-<span class="kw">use </span>image::{imageops, imageops::resize, imageops::FilterType, DynamicImage, Rgb, SubImage};
+<span class="kw">use </span>image::{imageops, imageops::resize, imageops::FilterType, DynamicImage, Rgb};
+<span class="kw">use </span>image::{GenericImageView, ImageOutputFormat};
 <span class="kw">use </span>imageproc::geometric_transformations::{rotate_about_center, warp, Interpolation, Projection};
 <span class="kw">use </span>rand::prelude::ThreadRng;
 <span class="kw">use </span>rand::Rng;
@@ -207,7 +205,7 @@
     <span class="kw">let </span>width = image.width() <span class="kw">as </span>f32 / scale;
     <span class="kw">let </span>height = image.height() <span class="kw">as </span>f32 / scale;
     <span class="kw">let </span>image = resize(image, width <span class="kw">as </span>u32, height <span class="kw">as </span>u32, FilterType::Nearest);
-    <span class="kw">let </span>image = DynamicImage::ImageRgba8(image);
+    <span class="kw">let </span>image = DynamicImage::from(image);
     <span class="kw">let </span>windows = sliding_window(<span class="kw-2">&amp;</span>image, step_size, window_size);
     windows
         .into_iter()
@@ -224,9 +222,7 @@
             windows.push((
                 x,
                 y,
-                DynamicImage::ImageRgba8(
-                    SubImage::new(image, x, y, window_size, window_size).to_image(),
-                ),
+                DynamicImage::from(image.view(x, y, window_size, window_size).to_image()),
             ))
         }
     }
@@ -241,7 +237,7 @@
     ]
     .iter()
     .map(|rad| {
-        DynamicImage::ImageRgb8(rotate_about_center(
+        DynamicImage::from(rotate_about_center(
             <span class="kw-2">&amp;</span>frame.to_rgb8(),
             <span class="kw-2">*</span>rad,
             Interpolation::Nearest,
@@ -254,7 +250,7 @@
 </span><span class="kw">pub fn </span>scaled_frames(frame: <span class="kw-2">&amp;</span>DynamicImage) -&gt; <span class="kw">impl </span>Iterator&lt;Item = DynamicImage&gt; + <span class="lifetime">&#39;_ </span>{
     [<span class="number">0.8</span>, <span class="number">0.9</span>, <span class="number">1.1</span>, <span class="number">1.2</span>].into_iter().map(|scalefactor| {
         <span class="kw">let </span>scale = Projection::scale(scalefactor, scalefactor);
-        DynamicImage::ImageRgb8(warp(
+        DynamicImage::from(warp(
             <span class="kw-2">&amp;</span>frame.to_rgb8(),
             <span class="kw-2">&amp;</span>scale,
             Interpolation::Nearest,
