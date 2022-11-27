@@ -65,6 +65,15 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
 <span class="kw">use </span><span class="kw">super</span>::HogDetectorJS;
 <span class="kw">use </span>wasm_bindgen_test::console_log;
@@ -76,6 +85,7 @@
     Train,
     SwitchBayesClassifier,
     SwitchRandomForestClassifier,
+    SwitchCombinedClassifier,
 }
 
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
@@ -110,6 +120,10 @@
                 ctx.props().detector.init_random_forest_classifier();
                 <span class="bool-val">true
             </span>}
+            Msg::SwitchCombinedClassifier =&gt; {
+                ctx.props().detector.init_combined_classifier();
+                <span class="bool-val">true
+            </span>}
         }
     }
 
@@ -117,6 +131,7 @@
         <span class="kw">let </span>onclick_train = ctx.link().callback(|<span class="kw">_</span>| Msg::Train);
         <span class="kw">let </span>onclick_bayes = ctx.link().callback(|<span class="kw">_</span>| Msg::SwitchBayesClassifier);
         <span class="kw">let </span>onclick_random_forest = ctx.link().callback(|<span class="kw">_</span>| Msg::SwitchRandomForestClassifier);
+        <span class="kw">let </span>onclick_combined = ctx.link().callback(|<span class="kw">_</span>| Msg::SwitchCombinedClassifier);
         <span class="macro">html! </span>{
             &lt;div id=<span class="string">&quot;train-classifier-buttons&quot;</span>&gt;
         &lt;button <span class="kw">type</span>=<span class="string">&quot;button&quot; </span>class=<span class="string">&quot;btn btn-success&quot; </span>onclick={onclick_train}&gt;
@@ -127,6 +142,9 @@
         &lt;/button&gt;
         &lt;button <span class="kw">type</span>=<span class="string">&quot;button&quot; </span>class=<span class="string">&quot;btn btn-success&quot; </span>onclick={onclick_random_forest}&gt;
         { <span class="string">&quot;Switch to Random Forest Classifier&quot; </span>}
+        &lt;/button&gt;
+        &lt;button <span class="kw">type</span>=<span class="string">&quot;button&quot; </span>class=<span class="string">&quot;btn btn-success&quot; </span>onclick={onclick_combined}&gt;
+        { <span class="string">&quot;Switch to Combined Classifier&quot; </span>}
         &lt;/button&gt;
             &lt;/div&gt;
         }
