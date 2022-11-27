@@ -4,7 +4,7 @@
     "Christian <chriamue@gmail.com>"
   ],
   "description": "Histogram of Oriented Gradients and Object Detection",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "repository": {
     "type": "git",
