@@ -3,7 +3,7 @@ use crate::data_augmentation::DataAugmentation;
 use crate::dataset::DataSet;
 use crate::utils::{rotated_frames, scaled_frames, window_crop};
 use crate::Detector;
-use image::{open, RgbImage};
+use image::{open, DynamicImage};
 use rand::prelude::ThreadRng;
 use rand::Rng;
 use std::fs::read_dir;
@@ -13,7 +13,7 @@ use std::io::{self, BufRead};
 /// Dataset of data from a folder
 pub struct FolderDataSet {
     path: String,
-    data: Vec<(String, RgbImage)>,
+    data: Vec<(String, DynamicImage)>,
     names: Vec<String>,
     window_size: u32,
 }
@@ -57,8 +57,8 @@ impl FolderDataSet {
         x: u32,
         y: u32,
         window_size: u32,
-    ) -> (String, RgbImage) {
-        let img = open(image_path).unwrap().to_rgb8();
+    ) -> (String, DynamicImage) {
+        let img = open(image_path).unwrap();
         let window = window_crop(&img, window_size, window_size, (x, y));
         (label, window)
     }
@@ -66,7 +66,7 @@ impl FolderDataSet {
     fn load_annotations(
         pathes: Vec<(String, String)>,
         window_size: u32,
-    ) -> Vec<(String, RgbImage)> {
+    ) -> Vec<(String, DynamicImage)> {
         let mut annotations = Vec::new();
         for path in pathes {
             let file = File::open(path.0).unwrap();
@@ -97,7 +97,7 @@ impl FolderDataSet {
         detector: &dyn Detector,
         class: u32,
         max_images: Option<usize>,
-    ) -> Vec<(String, RgbImage)> {
+    ) -> Vec<(String, DynamicImage)> {
         let mut annotations = Vec::new();
         let pathes = Self::list_pathes(&self.path);
         let class_label = self.names[class as usize].clone();
@@ -165,11 +165,11 @@ impl FolderDataSet {
     }
 
     fn generate_random_annotations_from_image(
-        image: &RgbImage,
+        image: &DynamicImage,
         label: String,
         count: usize,
         window_size: u32,
-    ) -> Vec<(String, RgbImage)> {
+    ) -> Vec<(String, DynamicImage)> {
         let mut annotations = Vec::new();
         let mut rng: ThreadRng = rand::thread_rng();
 
@@ -210,7 +210,7 @@ impl DataSet for FolderDataSet {
     fn generate_random_annotations(&mut self, count_each: usize) {
         let pathes = Self::list_pathes(&self.path);
         for (_, image_path) in pathes {
-            let img = open(image_path).unwrap().to_rgb8();
+            let img = open(image_path).unwrap();
             self.data
                 .extend(Self::generate_random_annotations_from_image(
                     &img,
@@ -221,7 +221,7 @@ impl DataSet for FolderDataSet {
         }
     }
 
-    fn get(&self) -> (Vec<RgbImage>, Vec<u32>, Vec<RgbImage>, Vec<u32>) {
+    fn get(&self) -> (Vec<DynamicImage>, Vec<u32>, Vec<DynamicImage>, Vec<u32>) {
         let train_x = self.data.iter().map(|(_, img)| img.clone()).collect();
         let train_y = self
             .data
@@ -259,6 +259,7 @@ impl DataAugmentation for FolderDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use image::RgbImage;
 
     const ANNOTATIONS: usize = 42;
     const IMAGES_PER_LABEL: usize = 21;
@@ -318,7 +319,7 @@ mod tests {
 
     #[test]
     fn test_generate_random_annotations() {
-        let image = RgbImage::new(32, 32);
+        let image = DynamicImage::ImageRgb8(RgbImage::new(32, 32));
         let annotations = FolderDataSet::generate_random_annotations_from_image(
             &image,
             "none".to_string(),

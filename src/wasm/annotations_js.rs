@@ -19,7 +19,7 @@ impl AnnotationsJS {
     pub fn create_dataset(&self) -> MemoryDataSet {
         let mut dataset = MemoryDataSet::default();
         dataset.add((
-            self.image.lock().unwrap().to_rgb8(),
+            self.image.lock().unwrap().clone(),
             self.annotations.lock().unwrap().clone(),
         ));
         dataset.load();

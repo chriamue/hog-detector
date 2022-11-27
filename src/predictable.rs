@@ -1,6 +1,6 @@
-use image::RgbImage;
+use image::DynamicImage;
 /// predictable trait
 pub trait Predictable {
     /// predicts class of image
-    fn predict(&self, image: &RgbImage) -> u32;
+    fn predict(&self, image: &DynamicImage) -> u32;
 }

@@ -3,15 +3,15 @@ use crate::utils::generate_random_subimages;
 use crate::Annotation;
 use image::{
     imageops::{crop, resize, FilterType},
-    DynamicImage, RgbImage,
+    DynamicImage,
 };
 
-type Sample = (RgbImage, Vec<Annotation>);
+type Sample = (DynamicImage, Vec<Annotation>);
 
 /// Memory only dataset
 pub struct MemoryDataSet {
     samples: Vec<Sample>,
-    x: Vec<RgbImage>,
+    x: Vec<DynamicImage>,
     y: Vec<u32>,
     window_width: u32,
     window_height: u32,
@@ -103,12 +103,12 @@ impl DataSet for MemoryDataSet {
                 )
                 .to_image();
                 let scaled_window = resize(
-                    &DynamicImage::ImageRgb8(window),
+                    &window,
                     self.window_width,
                     self.window_height,
                     FilterType::Nearest,
                 );
-                let image = DynamicImage::ImageRgba8(scaled_window).to_rgb8();
+                let image = DynamicImage::ImageRgba8(scaled_window);
                 self.x.push(image);
                 self.y.push(*class);
             }
@@ -133,7 +133,7 @@ impl DataSet for MemoryDataSet {
     fn samples(&self) -> usize {
         self.y.len()
     }
-    fn get(&self) -> (Vec<RgbImage>, Vec<u32>, Vec<RgbImage>, Vec<u32>) {
+    fn get(&self) -> (Vec<DynamicImage>, Vec<u32>, Vec<DynamicImage>, Vec<u32>) {
         let mut train_x = Vec::new();
         let mut train_y = Vec::new();
         let mut test_x = Vec::new();

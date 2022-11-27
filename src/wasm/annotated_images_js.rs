@@ -28,7 +28,7 @@ impl AnnotatedImagesJS {
         let mut dataset = MemoryDataSet::default();
         for annotations in self.images.lock().unwrap().iter() {
             dataset.add((
-                annotations.get_image().to_rgb8(),
+                annotations.get_image().clone(),
                 annotations.get_annotations(),
             ));
         }

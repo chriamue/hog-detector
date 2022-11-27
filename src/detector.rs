@@ -86,8 +86,8 @@ mod tests {
         let objects = detect_objects(detections, 16);
         let img = test_image();
 
-        assert_eq!(&Rgb([0, 0, 0]), img.get_pixel(8, 8));
-        let img = visualize_detections(&DynamicImage::ImageRgb8(img), &objects).to_rgb8();
+        assert_eq!(&Rgb([0, 0, 0]), img.to_rgb8().get_pixel(8, 8));
+        let img = visualize_detections(&img, &objects).to_rgb8();
 
         img.save("out/test_image2.png").unwrap();
         assert_eq!(&Rgb([125, 255, 0]), img.get_pixel(8, 8));

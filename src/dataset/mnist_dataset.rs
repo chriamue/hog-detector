@@ -20,7 +20,7 @@ impl Default for MnistDataSet {
 
 impl MnistDataSet {}
 
-fn bw_ndarray2_to_rgb_image(arr: Array2<f32>) -> RgbImage {
+fn bw_ndarray2_to_rgb_image(arr: Array2<f32>) -> DynamicImage {
     assert!(arr.is_standard_layout());
 
     let (width, height) = (arr.ncols(), arr.ncols());
@@ -32,7 +32,7 @@ fn bw_ndarray2_to_rgb_image(arr: Array2<f32>) -> RgbImage {
         }
     }
     let img = resize(&DynamicImage::ImageRgb8(img), 32, 32, FilterType::Gaussian);
-    DynamicImage::ImageRgba8(img).to_rgb8()
+    DynamicImage::ImageRgba8(img)
 }
 
 impl DataSet for MnistDataSet {
@@ -51,7 +51,7 @@ impl DataSet for MnistDataSet {
 
     fn generate_random_annotations(&mut self, _count_each: usize) {}
 
-    fn get(&self) -> (Vec<RgbImage>, Vec<u32>, Vec<RgbImage>, Vec<u32>) {
+    fn get(&self) -> (Vec<DynamicImage>, Vec<u32>, Vec<DynamicImage>, Vec<u32>) {
         let mut train_x = Vec::new();
         let mut train_y = Vec::new();
 

@@ -4,7 +4,6 @@
 use crate::dataset::DataSet;
 use crate::utils::window_crop;
 use image::io::Reader as ImageReader;
-use image::RgbImage;
 use image::{imageops::resize, imageops::FilterType, DynamicImage};
 use rand::prelude::ThreadRng;
 use rand::Rng;
@@ -18,7 +17,7 @@ pub struct EyesDataSet {
     zip_url: String,
     pos_path: String,
     neg_path: String,
-    data: Vec<(u32, RgbImage)>,
+    data: Vec<(u32, DynamicImage)>,
     window_size: u32,
 }
 
@@ -63,7 +62,7 @@ impl EyesDataSet {
                         self.window_size,
                         FilterType::Nearest,
                     );
-                    self.data.push((1, DynamicImage::ImageRgba8(img).to_rgb8()));
+                    self.data.push((1, DynamicImage::ImageRgba8(img)));
                 } else if filename.to_str().unwrap().contains(&self.neg_path) {
                     let mut buff = Cursor::new(Vec::new());
                     io::copy(&mut file, &mut buff).unwrap();
@@ -79,7 +78,7 @@ impl EyesDataSet {
                         self.window_size,
                         FilterType::Nearest,
                     );
-                    self.data.push((0, DynamicImage::ImageRgba8(img).to_rgb8()));
+                    self.data.push((0, DynamicImage::ImageRgba8(img)));
                 }
             }
         }
@@ -87,11 +86,11 @@ impl EyesDataSet {
 
     /// generates random annotations from an image
     pub fn generate_random_annotations_from_image(
-        image: &RgbImage,
+        image: &DynamicImage,
         label: String,
         count: usize,
         window_size: u32,
-    ) -> Vec<(String, RgbImage)> {
+    ) -> Vec<(String, DynamicImage)> {
         let mut annotations = Vec::new();
         let mut rng: ThreadRng = rand::thread_rng();
 
@@ -138,7 +137,7 @@ impl DataSet for EyesDataSet {
 
     fn generate_random_annotations(&mut self, _count_each: usize) {}
 
-    fn get(&self) -> (Vec<RgbImage>, Vec<u32>, Vec<RgbImage>, Vec<u32>) {
+    fn get(&self) -> (Vec<DynamicImage>, Vec<u32>, Vec<DynamicImage>, Vec<u32>) {
         let train_x = self.data.iter().map(|(_, img)| img.clone()).collect();
         let train_y = self.data.iter().map(|(label, _)| *label).collect();
 

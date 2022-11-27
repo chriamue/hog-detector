@@ -8,7 +8,7 @@ use crate::{
 };
 use image::{
     imageops::{resize, FilterType},
-    DynamicImage, RgbImage,
+    DynamicImage,
 };
 use serde::{Deserialize, Serialize};
 use smartcore::linalg::basic::matrix::DenseMatrix;
@@ -18,7 +18,7 @@ use super::Classifier;
 type BayesType = GaussianNB<f32, u32, DenseMatrix<f32>, Vec<u32>>;
 
 /// A naive bayes classifier
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Default, Serialize, Deserialize, Debug)]
 pub struct BayesClassifier {
     inner: Option<BayesType>,
 }
@@ -29,12 +29,6 @@ impl PartialEq for BayesClassifier {
     fn eq(&self, other: &BayesClassifier) -> bool {
         self.inner.is_none() && other.inner.is_none()
             || self.inner.is_some() && other.inner.is_some()
-    }
-}
-
-impl Default for BayesClassifier {
-    fn default() -> Self {
-        BayesClassifier { inner: None }
     }
 }
 
@@ -88,14 +82,9 @@ impl Trainable for HogDetector<BayesClassifier> {
 }
 
 impl Predictable for HogDetector<BayesClassifier> {
-    fn predict(&self, image: &RgbImage) -> u32 {
-        let image = resize(
-            &DynamicImage::ImageRgb8(image.clone()),
-            32,
-            32,
-            FilterType::Gaussian,
-        );
-        let image = DynamicImage::ImageRgba8(image).to_rgb8();
+    fn predict(&self, image: &DynamicImage) -> u32 {
+        let image = resize(image, 32, 32, FilterType::Gaussian);
+        let image = DynamicImage::ImageRgba8(image);
         let x = vec![self.preprocess(&image)];
         let x = DenseMatrix::from_2d_vec(&x);
         let y = self
@@ -115,10 +104,9 @@ impl Detector for HogDetector<BayesClassifier> {
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
         let step_size = 8;
         let window_size = 32;
-        let image = image.to_rgb8();
-        let mut windows = sliding_window(&image, step_size, window_size);
-        windows.extend(pyramid(&image, 1.3, step_size, window_size));
-        windows.extend(pyramid(&image, 1.5, step_size, window_size));
+        let mut windows = sliding_window(image, step_size, window_size);
+        windows.extend(pyramid(image, 1.3, step_size, window_size));
+        windows.extend(pyramid(image, 1.5, step_size, window_size));
 
         let predictions: Vec<(u32, u32, u32)> = windows
             .iter()
@@ -180,7 +168,7 @@ mod tests {
 
     #[test]
     fn test_detector() {
-        let img = DynamicImage::ImageRgb8(test_image());
+        let img = test_image();
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
         let mut detector = HogDetector::<BayesClassifier>::default();

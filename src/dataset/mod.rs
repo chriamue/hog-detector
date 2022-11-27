@@ -1,4 +1,4 @@
-use image::RgbImage;
+use image::DynamicImage;
 
 #[cfg(feature = "eyes")]
 #[cfg(not(target_arch = "wasm32"))]
@@ -19,7 +19,7 @@ pub trait DataSet {
     /// number of samples in dataset
     fn samples(&self) -> usize;
     /// get train and test data
-    fn get(&self) -> (Vec<RgbImage>, Vec<u32>, Vec<RgbImage>, Vec<u32>);
+    fn get(&self) -> (Vec<DynamicImage>, Vec<u32>, Vec<DynamicImage>, Vec<u32>);
 }
 
 #[cfg(feature = "eyes")]

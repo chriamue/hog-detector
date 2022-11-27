@@ -3,7 +3,7 @@ use crate::{
     feature_descriptor::{FeatureDescriptor, HogFeatureDescriptor},
     Detector, Trainable,
 };
-use image::{DynamicImage, RgbImage};
+use image::DynamicImage;
 use smartcore::linalg::basic::matrix::DenseMatrix;
 
 /// Hog Detector struct
@@ -30,10 +30,6 @@ impl<C: Classifier> PartialEq for HogDetector<C> {
                 && other.classifier.is_some()
                 && self.classifier.eq(&other.classifier)
     }
-
-    fn ne(&self, other: &Self) -> bool {
-        !self.eq(other)
-    }
 }
 
 impl<C: Classifier> Default for HogDetector<C> {
@@ -47,13 +43,11 @@ impl<C: Classifier> Default for HogDetector<C> {
 
 impl<C: Classifier> HogDetector<C> {
     /// preprocesses image to vector
-    pub fn preprocess(&self, image: &RgbImage) -> Vec<f32> {
-        let luma = DynamicImage::ImageRgb8(image.clone()).to_luma8();
-        let descriptor = HogFeatureDescriptor::default();
-        descriptor.calculate_feature(luma).unwrap()
+    pub fn preprocess(&self, image: &DynamicImage) -> Vec<f32> {
+        self.feature_descriptor.calculate_feature(image).unwrap()
     }
     /// preprocesses images into dense matrix
-    pub fn preprocess_matrix(&self, images: Vec<RgbImage>) -> DenseMatrix<f32> {
+    pub fn preprocess_matrix(&self, images: Vec<DynamicImage>) -> DenseMatrix<f32> {
         let descriptors: Vec<Vec<f32>> =
             images.iter().map(|image| self.preprocess(image)).collect();
         DenseMatrix::from_2d_vec(&descriptors)
@@ -86,7 +80,7 @@ mod tests {
         let model = HogDetector::<SVMClassifier>::default();
         let loco03 = open("res/loco03.jpg").unwrap().to_rgb8();
         let loco03 = resize(&loco03, 32, 32, FilterType::Nearest);
-        let descriptor = model.preprocess(&loco03);
+        let descriptor = model.preprocess(&DynamicImage::ImageRgb8(loco03));
         assert_eq!(descriptor.len(), 1568);
     }
 }

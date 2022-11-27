@@ -5,7 +5,7 @@ use crate::prelude::Detection;
 use crate::utils::{pyramid, sliding_window};
 use crate::{DataSet, Detector, HogDetector, Predictable, Trainable};
 use image::imageops::{resize, FilterType};
-use image::{DynamicImage, RgbImage};
+use image::DynamicImage;
 use serde::{Deserialize, Serialize};
 use smartcore::linalg::basic::matrix::DenseMatrix;
 use smartcore::svm::svc::{SVCParameters, SVC};
@@ -99,14 +99,9 @@ impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
 }
 
 impl<'a> Predictable for HogDetector<SVMClassifier<'a>> {
-    fn predict(&self, image: &RgbImage) -> u32 {
-        let image = resize(
-            &DynamicImage::ImageRgb8(image.clone()),
-            32,
-            32,
-            FilterType::Gaussian,
-        );
-        let image = DynamicImage::ImageRgba8(image).to_rgb8();
+    fn predict(&self, image: &DynamicImage) -> u32 {
+        let image = resize(image, 32, 32, FilterType::Gaussian);
+        let image = DynamicImage::ImageRgba8(image);
         let x = vec![self.preprocess(&image)];
         let x = DenseMatrix::from_2d_vec(&x);
         let y = self
@@ -126,10 +121,9 @@ impl<'a> Detector for HogDetector<SVMClassifier<'a>> {
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
         let step_size = 8;
         let window_size = 32;
-        let image = image.to_rgb8();
-        let mut windows = sliding_window(&image, step_size, window_size);
-        windows.extend(pyramid(&image, 1.3, step_size, window_size));
-        windows.extend(pyramid(&image, 1.5, step_size, window_size));
+        let mut windows = sliding_window(image, step_size, window_size);
+        windows.extend(pyramid(image, 1.3, step_size, window_size));
+        windows.extend(pyramid(image, 1.5, step_size, window_size));
 
         let predictions: Vec<(u32, u32, u32)> = windows
             .iter()
@@ -208,7 +202,7 @@ mod tests {
     #[should_panic = "called `Option::unwrap()` on a `None` value"]
     #[test]
     fn test_detector() {
-        let img = DynamicImage::ImageRgb8(test_image());
+        let img = test_image();
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
         let mut detector = HogDetector::<SVMClassifier>::default();

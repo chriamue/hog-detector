@@ -1,5 +1,5 @@
 use super::FeatureDescriptor;
-use image::{ImageBuffer, Luma};
+use image::DynamicImage;
 use imageproc::hog::{hog, HogOptions};
 
 /// A Histogram of Oriented Features Descriptor
@@ -22,8 +22,8 @@ impl Default for HogFeatureDescriptor {
 }
 
 impl FeatureDescriptor for HogFeatureDescriptor {
-    fn calculate_feature(&self, image: ImageBuffer<Luma<u8>, Vec<u8>>) -> Result<Vec<f32>, String> {
-        hog(&image, self.options)
+    fn calculate_feature(&self, image: &DynamicImage) -> Result<Vec<f32>, String> {
+        hog(&image.to_luma8(), self.options)
     }
 }
 
@@ -32,13 +32,12 @@ mod tests {
 
     use super::*;
     use crate::tests::test_image;
-    use image::DynamicImage;
 
     #[test]
     fn test_default() {
-        let img = DynamicImage::ImageRgb8(test_image());
+        let img = test_image();
         let descriptor = HogFeatureDescriptor::default();
-        let features = descriptor.calculate_feature(img.to_luma8());
+        let features = descriptor.calculate_feature(&img);
         assert_eq!(18432, features.unwrap().len());
     }
 }
