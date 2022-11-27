@@ -12,51 +12,56 @@ use image::{
 };
 use serde::{Deserialize, Serialize};
 use smartcore::ensemble::random_forest_classifier::RandomForestClassifier as RFC;
-use smartcore::linalg::basic::matrix::DenseMatrix;
+use smartcore::{linalg::basic::matrix::DenseMatrix, naive_bayes::gaussian::GaussianNB};
 
-use super::Classifier;
-type RFCType = RFC<f32, u32, DenseMatrix<f32>, Vec<u32>>;
-
-/// A Random Forest classifier
+use super::{BayesClassifier, Classifier, RandomForestClassifier};
+/// A naive bayes classifier
 #[derive(Default, Serialize, Deserialize, Debug)]
-pub struct RandomForestClassifier {
-    /// inner
-    pub inner: Option<RFCType>,
+pub struct CombinedClassifier {
+    /// inner bayes
+    pub bayes: BayesClassifier,
+    /// inner random forest
+    pub randomforest: RandomForestClassifier,
 }
 
-impl Classifier for RandomForestClassifier {}
+impl Classifier for CombinedClassifier {}
 
-impl PartialEq for RandomForestClassifier {
-    fn eq(&self, other: &RandomForestClassifier) -> bool {
-        self.inner.is_none() && other.inner.is_none()
-            || self.inner.is_some() && other.inner.is_some()
+impl PartialEq for CombinedClassifier {
+    fn eq(&self, other: &CombinedClassifier) -> bool {
+        self.bayes.eq(&other.bayes) && self.randomforest.eq(&other.randomforest)
     }
 }
 
-impl HogDetector<RandomForestClassifier> {
-    /// new default random forest
-    pub fn random_forest() -> Self {
-        HogDetector::<RandomForestClassifier> {
+impl HogDetector<CombinedClassifier> {
+    /// new default combined
+    pub fn combined() -> Self {
+        HogDetector::<CombinedClassifier> {
             classifier: None,
             feature_descriptor: Box::new(HogFeatureDescriptor::default()),
         }
     }
 }
 
-impl HogDetectorTrait for HogDetector<RandomForestClassifier> {
+impl HogDetectorTrait for HogDetector<CombinedClassifier> {
     fn save(&self) -> String {
         serde_json::to_string(&self.classifier).unwrap()
     }
 
     fn load(&mut self, model: &str) {
-        self.classifier = Some(serde_json::from_str::<RandomForestClassifier>(model).unwrap());
+        self.classifier = Some(serde_json::from_str::<CombinedClassifier>(model).unwrap());
     }
 }
 
-impl Trainable for HogDetector<RandomForestClassifier> {
+impl Trainable for HogDetector<CombinedClassifier> {
     fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {
+        let nb = GaussianNB::fit(&x_train, &y_train, Default::default()).unwrap();
+        let bayes = BayesClassifier { inner: Some(nb) };
         let rfc = RFC::fit(&x_train, &y_train, Default::default()).unwrap();
-        let classifier = RandomForestClassifier { inner: Some(rfc) };
+        let randomforest = RandomForestClassifier { inner: Some(rfc) };
+        let classifier = CombinedClassifier {
+            bayes,
+            randomforest,
+        };
         self.classifier = Some(classifier);
     }
 
@@ -82,26 +87,45 @@ impl Trainable for HogDetector<RandomForestClassifier> {
     }
 }
 
-impl Predictable for HogDetector<RandomForestClassifier> {
+impl Predictable for HogDetector<CombinedClassifier> {
     fn predict(&self, image: &DynamicImage) -> u32 {
         let image = resize(image, 32, 32, FilterType::Gaussian);
         let image = DynamicImage::ImageRgba8(image);
         let x = vec![self.preprocess(&image)];
         let x = DenseMatrix::from_2d_vec(&x);
-        let y = self
+        let bayes_y = *self
             .classifier
             .as_ref()
             .unwrap()
+            .bayes
             .inner
             .as_ref()
             .unwrap()
             .predict(&x)
+            .unwrap_or_else(|_| vec![0])
+            .first()
             .unwrap();
-        *y.first().unwrap() as u32
+        let randomforest_y = *self
+            .classifier
+            .as_ref()
+            .unwrap()
+            .randomforest
+            .inner
+            .as_ref()
+            .unwrap()
+            .predict(&x)
+            .unwrap_or_else(|_| vec![0])
+            .first()
+            .unwrap();
+        if bayes_y == randomforest_y {
+            bayes_y
+        } else {
+            0
+        }
     }
 }
 
-impl Detector for HogDetector<RandomForestClassifier> {
+impl Detector for HogDetector<CombinedClassifier> {
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
         let step_size = 8;
         let window_size = 32;
@@ -132,32 +156,31 @@ mod tests {
 
     #[test]
     fn test_default() {
-        let classifier = RandomForestClassifier::default();
-        assert!(classifier.inner.is_none());
+        let _classifier = CombinedClassifier::default();
     }
 
     #[test]
     fn test_partial_eq() {
         let detector1 = HogDetector::default();
-        let detector2 = HogDetector::random_forest();
+        let detector2 = HogDetector::combined();
         assert!(detector1.eq(&detector2));
     }
 
     #[test]
     fn test_save_load() {
-        let mut model = HogDetector::<RandomForestClassifier>::default();
+        let mut model = HogDetector::<CombinedClassifier>::default();
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
         model.train_class(&dataset, 1);
         let serialized = model.save();
-        let mut model2 = HogDetector::<RandomForestClassifier>::default();
+        let mut model2 = HogDetector::<CombinedClassifier>::default();
         model2.load(&serialized);
         assert_eq!(model, model2);
     }
 
     #[test]
     fn test_evaluate() {
-        let mut model = HogDetector::<RandomForestClassifier>::default();
+        let mut model = HogDetector::<CombinedClassifier>::default();
 
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
@@ -172,16 +195,12 @@ mod tests {
         let img = test_image();
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
-        let mut detector = HogDetector::<RandomForestClassifier>::default();
+        let mut detector = HogDetector::<BayesClassifier>::default();
         detector.train_class(&dataset, 1);
         let detections = detector.detect_objects(&img);
-        assert!(!detections.is_empty());
-        assert!(detections[0].bbox.x < 75.0);
-        assert!(detections[0].bbox.x > 25.0);
-        assert!(detections[0].bbox.y < 25.0);
-        assert!(detections[0].bbox.y >= 0.0);
+        assert!(detections.is_empty());
         let visualization = detector.visualize_detections(&img).to_rgb8();
-        assert_eq!(&Rgb([125, 255, 0]), visualization.get_pixel(55, 0));
-        assert_eq!(&Rgb([125, 255, 0]), visualization.get_pixel(75, 0));
+        assert_eq!(&Rgb([0, 0, 0]), visualization.get_pixel(55, 0));
+        assert_eq!(&Rgb([255, 0, 0]), visualization.get_pixel(75, 0));
     }
 }

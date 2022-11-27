@@ -20,7 +20,8 @@ type BayesType = GaussianNB<f32, u32, DenseMatrix<f32>, Vec<u32>>;
 /// A naive bayes classifier
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct BayesClassifier {
-    inner: Option<BayesType>,
+    /// inner
+    pub inner: Option<BayesType>,
 }
 
 impl Classifier for BayesClassifier {}
