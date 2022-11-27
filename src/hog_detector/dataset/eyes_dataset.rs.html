@@ -250,14 +250,12 @@
 <span id="250">250</span>
 <span id="251">251</span>
 <span id="252">252</span>
-<span id="253">253</span>
 </pre><pre class="rust"><code><span class="comment">// source: https://github.com/tiruss/eye_detector
 // https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip
 
 </span><span class="kw">use </span><span class="kw">crate</span>::dataset::DataSet;
 <span class="kw">use </span><span class="kw">crate</span>::utils::window_crop;
 <span class="kw">use </span>image::io::Reader <span class="kw">as </span>ImageReader;
-<span class="kw">use </span>image::RgbImage;
 <span class="kw">use </span>image::{imageops::resize, imageops::FilterType, DynamicImage};
 <span class="kw">use </span>rand::prelude::ThreadRng;
 <span class="kw">use </span>rand::Rng;
@@ -271,7 +269,7 @@
     zip_url: String,
     pos_path: String,
     neg_path: String,
-    data: Vec&lt;(u32, RgbImage)&gt;,
+    data: Vec&lt;(u32, DynamicImage)&gt;,
     window_size: u32,
 }
 
@@ -316,7 +314,7 @@
                         <span class="self">self</span>.window_size,
                         FilterType::Nearest,
                     );
-                    <span class="self">self</span>.data.push((<span class="number">1</span>, DynamicImage::ImageRgba8(img).to_rgb8()));
+                    <span class="self">self</span>.data.push((<span class="number">1</span>, DynamicImage::ImageRgba8(img)));
                 } <span class="kw">else if </span>filename.to_str().unwrap().contains(<span class="kw-2">&amp;</span><span class="self">self</span>.neg_path) {
                     <span class="kw">let </span><span class="kw-2">mut </span>buff = Cursor::new(Vec::new());
                     io::copy(<span class="kw-2">&amp;mut </span>file, <span class="kw-2">&amp;mut </span>buff).unwrap();
@@ -332,7 +330,7 @@
                         <span class="self">self</span>.window_size,
                         FilterType::Nearest,
                     );
-                    <span class="self">self</span>.data.push((<span class="number">0</span>, DynamicImage::ImageRgba8(img).to_rgb8()));
+                    <span class="self">self</span>.data.push((<span class="number">0</span>, DynamicImage::ImageRgba8(img)));
                 }
             }
         }
@@ -340,11 +338,11 @@
 
     <span class="doccomment">/// generates random annotations from an image
     </span><span class="kw">pub fn </span>generate_random_annotations_from_image(
-        image: <span class="kw-2">&amp;</span>RgbImage,
+        image: <span class="kw-2">&amp;</span>DynamicImage,
         label: String,
         count: usize,
         window_size: u32,
-    ) -&gt; Vec&lt;(String, RgbImage)&gt; {
+    ) -&gt; Vec&lt;(String, DynamicImage)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>annotations = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>rng: ThreadRng = rand::thread_rng();
 
@@ -391,7 +389,7 @@
 
     <span class="kw">fn </span>generate_random_annotations(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _count_each: usize) {}
 
-    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;, Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;) {
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;, Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;) {
         <span class="kw">let </span>train_x = <span class="self">self</span>.data.iter().map(|(<span class="kw">_</span>, img)| img.clone()).collect();
         <span class="kw">let </span>train_y = <span class="self">self</span>.data.iter().map(|(label, <span class="kw">_</span>)| <span class="kw-2">*</span>label).collect();
 

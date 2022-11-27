@@ -180,18 +180,6 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     detector::{detect_objects, visualize_detections},
     feature_descriptor::HogFeatureDescriptor,
@@ -202,7 +190,7 @@
 };
 <span class="kw">use </span>image::{
     imageops::{resize, FilterType},
-    DynamicImage, RgbImage,
+    DynamicImage,
 };
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
@@ -212,7 +200,7 @@
 <span class="kw">type </span>BayesType = GaussianNB&lt;f32, u32, DenseMatrix&lt;f32&gt;, Vec&lt;u32&gt;&gt;;
 
 <span class="doccomment">/// A naive bayes classifier
-</span><span class="attribute">#[derive(Serialize, Deserialize, Debug)]
+</span><span class="attribute">#[derive(Default, Serialize, Deserialize, Debug)]
 </span><span class="kw">pub struct </span>BayesClassifier {
     inner: <span class="prelude-ty">Option</span>&lt;BayesType&gt;,
 }
@@ -223,12 +211,6 @@
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BayesClassifier) -&gt; bool {
         <span class="self">self</span>.inner.is_none() &amp;&amp; other.inner.is_none()
             || <span class="self">self</span>.inner.is_some() &amp;&amp; other.inner.is_some()
-    }
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>BayesClassifier {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        BayesClassifier { inner: <span class="prelude-val">None </span>}
     }
 }
 
@@ -282,14 +264,9 @@
 }
 
 <span class="kw">impl </span>Predictable <span class="kw">for </span>HogDetector&lt;BayesClassifier&gt; {
-    <span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; u32 {
-        <span class="kw">let </span>image = resize(
-            <span class="kw-2">&amp;</span>DynamicImage::ImageRgb8(image.clone()),
-            <span class="number">32</span>,
-            <span class="number">32</span>,
-            FilterType::Gaussian,
-        );
-        <span class="kw">let </span>image = DynamicImage::ImageRgba8(image).to_rgb8();
+    <span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; u32 {
+        <span class="kw">let </span>image = resize(image, <span class="number">32</span>, <span class="number">32</span>, FilterType::Gaussian);
+        <span class="kw">let </span>image = DynamicImage::ImageRgba8(image);
         <span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="self">self</span>.preprocess(<span class="kw-2">&amp;</span>image)];
         <span class="kw">let </span>x = DenseMatrix::from_2d_vec(<span class="kw-2">&amp;</span>x);
         <span class="kw">let </span>y = <span class="self">self
@@ -309,10 +286,9 @@
     <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt; {
         <span class="kw">let </span>step_size = <span class="number">8</span>;
         <span class="kw">let </span>window_size = <span class="number">32</span>;
-        <span class="kw">let </span>image = image.to_rgb8();
-        <span class="kw">let </span><span class="kw-2">mut </span>windows = sliding_window(<span class="kw-2">&amp;</span>image, step_size, window_size);
-        windows.extend(pyramid(<span class="kw-2">&amp;</span>image, <span class="number">1.3</span>, step_size, window_size));
-        windows.extend(pyramid(<span class="kw-2">&amp;</span>image, <span class="number">1.5</span>, step_size, window_size));
+        <span class="kw">let </span><span class="kw-2">mut </span>windows = sliding_window(image, step_size, window_size);
+        windows.extend(pyramid(image, <span class="number">1.3</span>, step_size, window_size));
+        windows.extend(pyramid(image, <span class="number">1.5</span>, step_size, window_size));
 
         <span class="kw">let </span>predictions: Vec&lt;(u32, u32, u32)&gt; = windows
             .iter()
@@ -374,7 +350,7 @@
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_detector() {
-        <span class="kw">let </span>img = DynamicImage::ImageRgb8(test_image());
+        <span class="kw">let </span>img = test_image();
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
         dataset.load();
         <span class="kw">let </span><span class="kw-2">mut </span>detector = HogDetector::&lt;BayesClassifier&gt;::default();

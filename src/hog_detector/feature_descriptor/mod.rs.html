@@ -9,7 +9,7 @@
 <span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
-</pre><pre class="rust"><code><span class="kw">use </span>image::{ImageBuffer, Luma};
+</pre><pre class="rust"><code><span class="kw">use </span>image::DynamicImage;
 <span class="kw">use </span>std::fmt::Debug;
 
 <span class="kw">mod </span>hog_feature_descriptor;
@@ -18,7 +18,7 @@
 <span class="doccomment">/// trait for a feature descriptor
 </span><span class="kw">pub trait </span>FeatureDescriptor: Debug {
     <span class="doccomment">/// calculates a feature description from a grayscale image
-    </span><span class="kw">fn </span>calculate_feature(<span class="kw-2">&amp;</span><span class="self">self</span>, image: ImageBuffer&lt;Luma&lt;u8&gt;, Vec&lt;u8&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;f32&gt;, String&gt;;
+    </span><span class="kw">fn </span>calculate_feature(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;f32&gt;, String&gt;;
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hog_detector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

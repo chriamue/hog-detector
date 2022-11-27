@@ -117,7 +117,7 @@
     <span class="kw">pub fn </span>create_dataset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MemoryDataSet {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
         dataset.add((
-            <span class="self">self</span>.image.lock().unwrap().to_rgb8(),
+            <span class="self">self</span>.image.lock().unwrap().clone(),
             <span class="self">self</span>.annotations.lock().unwrap().clone(),
         ));
         dataset.load();

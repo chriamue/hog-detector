@@ -109,7 +109,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
         <span class="kw">for </span>annotations <span class="kw">in </span><span class="self">self</span>.images.lock().unwrap().iter() {
             dataset.add((
-                annotations.get_image().to_rgb8(),
+                annotations.get_image().clone(),
                 annotations.get_annotations(),
             ));
         }

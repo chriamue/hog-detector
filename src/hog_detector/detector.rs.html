@@ -181,8 +181,8 @@
         <span class="kw">let </span>objects = detect_objects(detections, <span class="number">16</span>);
         <span class="kw">let </span>img = test_image();
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]), img.get_pixel(<span class="number">8</span>, <span class="number">8</span>));
-        <span class="kw">let </span>img = visualize_detections(<span class="kw-2">&amp;</span>DynamicImage::ImageRgb8(img), <span class="kw-2">&amp;</span>objects).to_rgb8();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]), img.to_rgb8().get_pixel(<span class="number">8</span>, <span class="number">8</span>));
+        <span class="kw">let </span>img = visualize_detections(<span class="kw-2">&amp;</span>img, <span class="kw-2">&amp;</span>objects).to_rgb8();
 
         img.save(<span class="string">&quot;out/test_image2.png&quot;</span>).unwrap();
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">125</span>, <span class="number">255</span>, <span class="number">0</span>]), img.get_pixel(<span class="number">8</span>, <span class="number">8</span>));

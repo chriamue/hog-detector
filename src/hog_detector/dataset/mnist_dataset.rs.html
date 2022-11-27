@@ -127,7 +127,7 @@
 
 <span class="kw">impl </span>MnistDataSet {}
 
-<span class="kw">fn </span>bw_ndarray2_to_rgb_image(arr: Array2&lt;f32&gt;) -&gt; RgbImage {
+<span class="kw">fn </span>bw_ndarray2_to_rgb_image(arr: Array2&lt;f32&gt;) -&gt; DynamicImage {
     <span class="macro">assert!</span>(arr.is_standard_layout());
 
     <span class="kw">let </span>(width, height) = (arr.ncols(), arr.ncols());
@@ -139,7 +139,7 @@
         }
     }
     <span class="kw">let </span>img = resize(<span class="kw-2">&amp;</span>DynamicImage::ImageRgb8(img), <span class="number">32</span>, <span class="number">32</span>, FilterType::Gaussian);
-    DynamicImage::ImageRgba8(img).to_rgb8()
+    DynamicImage::ImageRgba8(img)
 }
 
 <span class="kw">impl </span>DataSet <span class="kw">for </span>MnistDataSet {
@@ -158,7 +158,7 @@
 
     <span class="kw">fn </span>generate_random_annotations(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _count_each: usize) {}
 
-    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;, Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;) {
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;, Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>train_x = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>train_y = Vec::new();
 

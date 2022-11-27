@@ -31,7 +31,7 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
-</pre><pre class="rust"><code><span class="kw">use </span>image::RgbImage;
+</pre><pre class="rust"><code><span class="kw">use </span>image::DynamicImage;
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;eyes&quot;</span>)]
 #[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
@@ -52,7 +52,7 @@
     <span class="doccomment">/// number of samples in dataset
     </span><span class="kw">fn </span>samples(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
     <span class="doccomment">/// get train and test data
-    </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;, Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;);
+    </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;, Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;);
 }
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;eyes&quot;</span>)]

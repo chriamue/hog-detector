@@ -391,12 +391,13 @@
 <span id="391">391</span>
 <span id="392">392</span>
 <span id="393">393</span>
+<span id="394">394</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span><span class="kw">crate</span>::data_augmentation::DataAugmentation;
 <span class="kw">use </span><span class="kw">crate</span>::dataset::DataSet;
 <span class="kw">use </span><span class="kw">crate</span>::utils::{rotated_frames, scaled_frames, window_crop};
 <span class="kw">use </span><span class="kw">crate</span>::Detector;
-<span class="kw">use </span>image::{open, RgbImage};
+<span class="kw">use </span>image::{open, DynamicImage};
 <span class="kw">use </span>rand::prelude::ThreadRng;
 <span class="kw">use </span>rand::Rng;
 <span class="kw">use </span>std::fs::read_dir;
@@ -406,7 +407,7 @@
 <span class="doccomment">/// Dataset of data from a folder
 </span><span class="kw">pub struct </span>FolderDataSet {
     path: String,
-    data: Vec&lt;(String, RgbImage)&gt;,
+    data: Vec&lt;(String, DynamicImage)&gt;,
     names: Vec&lt;String&gt;,
     window_size: u32,
 }
@@ -450,8 +451,8 @@
         x: u32,
         y: u32,
         window_size: u32,
-    ) -&gt; (String, RgbImage) {
-        <span class="kw">let </span>img = open(image_path).unwrap().to_rgb8();
+    ) -&gt; (String, DynamicImage) {
+        <span class="kw">let </span>img = open(image_path).unwrap();
         <span class="kw">let </span>window = window_crop(<span class="kw-2">&amp;</span>img, window_size, window_size, (x, y));
         (label, window)
     }
@@ -459,7 +460,7 @@
     <span class="kw">fn </span>load_annotations(
         pathes: Vec&lt;(String, String)&gt;,
         window_size: u32,
-    ) -&gt; Vec&lt;(String, RgbImage)&gt; {
+    ) -&gt; Vec&lt;(String, DynamicImage)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>annotations = Vec::new();
         <span class="kw">for </span>path <span class="kw">in </span>pathes {
             <span class="kw">let </span>file = File::open(path.<span class="number">0</span>).unwrap();
@@ -490,7 +491,7 @@
         detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector,
         class: u32,
         max_images: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-    ) -&gt; Vec&lt;(String, RgbImage)&gt; {
+    ) -&gt; Vec&lt;(String, DynamicImage)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>annotations = Vec::new();
         <span class="kw">let </span>pathes = <span class="self">Self</span>::list_pathes(<span class="kw-2">&amp;</span><span class="self">self</span>.path);
         <span class="kw">let </span>class_label = <span class="self">self</span>.names[class <span class="kw">as </span>usize].clone();
@@ -558,11 +559,11 @@
     }
 
     <span class="kw">fn </span>generate_random_annotations_from_image(
-        image: <span class="kw-2">&amp;</span>RgbImage,
+        image: <span class="kw-2">&amp;</span>DynamicImage,
         label: String,
         count: usize,
         window_size: u32,
-    ) -&gt; Vec&lt;(String, RgbImage)&gt; {
+    ) -&gt; Vec&lt;(String, DynamicImage)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>annotations = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>rng: ThreadRng = rand::thread_rng();
 
@@ -603,7 +604,7 @@
     <span class="kw">fn </span>generate_random_annotations(<span class="kw-2">&amp;mut </span><span class="self">self</span>, count_each: usize) {
         <span class="kw">let </span>pathes = <span class="self">Self</span>::list_pathes(<span class="kw-2">&amp;</span><span class="self">self</span>.path);
         <span class="kw">for </span>(<span class="kw">_</span>, image_path) <span class="kw">in </span>pathes {
-            <span class="kw">let </span>img = open(image_path).unwrap().to_rgb8();
+            <span class="kw">let </span>img = open(image_path).unwrap();
             <span class="self">self</span>.data
                 .extend(<span class="self">Self</span>::generate_random_annotations_from_image(
                     <span class="kw-2">&amp;</span>img,
@@ -614,7 +615,7 @@
         }
     }
 
-    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;, Vec&lt;RgbImage&gt;, Vec&lt;u32&gt;) {
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;, Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;) {
         <span class="kw">let </span>train_x = <span class="self">self</span>.data.iter().map(|(<span class="kw">_</span>, img)| img.clone()).collect();
         <span class="kw">let </span>train_y = <span class="self">self
             </span>.data
@@ -652,6 +653,7 @@
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>image::RgbImage;
 
     <span class="kw">const </span>ANNOTATIONS: usize = <span class="number">42</span>;
     <span class="kw">const </span>IMAGES_PER_LABEL: usize = <span class="number">21</span>;
@@ -711,7 +713,7 @@
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_generate_random_annotations() {
-        <span class="kw">let </span>image = RgbImage::new(<span class="number">32</span>, <span class="number">32</span>);
+        <span class="kw">let </span>image = DynamicImage::ImageRgb8(RgbImage::new(<span class="number">32</span>, <span class="number">32</span>));
         <span class="kw">let </span>annotations = FolderDataSet::generate_random_annotations_from_image(
             <span class="kw-2">&amp;</span>image,
             <span class="string">&quot;none&quot;</span>.to_string(),

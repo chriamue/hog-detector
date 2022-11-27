@@ -218,12 +218,6 @@
 <span id="218">218</span>
 <span id="219">219</span>
 <span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::{detect_objects, visualize_detections};
 <span class="kw">use </span><span class="kw">crate</span>::feature_descriptor::HogFeatureDescriptor;
 <span class="kw">use </span><span class="kw">crate</span>::hogdetector::HogDetectorTrait;
@@ -231,7 +225,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::utils::{pyramid, sliding_window};
 <span class="kw">use crate</span>::{DataSet, Detector, HogDetector, Predictable, Trainable};
 <span class="kw">use </span>image::imageops::{resize, FilterType};
-<span class="kw">use </span>image::{DynamicImage, RgbImage};
+<span class="kw">use </span>image::DynamicImage;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
 <span class="kw">use </span>smartcore::svm::svc::{SVCParameters, SVC};
@@ -325,14 +319,9 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Predictable <span class="kw">for </span>HogDetector&lt;SVMClassifier&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-    <span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>RgbImage) -&gt; u32 {
-        <span class="kw">let </span>image = resize(
-            <span class="kw-2">&amp;</span>DynamicImage::ImageRgb8(image.clone()),
-            <span class="number">32</span>,
-            <span class="number">32</span>,
-            FilterType::Gaussian,
-        );
-        <span class="kw">let </span>image = DynamicImage::ImageRgba8(image).to_rgb8();
+    <span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; u32 {
+        <span class="kw">let </span>image = resize(image, <span class="number">32</span>, <span class="number">32</span>, FilterType::Gaussian);
+        <span class="kw">let </span>image = DynamicImage::ImageRgba8(image);
         <span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="self">self</span>.preprocess(<span class="kw-2">&amp;</span>image)];
         <span class="kw">let </span>x = DenseMatrix::from_2d_vec(<span class="kw-2">&amp;</span>x);
         <span class="kw">let </span>y = <span class="self">self
@@ -352,10 +341,9 @@
     <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt; {
         <span class="kw">let </span>step_size = <span class="number">8</span>;
         <span class="kw">let </span>window_size = <span class="number">32</span>;
-        <span class="kw">let </span>image = image.to_rgb8();
-        <span class="kw">let </span><span class="kw-2">mut </span>windows = sliding_window(<span class="kw-2">&amp;</span>image, step_size, window_size);
-        windows.extend(pyramid(<span class="kw-2">&amp;</span>image, <span class="number">1.3</span>, step_size, window_size));
-        windows.extend(pyramid(<span class="kw-2">&amp;</span>image, <span class="number">1.5</span>, step_size, window_size));
+        <span class="kw">let </span><span class="kw-2">mut </span>windows = sliding_window(image, step_size, window_size);
+        windows.extend(pyramid(image, <span class="number">1.3</span>, step_size, window_size));
+        windows.extend(pyramid(image, <span class="number">1.5</span>, step_size, window_size));
 
         <span class="kw">let </span>predictions: Vec&lt;(u32, u32, u32)&gt; = windows
             .iter()
@@ -434,7 +422,7 @@
     </span><span class="attribute">#[should_panic = <span class="string">&quot;called `Option::unwrap()` on a `None` value&quot;</span>]
     #[test]
     </span><span class="kw">fn </span>test_detector() {
-        <span class="kw">let </span>img = DynamicImage::ImageRgb8(test_image());
+        <span class="kw">let </span>img = test_image();
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
         dataset.load();
         <span class="kw">let </span><span class="kw-2">mut </span>detector = HogDetector::&lt;SVMClassifier&gt;::default();

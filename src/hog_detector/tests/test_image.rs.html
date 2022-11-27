@@ -34,19 +34,19 @@
 <span id="34">34</span>
 <span id="35">35</span>
 <span id="36">36</span>
-</pre><pre class="rust"><code><span class="kw">use </span>image::{Rgb, RgbImage};
+</pre><pre class="rust"><code><span class="kw">use </span>image::{DynamicImage, Rgb, RgbImage};
 <span class="kw">use </span>imageproc::{
     drawing::{draw_filled_circle_mut, draw_filled_ellipse_mut, draw_filled_rect_mut},
     rect::Rect,
 };
 
 <span class="doccomment">/// a simple image for testing purposes
-</span><span class="kw">pub fn </span>test_image() -&gt; RgbImage {
+</span><span class="kw">pub fn </span>test_image() -&gt; DynamicImage {
     <span class="kw">let </span><span class="kw-2">mut </span>img = RgbImage::new(<span class="number">100</span>, <span class="number">100</span>);
     draw_filled_circle_mut(<span class="kw-2">&amp;mut </span>img, (<span class="number">75</span>, <span class="number">25</span>), <span class="number">25</span>, Rgb([<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>]));
     draw_filled_rect_mut(<span class="kw-2">&amp;mut </span>img, Rect::at(<span class="number">25</span>, <span class="number">75</span>).of_size(<span class="number">10</span>, <span class="number">10</span>), Rgb([<span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>]));
     draw_filled_ellipse_mut(<span class="kw-2">&amp;mut </span>img, (<span class="number">75</span>, <span class="number">75</span>), <span class="number">25</span>, <span class="number">10</span>, Rgb([<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>]));
-    img
+    DynamicImage::ImageRgb8(img)
 }
 
 <span class="attribute">#[test]
@@ -58,7 +58,7 @@
 
 <span class="attribute">#[test]
 </span><span class="kw">fn </span>test_pixel_color() {
-    <span class="kw">let </span>img = test_image();
+    <span class="kw">let </span>img = test_image().into_rgb8();
     <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>]), img.get_pixel(<span class="number">75</span>, <span class="number">25</span>));
     <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>]), img.get_pixel(<span class="number">55</span>, <span class="number">80</span>));
     <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>]), img.get_pixel(<span class="number">30</span>, <span class="number">80</span>));
