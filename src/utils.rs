@@ -1,7 +1,7 @@
 use std::io::Cursor;
 
-use image::ImageOutputFormat;
-use image::{imageops, imageops::resize, imageops::FilterType, DynamicImage, Rgb, SubImage};
+use image::{imageops, imageops::resize, imageops::FilterType, DynamicImage, Rgb};
+use image::{GenericImageView, ImageOutputFormat};
 use imageproc::geometric_transformations::{rotate_about_center, warp, Interpolation, Projection};
 use rand::prelude::ThreadRng;
 use rand::Rng;
@@ -20,7 +20,7 @@ pub fn pyramid(
     let width = image.width() as f32 / scale;
     let height = image.height() as f32 / scale;
     let image = resize(image, width as u32, height as u32, FilterType::Nearest);
-    let image = DynamicImage::ImageRgba8(image);
+    let image = DynamicImage::from(image);
     let windows = sliding_window(&image, step_size, window_size);
     windows
         .into_iter()
@@ -37,9 +37,7 @@ pub fn sliding_window(image: &DynamicImage, step_size: usize, window_size: u32) 
             windows.push((
                 x,
                 y,
-                DynamicImage::ImageRgba8(
-                    SubImage::new(image, x, y, window_size, window_size).to_image(),
-                ),
+                DynamicImage::from(image.view(x, y, window_size, window_size).to_image()),
             ))
         }
     }
@@ -54,7 +52,7 @@ pub fn rotated_frames(frame: &DynamicImage) -> impl Iterator<Item = DynamicImage
     ]
     .iter()
     .map(|rad| {
-        DynamicImage::ImageRgb8(rotate_about_center(
+        DynamicImage::from(rotate_about_center(
             &frame.to_rgb8(),
             *rad,
             Interpolation::Nearest,
@@ -67,7 +65,7 @@ pub fn rotated_frames(frame: &DynamicImage) -> impl Iterator<Item = DynamicImage
 pub fn scaled_frames(frame: &DynamicImage) -> impl Iterator<Item = DynamicImage> + '_ {
     [0.8, 0.9, 1.1, 1.2].into_iter().map(|scalefactor| {
         let scale = Projection::scale(scalefactor, scalefactor);
-        DynamicImage::ImageRgb8(warp(
+        DynamicImage::from(warp(
             &frame.to_rgb8(),
             &scale,
             Interpolation::Nearest,

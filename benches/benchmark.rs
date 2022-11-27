@@ -1,9 +1,10 @@
 use criterion::{criterion_group, criterion_main, Bencher, Criterion};
 use hog_detector::{
     classifier::BayesClassifier,
+    dataset::MemoryDataSet,
     feature_descriptor::{FeatureDescriptor, HogFeatureDescriptor},
     tests::test_image,
-    HogDetector,
+    DataSet, Detector, HogDetector, Trainable,
 };
 use image::{DynamicImage, RgbImage};
 
@@ -43,12 +44,22 @@ fn preprocess_matrix(b: &mut Bencher) {
     b.iter(|| hog_detector.preprocess_matrix(images.clone()));
 }
 
+fn detect_objects(b: &mut Bencher) {
+    let image = test_image();
+    let mut hog_detector: HogDetector<BayesClassifier> = HogDetector::default();
+    let mut dataset = MemoryDataSet::new_test();
+    dataset.load();
+    hog_detector.train_class(&dataset, 1);
+    b.iter(|| hog_detector.detect_objects(&image));
+}
+
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("rotated_frames", rotated_frames);
     c.bench_function("scaled_frames", scaled_frames);
     c.bench_function("window_crop", window_crop);
     c.bench_function("calculate hog feature", calculate_hog_feature);
     c.bench_function("preprocess matrix", preprocess_matrix);
+    c.bench_function("detect objects", detect_objects);
 }
 
 criterion_group!(benches, criterion_benchmark);

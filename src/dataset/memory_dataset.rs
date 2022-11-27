@@ -35,7 +35,7 @@ impl MemoryDataSet {
         self.samples.push(sample);
     }
 
-    #[cfg(test)]
+    /// small test dataset
     pub fn new_test() -> Self {
         use crate::{bbox::BBox, tests::test_image};
 
