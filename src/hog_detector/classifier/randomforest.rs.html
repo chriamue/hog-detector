@@ -184,6 +184,7 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     detector::{detect_objects, visualize_detections},
     feature_descriptor::HogFeatureDescriptor,
@@ -206,7 +207,8 @@
 <span class="doccomment">/// A Random Forest classifier
 </span><span class="attribute">#[derive(Default, Serialize, Deserialize, Debug)]
 </span><span class="kw">pub struct </span>RandomForestClassifier {
-    inner: <span class="prelude-ty">Option</span>&lt;RFCType&gt;,
+    <span class="doccomment">/// inner
+    </span><span class="kw">pub </span>inner: <span class="prelude-ty">Option</span>&lt;RFCType&gt;,
 }
 
 <span class="kw">impl </span>Classifier <span class="kw">for </span>RandomForestClassifier {}
