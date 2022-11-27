@@ -9,6 +9,7 @@ pub enum Msg {
     Train,
     SwitchBayesClassifier,
     SwitchRandomForestClassifier,
+    SwitchCombinedClassifier,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -43,6 +44,10 @@ impl Component for TrainerApp {
                 ctx.props().detector.init_random_forest_classifier();
                 true
             }
+            Msg::SwitchCombinedClassifier => {
+                ctx.props().detector.init_combined_classifier();
+                true
+            }
         }
     }
 
@@ -50,6 +55,7 @@ impl Component for TrainerApp {
         let onclick_train = ctx.link().callback(|_| Msg::Train);
         let onclick_bayes = ctx.link().callback(|_| Msg::SwitchBayesClassifier);
         let onclick_random_forest = ctx.link().callback(|_| Msg::SwitchRandomForestClassifier);
+        let onclick_combined = ctx.link().callback(|_| Msg::SwitchCombinedClassifier);
         html! {
             <div id="train-classifier-buttons">
         <button type="button" class="btn btn-success" onclick={onclick_train}>
@@ -60,6 +66,9 @@ impl Component for TrainerApp {
         </button>
         <button type="button" class="btn btn-success" onclick={onclick_random_forest}>
         { "Switch to Random Forest Classifier" }
+        </button>
+        <button type="button" class="btn btn-success" onclick={onclick_combined}>
+        { "Switch to Combined Classifier" }
         </button>
             </div>
         }

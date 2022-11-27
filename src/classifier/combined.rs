@@ -117,10 +117,10 @@ impl Predictable for HogDetector<CombinedClassifier> {
             .unwrap_or_else(|_| vec![0])
             .first()
             .unwrap();
-        if bayes_y == randomforest_y {
+        if bayes_y.eq(&randomforest_y) {
             bayes_y
         } else {
-            0
+            0u32
         }
     }
 }

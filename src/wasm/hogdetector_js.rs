@@ -1,4 +1,5 @@
 use crate::classifier::BayesClassifier;
+use crate::classifier::CombinedClassifier;
 use crate::classifier::RandomForestClassifier;
 use crate::hogdetector::HogDetectorTrait;
 use crate::DataSet;
@@ -47,6 +48,14 @@ impl HogDetectorJS {
     pub fn init_bayes_classifier(&self) {
         let mut hog = HogDetector::<BayesClassifier>::default();
         let model = include_str!("../../res/eyes_bayes_model.json");
+        hog.load(model);
+        *self.hog.lock().unwrap() = Box::new(hog);
+    }
+
+    #[wasm_bindgen]
+    pub fn init_combined_classifier(&self) {
+        let mut hog = HogDetector::<CombinedClassifier>::default();
+        let model = include_str!("../../res/eyes_combined_model.json");
         hog.load(model);
         *self.hog.lock().unwrap() = Box::new(hog);
     }
