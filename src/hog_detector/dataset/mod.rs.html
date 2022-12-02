@@ -31,7 +31,25 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
-</pre><pre class="rust"><code><span class="kw">use </span>image::DynamicImage;
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Annotation;
+<span class="kw">use </span><span class="kw">crate</span>::Detector;
+<span class="kw">use </span>image::DynamicImage;
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;eyes&quot;</span>)]
 #[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
@@ -43,6 +61,9 @@
 #[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
 </span><span class="kw">mod </span>mnist_dataset;
 
+<span class="doccomment">/// Image annotated by list of Annotations
+</span><span class="kw">pub type </span>AnnotatedImage = (DynamicImage, Vec&lt;Annotation&gt;);
+
 <span class="doccomment">/// trait for a dataset
 </span><span class="kw">pub trait </span>DataSet {
     <span class="doccomment">/// loads the dataset
@@ -53,6 +74,17 @@
     </span><span class="kw">fn </span>samples(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
     <span class="doccomment">/// get train and test data
     </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;, Vec&lt;DynamicImage&gt;, Vec&lt;u32&gt;);
+}
+
+<span class="doccomment">/// trait for generating data
+</span><span class="kw">pub trait </span>DataGenerator {
+    <span class="doccomment">/// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)
+    </span><span class="kw">fn </span>generate_hard_negative_samples(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector,
+        class: u32,
+        max_images: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    );
 }
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;eyes&quot;</span>)]

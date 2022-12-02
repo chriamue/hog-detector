@@ -213,22 +213,16 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DataSet;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{AnnotatedImage, DataSet};
 <span class="kw">use </span><span class="kw">crate</span>::utils::generate_random_subimages;
-<span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span>image::{
     imageops::{crop, resize, FilterType},
     DynamicImage,
 };
 
-<span class="kw">type </span>Sample = (DynamicImage, Vec&lt;Annotation&gt;);
-
 <span class="doccomment">/// Memory only dataset
 </span><span class="kw">pub struct </span>MemoryDataSet {
-    samples: Vec&lt;Sample&gt;,
+    annotated_images: Vec&lt;AnnotatedImage&gt;,
     x: Vec&lt;DynamicImage&gt;,
     y: Vec&lt;u32&gt;,
     window_width: u32,
@@ -238,7 +232,7 @@
 <span class="kw">impl </span>Default <span class="kw">for </span>MemoryDataSet {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         MemoryDataSet {
-            samples: Vec::new(),
+            annotated_images: Vec::new(),
             x: Vec::new(),
             y: Vec::new(),
             window_width: <span class="number">32</span>,
@@ -249,8 +243,8 @@
 
 <span class="kw">impl </span>MemoryDataSet {
     <span class="doccomment">/// adds sample to dataset
-    </span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sample: Sample) {
-        <span class="self">self</span>.samples.push(sample);
+    </span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, annotated_image: AnnotatedImage) {
+        <span class="self">self</span>.annotated_images.push(annotated_image);
     }
 
     <span class="doccomment">/// small test dataset
@@ -308,7 +302,7 @@
     <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.x.clear();
         <span class="self">self</span>.y.clear();
-        <span class="kw">for </span>(img, annotations) <span class="kw">in </span><span class="self">self</span>.samples.iter() {
+        <span class="kw">for </span>(img, annotations) <span class="kw">in </span><span class="self">self</span>.annotated_images.iter() {
             <span class="kw">let </span><span class="kw-2">mut </span>img = img.clone();
             <span class="kw">for </span>annotation <span class="kw">in </span>annotations {
                 <span class="kw">let </span>(bbox, class) = annotation;
@@ -334,7 +328,7 @@
     }
 
     <span class="kw">fn </span>generate_random_annotations(<span class="kw-2">&amp;mut </span><span class="self">self</span>, count_each: usize) {
-        <span class="kw">for </span>sample <span class="kw">in </span><span class="self">self</span>.samples.iter() {
+        <span class="kw">for </span>sample <span class="kw">in </span><span class="self">self</span>.annotated_images.iter() {
             <span class="kw">let </span>subimages = generate_random_subimages(
                 <span class="kw-2">&amp;</span>sample.<span class="number">0</span>,
                 count_each,
