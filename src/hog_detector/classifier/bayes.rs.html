@@ -181,6 +181,10 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     detector::{detect_objects, visualize_detections},
     feature_descriptor::HogFeatureDescriptor,
@@ -234,6 +238,10 @@
     <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>str) {
         <span class="self">self</span>.classifier = <span class="prelude-val">Some</span>(serde_json::from_str::&lt;BayesClassifier&gt;(model).unwrap());
     }
+
+    <span class="kw">fn </span>detector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector {
+        <span class="self">self
+    </span>}
 }
 
 <span class="kw">impl </span>Trainable <span class="kw">for </span>HogDetector&lt;BayesClassifier&gt; {

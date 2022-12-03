@@ -204,6 +204,10 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     detector::{detect_objects, visualize_detections},
     feature_descriptor::HogFeatureDescriptor,
@@ -256,6 +260,10 @@
     <span class="kw">fn </span>load(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>str) {
         <span class="self">self</span>.classifier = <span class="prelude-val">Some</span>(serde_json::from_str::&lt;CombinedClassifier&gt;(model).unwrap());
     }
+
+    <span class="kw">fn </span>detector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector {
+        <span class="self">self
+    </span>}
 }
 
 <span class="kw">impl </span>Trainable <span class="kw">for </span>HogDetector&lt;CombinedClassifier&gt; {
