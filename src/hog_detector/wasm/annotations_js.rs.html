@@ -96,7 +96,7 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::dataset::{DataSet, MemoryDataSet};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::dataset::{AnnotatedImageSet, DataSet, MemoryDataSet};
 <span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span>image::DynamicImage;
 <span class="kw">use </span>std::sync::{Arc, Mutex};
@@ -116,7 +116,7 @@
 
     <span class="kw">pub fn </span>create_dataset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MemoryDataSet {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
-        dataset.add((
+        dataset.add_annotated_image((
             <span class="self">self</span>.image.lock().unwrap().clone(),
             <span class="self">self</span>.annotations.lock().unwrap().clone(),
         ));

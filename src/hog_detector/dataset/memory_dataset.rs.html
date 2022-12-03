@@ -213,7 +213,26 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{AnnotatedImage, DataSet};
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+</pre><pre class="rust"><code><span class="kw">use super</span>::{AnnotatedImage, AnnotatedImageSet, DataSet};
 <span class="kw">use </span><span class="kw">crate</span>::utils::generate_random_subimages;
 <span class="kw">use </span>image::{
     imageops::{crop, resize, FilterType},
@@ -242,11 +261,6 @@
 }
 
 <span class="kw">impl </span>MemoryDataSet {
-    <span class="doccomment">/// adds sample to dataset
-    </span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, annotated_image: AnnotatedImage) {
-        <span class="self">self</span>.annotated_images.push(annotated_image);
-    }
-
     <span class="doccomment">/// small test dataset
     </span><span class="kw">pub fn </span>new_test() -&gt; <span class="self">Self </span>{
         <span class="kw">use crate</span>::{bbox::BBox, tests::test_image};
@@ -293,8 +307,22 @@
                 ),
             ],
         );
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         dataset
+    }
+}
+
+<span class="kw">impl </span>AnnotatedImageSet <span class="kw">for </span>MemoryDataSet {
+    <span class="kw">fn </span>add_annotated_image(<span class="kw-2">&amp;mut </span><span class="self">self</span>, annotated_image: AnnotatedImage) {
+        <span class="self">self</span>.annotated_images.push(annotated_image);
+    }
+
+    <span class="kw">fn </span>annotated_images_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.annotated_images.len()
+    }
+
+    <span class="kw">fn </span>annotated_images(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>AnnotatedImage&gt; + <span class="lifetime">&#39;_</span>&gt; {
+        Box::new(<span class="self">self</span>.annotated_images.iter())
     }
 }
 
@@ -379,15 +407,25 @@
     </span><span class="kw">fn </span>test_add_sample() {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
         <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, dataset.samples());
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_annotated_image_set() {
+        <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
+        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
+        dataset.add_annotated_image(sample);
+        <span class="macro">assert_eq!</span>(<span class="number">1</span>, dataset.annotated_images_size());
+        <span class="kw">let </span>mapped: Vec&lt;bool&gt; = dataset.annotated_images().map(|<span class="kw">_</span>| <span class="bool-val">true</span>).collect();
+        <span class="macro">assert_eq!</span>(<span class="number">1</span>, mapped.len());
     }
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_load() {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
         <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, dataset.samples());
         dataset.load();
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, dataset.samples());
@@ -397,7 +435,7 @@
     </span><span class="kw">fn </span>test_generate_annotations() {
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::default();
         <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, dataset.samples());
         dataset.load();
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, dataset.samples());
@@ -418,7 +456,7 @@
             <span class="number">0</span>,
         );
         <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[annotation]);
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         dataset.load();
         <span class="kw">let </span>(train_x, train_y, test_x, test_y) = dataset.get();
         <span class="macro">assert_eq!</span>(train_x.len(), train_y.len());

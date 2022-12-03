@@ -444,6 +444,38 @@
 <span id="444">444</span>
 <span id="445">445</span>
 <span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span><span class="kw">crate</span>::data_augmentation::DataAugmentation;
 <span class="kw">use </span><span class="kw">crate</span>::dataset::DataSet;
@@ -456,7 +488,7 @@
 <span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::io::{<span class="self">self</span>, BufRead};
 
-<span class="kw">use super</span>::{AnnotatedImage, DataGenerator};
+<span class="kw">use super</span>::{AnnotatedImage, AnnotatedImageSet, DataGenerator};
 
 <span class="doccomment">/// Dataset of data from a folder
 </span><span class="kw">pub struct </span>FolderDataSet {
@@ -674,6 +706,20 @@
     }
 }
 
+<span class="kw">impl </span>AnnotatedImageSet <span class="kw">for </span>FolderDataSet {
+    <span class="kw">fn </span>add_annotated_image(<span class="kw-2">&amp;mut </span><span class="self">self</span>, annotated_image: AnnotatedImage) {
+        <span class="self">self</span>.annotated_images.push(annotated_image);
+    }
+
+    <span class="kw">fn </span>annotated_images_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.annotated_images.len()
+    }
+
+    <span class="kw">fn </span>annotated_images(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>AnnotatedImage&gt; + <span class="lifetime">&#39;_</span>&gt; {
+        Box::new(<span class="self">self</span>.annotated_images.iter())
+    }
+}
+
 <span class="kw">impl </span>DataGenerator <span class="kw">for </span>FolderDataSet {
     <span class="kw">fn </span>generate_hard_negative_samples(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -744,6 +790,8 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::tests::test_image;
+
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>image::RgbImage;
 
@@ -791,6 +839,22 @@
         <span class="kw">let </span>(train_x, train_y, <span class="kw">_</span>, <span class="kw">_</span>) = dataset.get();
         <span class="macro">assert_eq!</span>(train_x.len(), ANNOTATIONS);
         <span class="macro">assert_eq!</span>(train_y.len(), ANNOTATIONS);
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_annotated_image_set() {
+        <span class="kw">let </span><span class="kw-2">mut </span>dataset = FolderDataSet::new(
+            <span class="string">&quot;res/training/&quot;</span>.to_string(),
+            <span class="string">&quot;res/labels.txt&quot;</span>.to_string(),
+            <span class="number">28</span>,
+        );
+        dataset.load();
+        <span class="macro">assert_eq!</span>(<span class="number">4</span>, dataset.annotated_images_size());
+        <span class="kw">let </span>sample = (test_image(), <span class="macro">vec!</span>[(BBox::default(), <span class="number">0</span>)]);
+        dataset.add_annotated_image(sample);
+        <span class="macro">assert_eq!</span>(<span class="number">5</span>, dataset.annotated_images_size());
+        <span class="kw">let </span>mapped: Vec&lt;bool&gt; = dataset.annotated_images().map(|<span class="kw">_</span>| <span class="bool-val">true</span>).collect();
+        <span class="macro">assert_eq!</span>(<span class="number">5</span>, mapped.len());
     }
 
     <span class="attribute">#[test]
