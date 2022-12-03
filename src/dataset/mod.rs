@@ -27,6 +27,16 @@ pub trait DataSet {
     fn get(&self) -> (Vec<DynamicImage>, Vec<u32>, Vec<DynamicImage>, Vec<u32>);
 }
 
+/// trait of a set of annotated images
+pub trait AnnotatedImageSet {
+    /// adds an annotated image
+    fn add_annotated_image(&mut self, annotated_image: AnnotatedImage);
+    /// returns count of annotated images
+    fn annotated_images_size(&self) -> usize;
+    /// returns iterator over annotated images
+    fn annotated_images(&self) -> Box<dyn Iterator<Item = &AnnotatedImage> + '_>;
+}
+
 /// trait for generating data
 pub trait DataGenerator {
     /// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)

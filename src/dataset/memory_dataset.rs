@@ -1,4 +1,4 @@
-use super::{AnnotatedImage, DataSet};
+use super::{AnnotatedImage, AnnotatedImageSet, DataSet};
 use crate::utils::generate_random_subimages;
 use image::{
     imageops::{crop, resize, FilterType},
@@ -27,11 +27,6 @@ impl Default for MemoryDataSet {
 }
 
 impl MemoryDataSet {
-    /// adds sample to dataset
-    pub fn add(&mut self, annotated_image: AnnotatedImage) {
-        self.annotated_images.push(annotated_image);
-    }
-
     /// small test dataset
     pub fn new_test() -> Self {
         use crate::{bbox::BBox, tests::test_image};
@@ -78,8 +73,22 @@ impl MemoryDataSet {
                 ),
             ],
         );
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         dataset
+    }
+}
+
+impl AnnotatedImageSet for MemoryDataSet {
+    fn add_annotated_image(&mut self, annotated_image: AnnotatedImage) {
+        self.annotated_images.push(annotated_image);
+    }
+
+    fn annotated_images_size(&self) -> usize {
+        self.annotated_images.len()
+    }
+
+    fn annotated_images(&self) -> Box<dyn Iterator<Item = &AnnotatedImage> + '_> {
+        Box::new(self.annotated_images.iter())
     }
 }
 
@@ -164,15 +173,25 @@ mod tests {
     fn test_add_sample() {
         let mut dataset = MemoryDataSet::default();
         let sample = (test_image(), vec![(BBox::default(), 0)]);
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         assert_eq!(0, dataset.samples());
+    }
+
+    #[test]
+    fn test_annotated_image_set() {
+        let mut dataset = MemoryDataSet::default();
+        let sample = (test_image(), vec![(BBox::default(), 0)]);
+        dataset.add_annotated_image(sample);
+        assert_eq!(1, dataset.annotated_images_size());
+        let mapped: Vec<bool> = dataset.annotated_images().map(|_| true).collect();
+        assert_eq!(1, mapped.len());
     }
 
     #[test]
     fn test_load() {
         let mut dataset = MemoryDataSet::default();
         let sample = (test_image(), vec![(BBox::default(), 0)]);
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         assert_eq!(0, dataset.samples());
         dataset.load();
         assert_eq!(1, dataset.samples());
@@ -182,7 +201,7 @@ mod tests {
     fn test_generate_annotations() {
         let mut dataset = MemoryDataSet::default();
         let sample = (test_image(), vec![(BBox::default(), 0)]);
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         assert_eq!(0, dataset.samples());
         dataset.load();
         assert_eq!(1, dataset.samples());
@@ -203,7 +222,7 @@ mod tests {
             0,
         );
         let sample = (test_image(), vec![annotation]);
-        dataset.add(sample);
+        dataset.add_annotated_image(sample);
         dataset.load();
         let (train_x, train_y, test_x, test_y) = dataset.get();
         assert_eq!(train_x.len(), train_y.len());

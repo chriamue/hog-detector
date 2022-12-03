@@ -1,4 +1,4 @@
-use crate::dataset::{DataSet, MemoryDataSet};
+use crate::dataset::{AnnotatedImageSet, DataSet, MemoryDataSet};
 use crate::Annotation;
 use image::DynamicImage;
 use std::sync::{Arc, Mutex};
@@ -18,7 +18,7 @@ impl AnnotationsJS {
 
     pub fn create_dataset(&self) -> MemoryDataSet {
         let mut dataset = MemoryDataSet::default();
-        dataset.add((
+        dataset.add_annotated_image((
             self.image.lock().unwrap().clone(),
             self.annotations.lock().unwrap().clone(),
         ));

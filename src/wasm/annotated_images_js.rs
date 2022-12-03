@@ -1,6 +1,6 @@
 use super::annotations_js::AnnotationsJS;
 use crate::{
-    dataset::{DataSet, MemoryDataSet},
+    dataset::{AnnotatedImageSet, DataSet, MemoryDataSet},
     Annotation,
 };
 use std::{
@@ -27,7 +27,7 @@ impl AnnotatedImagesJS {
     pub fn create_dataset(&self) -> MemoryDataSet {
         let mut dataset = MemoryDataSet::default();
         for annotations in self.images.lock().unwrap().iter() {
-            dataset.add((
+            dataset.add_annotated_image((
                 annotations.get_image().clone(),
                 annotations.get_annotations(),
             ));

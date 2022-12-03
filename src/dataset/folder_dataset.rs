@@ -10,7 +10,7 @@ use std::fs::read_dir;
 use std::fs::File;
 use std::io::{self, BufRead};
 
-use super::{AnnotatedImage, DataGenerator};
+use super::{AnnotatedImage, AnnotatedImageSet, DataGenerator};
 
 /// Dataset of data from a folder
 pub struct FolderDataSet {
@@ -228,6 +228,20 @@ impl FolderDataSet {
     }
 }
 
+impl AnnotatedImageSet for FolderDataSet {
+    fn add_annotated_image(&mut self, annotated_image: AnnotatedImage) {
+        self.annotated_images.push(annotated_image);
+    }
+
+    fn annotated_images_size(&self) -> usize {
+        self.annotated_images.len()
+    }
+
+    fn annotated_images(&self) -> Box<dyn Iterator<Item = &AnnotatedImage> + '_> {
+        Box::new(self.annotated_images.iter())
+    }
+}
+
 impl DataGenerator for FolderDataSet {
     fn generate_hard_negative_samples(
         &mut self,
@@ -298,6 +312,8 @@ impl DataAugmentation for FolderDataSet {
 
 #[cfg(test)]
 mod tests {
+    use crate::tests::test_image;
+
     use super::*;
     use image::RgbImage;
 
@@ -345,6 +361,22 @@ mod tests {
         let (train_x, train_y, _, _) = dataset.get();
         assert_eq!(train_x.len(), ANNOTATIONS);
         assert_eq!(train_y.len(), ANNOTATIONS);
+    }
+
+    #[test]
+    fn test_annotated_image_set() {
+        let mut dataset = FolderDataSet::new(
+            "res/training/".to_string(),
+            "res/labels.txt".to_string(),
+            28,
+        );
+        dataset.load();
+        assert_eq!(4, dataset.annotated_images_size());
+        let sample = (test_image(), vec![(BBox::default(), 0)]);
+        dataset.add_annotated_image(sample);
+        assert_eq!(5, dataset.annotated_images_size());
+        let mapped: Vec<bool> = dataset.annotated_images().map(|_| true).collect();
+        assert_eq!(5, mapped.len());
     }
 
     #[test]
