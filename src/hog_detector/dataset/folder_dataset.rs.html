@@ -725,9 +725,9 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector,
         class: u32,
-        max_images: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+        max_annotations: <span class="prelude-ty">Option</span>&lt;usize&gt;,
     ) {
-        <span class="kw">let </span>annotations = <span class="self">self</span>.get_negative_samples(detector, class, max_images);
+        <span class="kw">let </span>annotations = <span class="self">self</span>.get_negative_samples(detector, class, max_annotations);
         <span class="self">self</span>.data.extend(annotations);
     }
 }

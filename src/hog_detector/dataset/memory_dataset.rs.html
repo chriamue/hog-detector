@@ -232,7 +232,9 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{AnnotatedImage, AnnotatedImageSet, DataSet};
+<span id="235">235</span>
+<span id="236">236</span>
+</pre><pre class="rust"><code><span class="kw">use super</span>::{AnnotatedImage, AnnotatedImageSet, DataGenerator, DataSet};
 <span class="kw">use </span><span class="kw">crate</span>::utils::generate_random_subimages;
 <span class="kw">use </span>image::{
     imageops::{crop, resize, FilterType},
@@ -390,6 +392,8 @@
         (train_x, train_y, test_x, test_y)
     }
 }
+
+<span class="kw">impl </span>DataGenerator <span class="kw">for </span>MemoryDataSet {}
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {

@@ -57,6 +57,95 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span><span class="kw">crate</span>::Detector;
 <span class="kw">use </span>image::DynamicImage;
@@ -97,14 +186,60 @@
 }
 
 <span class="doccomment">/// trait for generating data
-</span><span class="kw">pub trait </span>DataGenerator {
+</span><span class="kw">pub trait </span>DataGenerator: AnnotatedImageSet {
     <span class="doccomment">/// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)
     </span><span class="kw">fn </span>generate_hard_negative_samples(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector,
         class: u32,
-        max_images: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-    );
+        max_annotations: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    ) {
+        <span class="kw">let </span>annotated_images = <span class="self">self</span>.generate_negative_samples(detector, class, max_annotations);
+        annotated_images
+            .into_iter()
+            .for_each(|annotated_image| <span class="self">self</span>.add_annotated_image(annotated_image));
+    }
+
+    <span class="doccomment">/// generates negative samples
+    </span><span class="kw">fn </span>generate_negative_samples(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        detector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector,
+        class: u32,
+        max_annotations: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    ) -&gt; Vec&lt;AnnotatedImage&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>annotations_counter = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>generated_annotated_images = Vec::new();
+        <span class="kw">for </span>annotated_image <span class="kw">in </span><span class="self">self</span>.annotated_images() {
+            <span class="kw">let </span>detections = detector.detect_objects(<span class="kw-2">&amp;</span>annotated_image.<span class="number">0</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>false_pos_annotations = Vec::new();
+            detections.iter().for_each(|detection| {
+                <span class="kw">if </span>max_annotations.is_some() &amp;&amp; max_annotations.unwrap() &lt;= annotations_counter {
+                    <span class="kw">return</span>;
+                }
+                <span class="kw">if </span>detection.class <span class="kw">as </span>u32 == class {
+                    <span class="kw">let </span><span class="kw-2">mut </span>false_pos = <span class="bool-val">true</span>;
+                    annotated_image
+                        .<span class="number">1
+                        </span>.iter()
+                        .for_each(|(bbox, annotated_class)| {
+                            <span class="kw">if </span>class == <span class="kw-2">*</span>annotated_class {
+                                <span class="kw">if </span>bbox.iou(<span class="kw-2">&amp;</span>detection.bbox) &gt; <span class="number">0.9 </span>{
+                                    false_pos = <span class="bool-val">false</span>;
+                                }
+                            }
+                        });
+                    <span class="kw">if </span>false_pos == <span class="bool-val">true </span>{
+                        <span class="kw">let </span>false_pos_bbox = detection.bbox.clone();
+                        <span class="kw">let </span>false_pos_annotation: Annotation = (false_pos_bbox, <span class="number">0</span>);
+                        false_pos_annotations.push(false_pos_annotation);
+                        annotations_counter += <span class="number">1</span>;
+                    }
+                }
+            });
+            generated_annotated_images.push((annotated_image.<span class="number">0</span>.clone(), false_pos_annotations));
+        }
+        generated_annotated_images
+    }
 }
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;eyes&quot;</span>)]
@@ -116,5 +251,48 @@
 <span class="attribute">#[cfg(feature = <span class="string">&quot;mnist&quot;</span>)]
 #[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
 </span><span class="kw">pub use </span>mnist_dataset::MnistDataSet;
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_hard_negative_samples() {
+        <span class="kw">use </span><span class="kw">crate</span>::prelude::Detection;
+        <span class="kw">use </span>mockall::<span class="kw-2">*</span>;
+
+        <span class="macro">mock! </span>{
+            HogDetector {}
+            <span class="kw">impl </span>Detector <span class="kw">for </span>HogDetector {
+                <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>image::DynamicImage) -&gt; Vec&lt;<span class="kw">crate</span>::prelude::Detection&gt;;
+                <span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>image::DynamicImage) -&gt; image::DynamicImage;
+            }
+        }
+
+        <span class="kw">let </span><span class="kw-2">mut </span>model = MockHogDetector::new();
+        model.expect_detect_objects().returning(<span class="kw">move </span>|<span class="kw">_</span>| {
+            <span class="macro">vec!</span>[Detection {
+                bbox: BBox {
+                    x: <span class="number">0.0</span>,
+                    y: <span class="number">0.0</span>,
+                    w: <span class="number">50.0</span>,
+                    h: <span class="number">50.0</span>,
+                },
+                class: <span class="number">1</span>,
+                confidence: <span class="number">1.0</span>,
+            }]
+        });
+
+        <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
+        dataset.load();
+        <span class="kw">let </span>samples = dataset.samples();
+        <span class="kw">let </span>annotated_images_size = dataset.annotated_images_size();
+        dataset.generate_hard_negative_samples(<span class="kw-2">&amp;</span>model, <span class="number">1</span>, <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        dataset.load();
+        <span class="macro">assert!</span>(dataset.samples() &gt; samples);
+        <span class="macro">assert!</span>(dataset.annotated_images_size() &gt; annotated_images_size);
+    }
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hog_detector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
