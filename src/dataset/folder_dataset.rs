@@ -247,9 +247,9 @@ impl DataGenerator for FolderDataSet {
         &mut self,
         detector: &dyn Detector,
         class: u32,
-        max_images: Option<usize>,
+        max_annotations: Option<usize>,
     ) {
-        let annotations = self.get_negative_samples(detector, class, max_images);
+        let annotations = self.get_negative_samples(detector, class, max_annotations);
         self.data.extend(annotations);
     }
 }

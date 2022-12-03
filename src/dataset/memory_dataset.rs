@@ -1,4 +1,4 @@
-use super::{AnnotatedImage, AnnotatedImageSet, DataSet};
+use super::{AnnotatedImage, AnnotatedImageSet, DataGenerator, DataSet};
 use crate::utils::generate_random_subimages;
 use image::{
     imageops::{crop, resize, FilterType},
@@ -156,6 +156,8 @@ impl DataSet for MemoryDataSet {
         (train_x, train_y, test_x, test_y)
     }
 }
+
+impl DataGenerator for MemoryDataSet {}
 
 #[cfg(test)]
 mod tests {

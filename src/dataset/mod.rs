@@ -38,14 +38,60 @@ pub trait AnnotatedImageSet {
 }
 
 /// trait for generating data
-pub trait DataGenerator {
+pub trait DataGenerator: AnnotatedImageSet {
     /// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)
     fn generate_hard_negative_samples(
         &mut self,
         detector: &dyn Detector,
         class: u32,
-        max_images: Option<usize>,
-    );
+        max_annotations: Option<usize>,
+    ) {
+        let annotated_images = self.generate_negative_samples(detector, class, max_annotations);
+        annotated_images
+            .into_iter()
+            .for_each(|annotated_image| self.add_annotated_image(annotated_image));
+    }
+
+    /// generates negative samples
+    fn generate_negative_samples(
+        &self,
+        detector: &dyn Detector,
+        class: u32,
+        max_annotations: Option<usize>,
+    ) -> Vec<AnnotatedImage> {
+        let mut annotations_counter = 0;
+        let mut generated_annotated_images = Vec::new();
+        for annotated_image in self.annotated_images() {
+            let detections = detector.detect_objects(&annotated_image.0);
+            let mut false_pos_annotations = Vec::new();
+            detections.iter().for_each(|detection| {
+                if max_annotations.is_some() && max_annotations.unwrap() <= annotations_counter {
+                    return;
+                }
+                if detection.class as u32 == class {
+                    let mut false_pos = true;
+                    annotated_image
+                        .1
+                        .iter()
+                        .for_each(|(bbox, annotated_class)| {
+                            if class == *annotated_class {
+                                if bbox.iou(&detection.bbox) > 0.9 {
+                                    false_pos = false;
+                                }
+                            }
+                        });
+                    if false_pos == true {
+                        let false_pos_bbox = detection.bbox.clone();
+                        let false_pos_annotation: Annotation = (false_pos_bbox, 0);
+                        false_pos_annotations.push(false_pos_annotation);
+                        annotations_counter += 1;
+                    }
+                }
+            });
+            generated_annotated_images.push((annotated_image.0.clone(), false_pos_annotations));
+        }
+        generated_annotated_images
+    }
 }
 
 #[cfg(feature = "eyes")]
@@ -57,3 +103,46 @@ pub use memory_dataset::MemoryDataSet;
 #[cfg(feature = "mnist")]
 #[cfg(not(target_arch = "wasm32"))]
 pub use mnist_dataset::MnistDataSet;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::bbox::BBox;
+
+    #[test]
+    fn test_hard_negative_samples() {
+        use crate::prelude::Detection;
+        use mockall::*;
+
+        mock! {
+            HogDetector {}
+            impl Detector for HogDetector {
+                fn detect_objects(&self, image: &image::DynamicImage) -> Vec<crate::prelude::Detection>;
+                fn visualize_detections(&self, image: &image::DynamicImage) -> image::DynamicImage;
+            }
+        }
+
+        let mut model = MockHogDetector::new();
+        model.expect_detect_objects().returning(move |_| {
+            vec![Detection {
+                bbox: BBox {
+                    x: 0.0,
+                    y: 0.0,
+                    w: 50.0,
+                    h: 50.0,
+                },
+                class: 1,
+                confidence: 1.0,
+            }]
+        });
+
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load();
+        let samples = dataset.samples();
+        let annotated_images_size = dataset.annotated_images_size();
+        dataset.generate_hard_negative_samples(&model, 1, Some(1));
+        dataset.load();
+        assert!(dataset.samples() > samples);
+        assert!(dataset.annotated_images_size() > annotated_images_size);
+    }
+}
