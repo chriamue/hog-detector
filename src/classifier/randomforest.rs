@@ -51,6 +51,10 @@ impl HogDetectorTrait for HogDetector<RandomForestClassifier> {
     fn load(&mut self, model: &str) {
         self.classifier = Some(serde_json::from_str::<RandomForestClassifier>(model).unwrap());
     }
+
+    fn detector(&self) -> &dyn Detector {
+        self
+    }
 }
 
 impl Trainable for HogDetector<RandomForestClassifier> {

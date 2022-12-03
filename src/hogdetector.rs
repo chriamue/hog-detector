@@ -21,6 +21,8 @@ pub trait HogDetectorTrait: Trainable + Detector {
     fn save(&self) -> String;
     /// load from string
     fn load(&mut self, model: &str);
+    /// reference to detector trait
+    fn detector(&self) -> &dyn Detector;
 }
 
 impl<C: Classifier> PartialEq for HogDetector<C> {

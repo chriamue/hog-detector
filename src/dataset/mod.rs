@@ -75,7 +75,7 @@ pub trait DataGenerator: AnnotatedImageSet {
                         .iter()
                         .for_each(|(bbox, annotated_class)| {
                             if class == *annotated_class {
-                                if bbox.iou(&detection.bbox) > 0.9 {
+                                if bbox.iou(&detection.bbox) > 0.1 {
                                     false_pos = false;
                                 }
                             }

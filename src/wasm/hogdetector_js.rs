@@ -1,8 +1,10 @@
 use crate::classifier::BayesClassifier;
 use crate::classifier::CombinedClassifier;
 use crate::classifier::RandomForestClassifier;
+use crate::dataset::DataGenerator;
+use crate::dataset::DataSet;
+use crate::dataset::MemoryDataSet;
 use crate::hogdetector::HogDetectorTrait;
-use crate::DataSet;
 use crate::HogDetector;
 use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
@@ -14,9 +16,18 @@ pub struct HogDetectorJS {
 }
 
 impl HogDetectorJS {
-    pub fn train(&self, dataset: &dyn DataSet) {
+    pub fn train(&self, dataset: MemoryDataSet) {
         let mut hog = self.hog.lock().unwrap();
-        hog.train_class(dataset, 1);
+        hog.train_class(&dataset, 1);
+    }
+
+    pub fn train_with_hard_negative_samples(&self, dataset: MemoryDataSet) {
+        let mut dataset = dataset;
+        let mut hog = self.hog.lock().unwrap();
+        hog.train_class(&dataset, 1);
+        dataset.generate_hard_negative_samples(hog.detector(), 1, Some(50));
+        dataset.load();
+        hog.train_class(&dataset, 1);
     }
 }
 

@@ -52,6 +52,10 @@ impl HogDetectorTrait for HogDetector<SVMClassifier<'_>> {
     fn load(&mut self, model: &str) {
         self.classifier = Some(serde_json::from_str::<SVMClassifier>(model).unwrap());
     }
+
+    fn detector(&self) -> &dyn Detector {
+        self
+    }
 }
 
 impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
