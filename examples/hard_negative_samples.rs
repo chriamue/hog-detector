@@ -6,7 +6,7 @@ fn main() {
 fn main() {
     use hog_detector::classifier::SVMClassifier;
     use hog_detector::data_augmentation::DataAugmentation;
-    use hog_detector::dataset::{DataSet, FolderDataSet};
+    use hog_detector::dataset::{DataGenerator, DataSet, FolderDataSet};
     use hog_detector::HogDetector;
     use hog_detector::Trainable;
 

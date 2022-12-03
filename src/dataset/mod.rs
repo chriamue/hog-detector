@@ -1,3 +1,5 @@
+use crate::Annotation;
+use crate::Detector;
 use image::DynamicImage;
 
 #[cfg(feature = "eyes")]
@@ -10,6 +12,9 @@ mod memory_dataset;
 #[cfg(not(target_arch = "wasm32"))]
 mod mnist_dataset;
 
+/// Image annotated by list of Annotations
+pub type AnnotatedImage = (DynamicImage, Vec<Annotation>);
+
 /// trait for a dataset
 pub trait DataSet {
     /// loads the dataset
@@ -20,6 +25,17 @@ pub trait DataSet {
     fn samples(&self) -> usize;
     /// get train and test data
     fn get(&self) -> (Vec<DynamicImage>, Vec<u32>, Vec<DynamicImage>, Vec<u32>);
+}
+
+/// trait for generating data
+pub trait DataGenerator {
+    /// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)
+    fn generate_hard_negative_samples(
+        &mut self,
+        detector: &dyn Detector,
+        class: u32,
+        max_images: Option<usize>,
+    );
 }
 
 #[cfg(feature = "eyes")]

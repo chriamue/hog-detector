@@ -10,9 +10,12 @@ use std::fs::read_dir;
 use std::fs::File;
 use std::io::{self, BufRead};
 
+use super::{AnnotatedImage, DataGenerator};
+
 /// Dataset of data from a folder
 pub struct FolderDataSet {
     path: String,
+    annotated_images: Vec<AnnotatedImage>,
     data: Vec<(String, DynamicImage)>,
     names: Vec<String>,
     window_size: u32,
@@ -23,6 +26,7 @@ impl FolderDataSet {
     pub fn new(path: String, label_names_path: String, window_size: u32) -> Self {
         FolderDataSet {
             path,
+            annotated_images: Vec::new(),
             data: Vec::new(),
             names: Self::load_label_names(label_names_path),
             window_size,
@@ -63,13 +67,48 @@ impl FolderDataSet {
         (label, window)
     }
 
+    fn load_annotated_images(
+        pathes: &Vec<(String, String)>,
+        window_size: u32,
+        class_names: &Vec<String>,
+    ) -> Vec<AnnotatedImage> {
+        let mut annotated_images = Vec::new();
+        for path in pathes {
+            let file = File::open(&path.0).unwrap();
+            let img = open(&path.1).unwrap();
+            let mut annotations = Vec::new();
+            for line in io::BufReader::new(file).lines() {
+                match line {
+                    Ok(line) => {
+                        let mut l = line.split(' ');
+                        let label = l.next().unwrap();
+                        let x: f32 = l.next().unwrap().parse().unwrap();
+                        let y: f32 = l.next().unwrap().parse().unwrap();
+                        let bbox = BBox {
+                            x,
+                            y,
+                            w: window_size as f32,
+                            h: window_size as f32,
+                        };
+                        let id = Self::label_id(label, &class_names);
+
+                        annotations.push((bbox, id));
+                    }
+                    _ => (),
+                }
+            }
+            annotated_images.push((img, annotations))
+        }
+        annotated_images
+    }
+
     fn load_annotations(
-        pathes: Vec<(String, String)>,
+        pathes: &Vec<(String, String)>,
         window_size: u32,
     ) -> Vec<(String, DynamicImage)> {
         let mut annotations = Vec::new();
         for path in pathes {
-            let file = File::open(path.0).unwrap();
+            let file = File::open(&path.0).unwrap();
             for line in io::BufReader::new(file).lines() {
                 match line {
                     Ok(line) => {
@@ -153,17 +192,6 @@ impl FolderDataSet {
         annotations
     }
 
-    /// generates hard negative samples, see: [Hard Negative Mining](https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf)
-    pub fn generate_hard_negative_samples(
-        &mut self,
-        detector: &dyn Detector,
-        class: u32,
-        max_images: Option<usize>,
-    ) {
-        let annotations = self.get_negative_samples(detector, class, max_images);
-        self.data.extend(annotations);
-    }
-
     fn generate_random_annotations_from_image(
         image: &DynamicImage,
         label: String,
@@ -200,11 +228,23 @@ impl FolderDataSet {
     }
 }
 
+impl DataGenerator for FolderDataSet {
+    fn generate_hard_negative_samples(
+        &mut self,
+        detector: &dyn Detector,
+        class: u32,
+        max_images: Option<usize>,
+    ) {
+        let annotations = self.get_negative_samples(detector, class, max_images);
+        self.data.extend(annotations);
+    }
+}
+
 impl DataSet for FolderDataSet {
     fn load(&mut self) {
         let pathes = Self::list_pathes(&self.path);
-        let annotations = Self::load_annotations(pathes, self.window_size);
-        self.data = annotations;
+        self.data = Self::load_annotations(&pathes, self.window_size);
+        self.annotated_images = Self::load_annotated_images(&pathes, self.window_size, &self.names);
     }
 
     fn generate_random_annotations(&mut self, count_each: usize) {
@@ -277,8 +317,20 @@ mod tests {
             "res/training/webcam01.txt".to_string(),
             "res/training/webcam01.jpg".to_string(),
         )];
-        let annotations = FolderDataSet::load_annotations(pathes, 28);
+        let annotations = FolderDataSet::load_annotations(&pathes, 28);
         assert_eq!(annotations.len(), 9);
+    }
+
+    #[test]
+    fn test_load_image_annotations() {
+        let pathes = vec![(
+            "res/training/webcam01.txt".to_string(),
+            "res/training/webcam01.jpg".to_string(),
+        )];
+        let class_names = FolderDataSet::load_label_names("res/labels.txt".to_string());
+        let annotations = FolderDataSet::load_annotated_images(&pathes, 28, &class_names);
+        assert_eq!(annotations.len(), 1);
+        assert_eq!(annotations.first().unwrap().1.len(), 9);
     }
 
     #[test]

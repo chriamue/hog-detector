@@ -5,8 +5,8 @@ fn main() {
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
     use hog_detector::{
-        classifier::SVMClassifier, data_augmentation::DataAugmentation, dataset::FolderDataSet,
-        DataSet, HogDetector, Trainable,
+        classifier::SVMClassifier, data_augmentation::DataAugmentation, dataset::DataGenerator,
+        dataset::FolderDataSet, DataSet, HogDetector, Trainable,
     };
     let mut model: HogDetector<SVMClassifier> = HogDetector::default();
 

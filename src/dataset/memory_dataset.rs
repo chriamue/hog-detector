@@ -1,16 +1,13 @@
-use super::DataSet;
+use super::{AnnotatedImage, DataSet};
 use crate::utils::generate_random_subimages;
-use crate::Annotation;
 use image::{
     imageops::{crop, resize, FilterType},
     DynamicImage,
 };
 
-type Sample = (DynamicImage, Vec<Annotation>);
-
 /// Memory only dataset
 pub struct MemoryDataSet {
-    samples: Vec<Sample>,
+    annotated_images: Vec<AnnotatedImage>,
     x: Vec<DynamicImage>,
     y: Vec<u32>,
     window_width: u32,
@@ -20,7 +17,7 @@ pub struct MemoryDataSet {
 impl Default for MemoryDataSet {
     fn default() -> Self {
         MemoryDataSet {
-            samples: Vec::new(),
+            annotated_images: Vec::new(),
             x: Vec::new(),
             y: Vec::new(),
             window_width: 32,
@@ -31,8 +28,8 @@ impl Default for MemoryDataSet {
 
 impl MemoryDataSet {
     /// adds sample to dataset
-    pub fn add(&mut self, sample: Sample) {
-        self.samples.push(sample);
+    pub fn add(&mut self, annotated_image: AnnotatedImage) {
+        self.annotated_images.push(annotated_image);
     }
 
     /// small test dataset
@@ -90,7 +87,7 @@ impl DataSet for MemoryDataSet {
     fn load(&mut self) {
         self.x.clear();
         self.y.clear();
-        for (img, annotations) in self.samples.iter() {
+        for (img, annotations) in self.annotated_images.iter() {
             let mut img = img.clone();
             for annotation in annotations {
                 let (bbox, class) = annotation;
@@ -116,7 +113,7 @@ impl DataSet for MemoryDataSet {
     }
 
     fn generate_random_annotations(&mut self, count_each: usize) {
-        for sample in self.samples.iter() {
+        for sample in self.annotated_images.iter() {
             let subimages = generate_random_subimages(
                 &sample.0,
                 count_each,
