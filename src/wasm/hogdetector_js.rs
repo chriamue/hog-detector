@@ -6,6 +6,8 @@ use crate::dataset::DataSet;
 use crate::dataset::MemoryDataSet;
 use crate::hogdetector::HogDetectorTrait;
 use crate::HogDetector;
+use instant::Instant;
+use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
 
@@ -13,6 +15,7 @@ use wasm_bindgen::prelude::*;
 #[derive(Clone)]
 pub struct HogDetectorJS {
     hog: Arc<Mutex<Box<dyn HogDetectorTrait>>>,
+    timestamps: Arc<Mutex<VecDeque<u128>>>,
 }
 
 impl HogDetectorJS {
@@ -44,6 +47,7 @@ impl HogDetectorJS {
 
         HogDetectorJS {
             hog: Arc::new(Mutex::new(Box::new(hog))),
+            timestamps: Arc::new(Mutex::new(VecDeque::with_capacity(5))),
         }
     }
 
@@ -73,6 +77,7 @@ impl HogDetectorJS {
 
     #[wasm_bindgen]
     pub fn next(&mut self, img_data: &[u8]) -> Vec<u8> {
+        let start = Instant::now();
         let mut img =
             image::load_from_memory_with_format(img_data, image::ImageFormat::Png).unwrap();
 
@@ -84,7 +89,27 @@ impl HogDetectorJS {
             image::ImageFormat::Png,
         )
         .unwrap();
+
+        self.timestamps
+            .lock()
+            .unwrap()
+            .push_back(start.elapsed().as_millis());
         image_data
+    }
+
+    #[wasm_bindgen]
+    pub fn fps(&self) -> f32 {
+        let average_millis: f32 = {
+            let timestamps = self.timestamps.lock().unwrap();
+            println!("{:?}", timestamps);
+            if timestamps.len() > 1 {
+                let sum: u128 = timestamps.iter().sum();
+                sum as f32 / timestamps.len() as f32
+            } else {
+                1.0
+            }
+        };
+        (1000.0 / average_millis).into()
     }
 }
 
