@@ -83,6 +83,10 @@ export class HogDetectorJS {
 * @returns {Uint8Array}
 */
   next(img_data: Uint8Array): Uint8Array;
+/**
+* @returns {number}
+*/
+  fps(): number;
 }
 /**
 * Runtime test harness support instantiated in JS.
@@ -129,19 +133,20 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly init_images: (a: number) => number;
+  readonly init_annotation_tool: (a: number, b: number) => void;
+  readonly init_trainer: (a: number, b: number, c: number) => void;
   readonly __wbg_annotationsjs_free: (a: number) => void;
   readonly annotationsjs_new: () => number;
+  readonly __wbg_annotatedimagesjs_free: (a: number) => void;
+  readonly annotatedimagesjs_new: () => number;
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
   readonly hogdetectorjs_new: () => number;
   readonly hogdetectorjs_init_random_forest_classifier: (a: number) => void;
   readonly hogdetectorjs_init_bayes_classifier: (a: number) => void;
   readonly hogdetectorjs_init_combined_classifier: (a: number) => void;
   readonly hogdetectorjs_next: (a: number, b: number, c: number, d: number) => void;
-  readonly init_images: (a: number) => number;
-  readonly init_annotation_tool: (a: number, b: number) => void;
-  readonly init_trainer: (a: number, b: number, c: number) => void;
-  readonly __wbg_annotatedimagesjs_free: (a: number) => void;
-  readonly annotatedimagesjs_new: () => number;
+  readonly hogdetectorjs_fps: (a: number) => number;
   readonly __wbg_wasmbindgentestcontext_free: (a: number) => void;
   readonly wasmbindgentestcontext_new: () => number;
   readonly wasmbindgentestcontext_args: (a: number, b: number, c: number) => void;
@@ -154,7 +159,7 @@ export interface InitOutput {
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly _dyn_core__ops__function__Fn__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h5c6c9f5e1b935007: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__Fn__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h56907aa2823a856f: (a: number, b: number, c: number) => void;
   readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h03ee0a4aa64ad4f9: (a: number, b: number, c: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number) => void;

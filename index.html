@@ -15,6 +15,7 @@
   <body>
     <video autoplay="true" id="videoElement"></video>
     <div id="container">
+      <div id="fps">FPS: 0</div>
       <canvas id="canvas"> </canvas>
 
       <img id="img" />
@@ -52,6 +53,7 @@
       var img = document.getElementById("img");
       var processCheckbox = document.getElementById("processCheckbox");
       var annotateCheckbox = document.getElementById("annotateCheckbox");
+      var fpsInfo = document.getElementById("fps");
       var annotated_images = null;
 
       annotateCheckbox.onclick = function () {
@@ -122,6 +124,7 @@
           const blob = await (await fetch(base64)).blob();
           let frame = new Uint8Array(await blob.arrayBuffer());
           var detected_frame = detector.next(frame);
+          fpsInfo.innerHTML = "FPS: " + detector.fps().toFixed(2);
 
           var detected_blob = new Blob([detected_frame], { type: "image/png" });
           var url = URL.createObjectURL(detected_blob);
