@@ -9,11 +9,11 @@
 
 Histogram of Oriented Gradients and Object Detection
 
-This project contains an algorithm for object detection based on SVM on HOG descriptors.
+This project uses support vector machines (SVM) and histogram of oriented gradients (HOG) to detect objects in images. The SVM classifier is trained on HOG features extracted from training images to identify the objects in new images. The project is written in Rust and can be compiled to WebAssembly (WASM) for use in web applications.
 
 You can find a [demo here](https://chriamue.github.io/hog-detector)
 
-## how it works
+## How it works
 
 1. A training dataset with positive and negative samples is given.
 2. HOG descriptors of the samples are calculated.
@@ -21,7 +21,35 @@ You can find a [demo here](https://chriamue.github.io/hog-detector)
 4. Using a sliding window, the svm classifier detects bounding boxes.
 5. Applying non-maximum suppression removes some of the bounding boxes.
 
-## run examples
+## Requirements
+
+* Rust
+* wasm-pack (for compiling to WASM)
+
+## Usage
+
+1. Clone the repository:
+
+```sh
+git clone https://github.com/chriamue/hog-detector
+cd hog-detector
+```
+
+2. Compile the code to WASM:
+
+```sh
+wasm-pack build --target web
+```
+
+3. Run the Web version in your browser
+
+```sh
+python3 -m http.server
+```
+
+Open your browser on [Localhost](http://localhost:8000)
+
+## Examples
 
 You can find examples in example folder.
 The mnist example loads the mnist dataset and trains hog on the numbers.
@@ -30,32 +58,25 @@ The mnist example loads the mnist dataset and trains hog on the numbers.
 cargo run --features mnist --example mnist
 ```
 
-## run wasm
+## Testing
 
-```sh
-wasm-pack build --target web
-python3 -m http.server
-```
-
-## run tests
-
-You can run tests
+The project includes a test suite that can be run with:
 
 ```sh
 cargo test
 ```
 
-and you can run benchmarks
+Benchmarks can be run with:
 
 ```sh
 cargo bench
 ```
 
-## train data preparation
+## Train data preparation
 
 Find a minimal annotation tool in the [demo](https://chriamue.github.io/hog-detector).
 
-## references
+## References
 
 [https://pyimagesearch.com/2014/11/10/histogram-oriented-gradients-object-detection/](https://pyimagesearch.com/2014/11/10/histogram-oriented-gradients-object-detection/)
 
