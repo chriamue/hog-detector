@@ -6,9 +6,9 @@
 <a href="https://chriamue.github.io/hog-detector/"><img src="https://img.shields.io/badge/Demo-online-green.svg" alt="Demo" /></a>
 <a href="https://chriamue.github.io/hog-detector/hog_detector/"><img src="https://img.shields.io/badge/Docs-online-green.svg" alt="Doc" /></a></p>
 <p>Histogram of Oriented Gradients and Object Detection</p>
-<p>This project contains an algorithm for object detection based on SVM on HOG descriptors.</p>
+<p>This project uses support vector machines (SVM) and histogram of oriented gradients (HOG) to detect objects in images. The SVM classifier is trained on HOG features extracted from training images to identify the objects in new images. The project is written in Rust and can be compiled to WebAssembly (WASM) for use in web applications.</p>
 <p>You can find a <a href="https://chriamue.github.io/hog-detector">demo here</a></p>
-<h3 id="how-it-works"><a href="#how-it-works">how it works</a></h3>
+<h3 id="how-it-works"><a href="#how-it-works">How it works</a></h3>
 <ol>
 <li>A training dataset with positive and negative samples is given.</li>
 <li>HOG descriptors of the samples are calculated.</li>
@@ -16,17 +16,36 @@
 <li>Using a sliding window, the svm classifier detects bounding boxes.</li>
 <li>Applying non-maximum suppression removes some of the bounding boxes.</li>
 </ol>
-<h3 id="run-examples"><a href="#run-examples">run examples</a></h3>
+<h3 id="requirements"><a href="#requirements">Requirements</a></h3>
+<ul>
+<li>Rust</li>
+<li>wasm-pack (for compiling to WASM)</li>
+</ul>
+<h3 id="usage"><a href="#usage">Usage</a></h3>
+<ol>
+<li>Clone the repository:</li>
+</ol>
+<div class="example-wrap"><pre class="language-sh"><code>git clone https://github.com/chriamue/hog-detector
+cd hog-detector</code></pre></div>
+<ol start="2">
+<li>Compile the code to WASM:</li>
+</ol>
+<div class="example-wrap"><pre class="language-sh"><code>wasm-pack build --target web</code></pre></div>
+<ol start="3">
+<li>Run the Web version in your browser</li>
+</ol>
+<div class="example-wrap"><pre class="language-sh"><code>python3 -m http.server</code></pre></div>
+<p>Open your browser on <a href="http://localhost:8000">Localhost</a></p>
+<h3 id="examples"><a href="#examples">Examples</a></h3>
 <p>You can find examples in example folder.
 The mnist example loads the mnist dataset and trains hog on the numbers.</p>
-<div class="example-wrap"><pre class="language-sh"><code>cargo run --features mnist --example mnist</code></pre></div><h3 id="run-wasm"><a href="#run-wasm">run wasm</a></h3><div class="example-wrap"><pre class="language-sh"><code>wasm-pack build --target web
-python3 -m http.server</code></pre></div><h3 id="run-tests"><a href="#run-tests">run tests</a></h3>
-<p>You can run tests</p>
+<div class="example-wrap"><pre class="language-sh"><code>cargo run --features mnist --example mnist</code></pre></div><h3 id="testing"><a href="#testing">Testing</a></h3>
+<p>The project includes a test suite that can be run with:</p>
 <div class="example-wrap"><pre class="language-sh"><code>cargo test</code></pre></div>
-<p>and you can run benchmarks</p>
-<div class="example-wrap"><pre class="language-sh"><code>cargo bench</code></pre></div><h3 id="train-data-preparation"><a href="#train-data-preparation">train data preparation</a></h3>
+<p>Benchmarks can be run with:</p>
+<div class="example-wrap"><pre class="language-sh"><code>cargo bench</code></pre></div><h3 id="train-data-preparation"><a href="#train-data-preparation">Train data preparation</a></h3>
 <p>Find a minimal annotation tool in the <a href="https://chriamue.github.io/hog-detector">demo</a>.</p>
-<h3 id="references"><a href="#references">references</a></h3>
+<h3 id="references"><a href="#references">References</a></h3>
 <p><a href="https://pyimagesearch.com/2014/11/10/histogram-oriented-gradients-object-detection/">https://pyimagesearch.com/2014/11/10/histogram-oriented-gradients-object-detection/</a></p>
 <p><a href="https://openaccess.thecvf.com/content_ECCV_2018/papers/SouYoung_Jin_Unsupervised_Hard-Negative_Mining_ECCV_2018_paper.pdf">Hard Negative Mining</a></p>
 <p><a href="https://github.com/tiruss/eye_detector/tree/master/eye_data">Eye Dataset</a></p>
