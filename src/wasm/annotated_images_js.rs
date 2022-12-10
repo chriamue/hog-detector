@@ -42,6 +42,11 @@ impl AnnotatedImagesJS {
         let annotations = locked.get_mut(index).unwrap();
         annotations.push(annotation);
     }
+
+    pub fn clear(&mut self) {
+        let mut locked = self.images.lock().unwrap();
+        locked.clear();
+    }
 }
 
 impl Default for AnnotatedImagesJS {
@@ -65,7 +70,10 @@ impl PartialEq for AnnotatedImagesJS {
         if ::core::ptr::eq(&self, &other) {
             true
         } else {
-            other.images.try_lock().unwrap().deref() == self.images.try_lock().unwrap().deref()
+            match (other.images.try_lock(), self.images.try_lock()) {
+                (Ok(a), Ok(b)) => a.deref() == b.deref(),
+                _ => true,
+            }
         }
     }
 }

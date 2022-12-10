@@ -9,11 +9,13 @@ pub mod editor;
 pub mod header;
 pub mod images_list;
 pub mod labels;
+pub mod load_example;
 pub mod upload_annotations;
 pub mod upload_image;
 pub mod use_webcam_image;
 
 pub enum Msg {
+    ExampleLoaded(Vec<String>),
     LabelChanged(String),
     ImageChanged((String, Vec<u8>)),
     AnnotationsChanged((String, Vec<u8>)),
@@ -43,7 +45,7 @@ impl Component for App {
             current: 0,
             current_label: "none".to_string(),
             current_filename: "Unknown".to_string(),
-            labels: include_str!("../../../res/labels.txt")
+            labels: include_str!("../../../res/object_labels.txt")
                 .split('\n')
                 .map(|s| s.to_string())
                 .collect(),
@@ -52,6 +54,10 @@ impl Component for App {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            Msg::ExampleLoaded(labels) => {
+                self.labels = labels;
+                true
+            }
             Msg::LabelChanged(label) => {
                 self.current_label = label;
                 true
@@ -143,6 +149,7 @@ impl Component for App {
         let on_annotations_change = ctx.link().callback(|(filename, data): (String, Vec<u8>)| {
             Msg::AnnotationsChanged((filename, data))
         });
+        let on_example_loaded = ctx.link().callback(|labels| Msg::ExampleLoaded(labels));
         let on_new_annotation = ctx.link().callback(Msg::NewAnnotation);
         let on_add_image = ctx.link().callback(|()| Msg::AddImage());
         let on_image_selected = ctx.link().callback(Msg::ImageSelected);
@@ -162,8 +169,9 @@ impl Component for App {
             <use_webcam_image::UseWebcamImage onchange={on_image_change.clone()} />
             <upload_image::UploadImage onchange={on_image_change}/>
             <upload_annotations::UploadAnnotations onchange={on_annotations_change}/>
+            <load_example::LoadExample images={ctx.props().images.clone()} onchange={on_example_loaded} />
             </div>
-            <labels::Labels onchange={ on_label_change } label={ label.clone()} />
+            <labels::Labels onchange={ on_label_change } labels={self.labels.clone()} label={ label.clone()} />
             <div id="annotation-tool-container">
             <editor::Editor {label} filename={self.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/>
             <images_list::ImagesList {images} onaddimage={on_add_image} current={self.current} onimageselected={on_image_selected} />

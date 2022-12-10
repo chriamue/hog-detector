@@ -1,13 +1,12 @@
 use super::Msg;
 use yew::{html, Callback, Component, Context, Html, Properties};
 
-pub struct Labels {
-    labels: Vec<String>,
-}
+pub struct Labels {}
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props {
     pub label: String,
+    pub labels: Vec<String>,
     pub onchange: Callback<String>,
 }
 
@@ -16,12 +15,7 @@ impl Component for Labels {
     type Properties = Props;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            labels: include_str!("../../../res/labels.txt")
-                .split('\n')
-                .map(|s| s.to_string())
-                .collect(),
-        }
+        Self {}
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -38,7 +32,7 @@ impl Component for Labels {
         html! {
             <div id="labels">
             <ul class="item-list">
-        { self.labels.iter().map(|label| {
+        { ctx.props().labels.iter().map(|label| {
 
             let l = label.clone();
             if l == ctx.props().label {
