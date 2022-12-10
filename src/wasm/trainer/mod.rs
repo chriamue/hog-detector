@@ -67,10 +67,8 @@ impl Component for TrainerApp {
         let onclick_bayes = ctx.link().callback(|_| Msg::SwitchBayesClassifier);
         let onclick_random_forest = ctx.link().callback(|_| Msg::SwitchRandomForestClassifier);
         let onclick_combined = ctx.link().callback(|_| Msg::SwitchCombinedClassifier);
-        let fps = ctx.props().detector.fps();
         html! {
             <div id="train-classifier-buttons">
-            <div id="fps">{format!("FPS: {}", fps)}</div>
             <button type="button" class="btn btn-success" onclick={onclick_train}>
             { "Train Detector" }
             </button>

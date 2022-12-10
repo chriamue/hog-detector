@@ -30,21 +30,23 @@ pub async fn init_images(images: &AnnotatedImagesJS) {
 
 #[wasm_bindgen]
 pub fn init_annotation_tool(root: web_sys::Element, images: &AnnotatedImagesJS) {
-    yew::start_app_with_props_in_element::<annotation_tool::App>(
+    yew::Renderer::<annotation_tool::App>::with_root_and_props(
         root,
         annotation_tool::Props {
             images: images.clone(),
         },
-    );
+    )
+    .render();
 }
 
 #[wasm_bindgen]
 pub fn init_trainer(root: web_sys::Element, images: &AnnotatedImagesJS, detector: &HogDetectorJS) {
-    yew::start_app_with_props_in_element::<trainer::TrainerApp>(
+    yew::Renderer::<trainer::TrainerApp>::with_root_and_props(
         root,
         trainer::Props {
             detector: detector.clone(),
             images: images.clone(),
         },
-    );
+    )
+    .render();
 }

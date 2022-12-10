@@ -70,8 +70,8 @@ impl Component for Editor {
                 let (x1, y1) = self.pos;
                 let x = x1.min(x2);
                 let y = y1.min(y2);
-                let w = (x2 - x1).abs();
-                let h = (y2 - y1).abs();
+                let w = ((x2 - x1).abs()).max(1);
+                let h = ((y2 - y1).abs()).max(1);
                 let class = self
                     .labels
                     .iter()
