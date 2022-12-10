@@ -51,22 +51,15 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Msg;
 <span class="kw">use </span>yew::{html, Callback, Component, Context, Html, Properties};
 
-<span class="kw">pub struct </span>Labels {
-    labels: Vec&lt;String&gt;,
-}
+<span class="kw">pub struct </span>Labels {}
 
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
 </span><span class="kw">pub struct </span>Props {
     <span class="kw">pub </span>label: String,
+    <span class="kw">pub </span>labels: Vec&lt;String&gt;,
     <span class="kw">pub </span>onchange: Callback&lt;String&gt;,
 }
 
@@ -75,12 +68,7 @@
     <span class="kw">type </span>Properties = Props;
 
     <span class="kw">fn </span>create(_ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            labels: <span class="macro">include_str!</span>(<span class="string">&quot;../../../res/labels.txt&quot;</span>)
-                .split(<span class="string">&#39;\n&#39;</span>)
-                .map(|s| s.to_string())
-                .collect(),
-        }
+        <span class="self">Self </span>{}
     }
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;, msg: <span class="self">Self</span>::Message) -&gt; bool {
@@ -97,7 +85,7 @@
         <span class="macro">html! </span>{
             &lt;div id=<span class="string">&quot;labels&quot;</span>&gt;
             &lt;ul class=<span class="string">&quot;item-list&quot;</span>&gt;
-        { <span class="self">self</span>.labels.iter().map(|label| {
+        { ctx.props().labels.iter().map(|label| {
 
             <span class="kw">let </span>l = label.clone();
             <span class="kw">if </span>l == ctx.props().label {

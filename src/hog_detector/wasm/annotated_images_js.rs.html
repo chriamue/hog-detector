@@ -79,6 +79,14 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotations_js::AnnotationsJS;
 <span class="kw">use crate</span>::{
     dataset::{AnnotatedImageSet, DataSet, MemoryDataSet},
@@ -123,6 +131,11 @@
         <span class="kw">let </span>annotations = locked.get_mut(index).unwrap();
         annotations.push(annotation);
     }
+
+    <span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>locked = <span class="self">self</span>.images.lock().unwrap();
+        locked.clear();
+    }
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>AnnotatedImagesJS {
@@ -146,7 +159,10 @@
         <span class="kw">if </span>::core::ptr::eq(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>other) {
             <span class="bool-val">true
         </span>} <span class="kw">else </span>{
-            other.images.try_lock().unwrap().deref() == <span class="self">self</span>.images.try_lock().unwrap().deref()
+            <span class="kw">match </span>(other.images.try_lock(), <span class="self">self</span>.images.try_lock()) {
+                (<span class="prelude-val">Ok</span>(a), <span class="prelude-val">Ok</span>(b)) =&gt; a.deref() == b.deref(),
+                <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
+            }
         }
     }
 }

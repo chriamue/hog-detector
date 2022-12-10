@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["Msg",""]],"mod":[["editor",""],["header",""],["images_list",""],["labels",""],["upload_annotations",""],["upload_image",""],["use_webcam_image",""]],"struct":[["App",""],["Props",""]]};
+window.SIDEBAR_ITEMS = {"enum":[["Msg",""]],"mod":[["editor",""],["header",""],["images_list",""],["labels",""],["load_example",""],["upload_annotations",""],["upload_image",""],["use_webcam_image",""]],"struct":[["App",""],["Props",""]]};

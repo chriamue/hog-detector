@@ -172,6 +172,14 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
 <span class="kw">use </span><span class="kw">super</span>::annotations_js::AnnotationsJS;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::BBox;
@@ -183,11 +191,13 @@
 <span class="kw">pub mod </span>header;
 <span class="kw">pub mod </span>images_list;
 <span class="kw">pub mod </span>labels;
+<span class="kw">pub mod </span>load_example;
 <span class="kw">pub mod </span>upload_annotations;
 <span class="kw">pub mod </span>upload_image;
 <span class="kw">pub mod </span>use_webcam_image;
 
 <span class="kw">pub enum </span>Msg {
+    ExampleLoaded(Vec&lt;String&gt;),
     LabelChanged(String),
     ImageChanged((String, Vec&lt;u8&gt;)),
     AnnotationsChanged((String, Vec&lt;u8&gt;)),
@@ -217,7 +227,7 @@
             current: <span class="number">0</span>,
             current_label: <span class="string">&quot;none&quot;</span>.to_string(),
             current_filename: <span class="string">&quot;Unknown&quot;</span>.to_string(),
-            labels: <span class="macro">include_str!</span>(<span class="string">&quot;../../../res/labels.txt&quot;</span>)
+            labels: <span class="macro">include_str!</span>(<span class="string">&quot;../../../res/object_labels.txt&quot;</span>)
                 .split(<span class="string">&#39;\n&#39;</span>)
                 .map(|s| s.to_string())
                 .collect(),
@@ -226,6 +236,10 @@
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="self">Self</span>&gt;, msg: <span class="self">Self</span>::Message) -&gt; bool {
         <span class="kw">match </span>msg {
+            Msg::ExampleLoaded(labels) =&gt; {
+                <span class="self">self</span>.labels = labels;
+                <span class="bool-val">true
+            </span>}
             Msg::LabelChanged(label) =&gt; {
                 <span class="self">self</span>.current_label = label;
                 <span class="bool-val">true
@@ -317,6 +331,7 @@
         <span class="kw">let </span>on_annotations_change = ctx.link().callback(|(filename, data): (String, Vec&lt;u8&gt;)| {
             Msg::AnnotationsChanged((filename, data))
         });
+        <span class="kw">let </span>on_example_loaded = ctx.link().callback(|labels| Msg::ExampleLoaded(labels));
         <span class="kw">let </span>on_new_annotation = ctx.link().callback(Msg::NewAnnotation);
         <span class="kw">let </span>on_add_image = ctx.link().callback(|()| Msg::AddImage());
         <span class="kw">let </span>on_image_selected = ctx.link().callback(Msg::ImageSelected);
@@ -336,8 +351,9 @@
             &lt;use_webcam_image::UseWebcamImage onchange={on_image_change.clone()} /&gt;
             &lt;upload_image::UploadImage onchange={on_image_change}/&gt;
             &lt;upload_annotations::UploadAnnotations onchange={on_annotations_change}/&gt;
+            &lt;load_example::LoadExample images={ctx.props().images.clone()} onchange={on_example_loaded} /&gt;
             &lt;/div&gt;
-            &lt;labels::Labels onchange={ on_label_change } label={ label.clone()} /&gt;
+            &lt;labels::Labels onchange={ on_label_change } labels={<span class="self">self</span>.labels.clone()} label={ label.clone()} /&gt;
             &lt;div id=<span class="string">&quot;annotation-tool-container&quot;</span>&gt;
             &lt;editor::Editor {label} filename={<span class="self">self</span>.current_filename.to_string()} {image} {annotations} onchange={on_new_annotation}/&gt;
             &lt;images_list::ImagesList {images} onaddimage={on_add_image} current={<span class="self">self</span>.current} onimageselected={on_image_selected} /&gt;
