@@ -47,6 +47,12 @@
 <span id="47">47</span>
 <span id="48">48</span>
 <span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
 </pre><pre class="rust"><code><span class="attribute">#![warn(missing_docs)]
 #![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 
@@ -94,7 +100,13 @@
 <span class="doccomment">/// the hog_detector prelude
 </span><span class="kw">pub mod </span>prelude {
     <span class="kw">pub use </span><span class="kw">crate</span>::bbox::BBox;
+    <span class="kw">pub use </span><span class="kw">crate</span>::classifier::Classifier;
+    <span class="kw">pub use </span><span class="kw">crate</span>::dataset::DataSet;
     <span class="kw">pub use </span><span class="kw">crate</span>::detection::Detection;
+    <span class="kw">pub use </span><span class="kw">crate</span>::detector::Detector;
+    <span class="kw">pub use </span><span class="kw">crate</span>::feature_descriptor::FeatureDescriptor;
+    <span class="kw">pub use </span><span class="kw">crate</span>::predictable::Predictable;
+    <span class="kw">pub use </span><span class="kw">crate</span>::trainable::Trainable;
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hog_detector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

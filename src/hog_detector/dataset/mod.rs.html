@@ -228,7 +228,7 @@
                                 }
                             }
                         });
-                    <span class="kw">if </span>false_pos == <span class="bool-val">true </span>{
+                    <span class="kw">if </span>false_pos {
                         <span class="kw">let </span>false_pos_bbox = detection.bbox.clone();
                         <span class="kw">let </span>false_pos_annotation: Annotation = (false_pos_bbox, <span class="number">0</span>);
                         false_pos_annotations.push(false_pos_annotation);
