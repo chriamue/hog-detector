@@ -7,6 +7,17 @@ use image::DynamicImage;
 use smartcore::linalg::basic::matrix::DenseMatrix;
 
 /// Hog Detector struct
+/// ,-----.  ,---------.   ,--------------------.   ,---.                             
+/// |Image|  |GrayImage|   |HogFeatureDescriptor|   |SVM|                             
+/// |-----|--|---------|---|--------------------|---|---|                             
+/// `-----'  `---------'   `--------------------'   `---'                             
+///                                                    |                              
+///                                                    |                              
+///                                             ,-----------.   ,--------.   ,-------.
+///                                             |Predictions|   |Detector|   |Objects|
+///                                             |-----------|---|--------|---|-------|
+///                                             `-----------'   `--------'   `-------'
+///
 #[derive(Debug)]
 pub struct HogDetector<C: Classifier> {
     /// support vector classifier

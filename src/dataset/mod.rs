@@ -80,7 +80,7 @@ pub trait DataGenerator: AnnotatedImageSet {
                                 }
                             }
                         });
-                    if false_pos == true {
+                    if false_pos {
                         let false_pos_bbox = detection.bbox.clone();
                         let false_pos_annotation: Annotation = (false_pos_bbox, 0);
                         false_pos_annotations.push(false_pos_annotation);

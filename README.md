@@ -13,6 +13,8 @@ This project uses support vector machines (SVM) and histogram of oriented gradie
 
 You can find a [demo here](https://chriamue.github.io/hog-detector)
 
+![HogDetector](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.github.com/chriamue/hog-detector/master/docs/hog_detector.puml)
+
 ## How it works
 
 1. A training dataset with positive and negative samples is given.

@@ -109,7 +109,7 @@ impl HogDetectorJS {
                 1.0
             }
         };
-        (1000.0 / average_millis).into()
+        1000.0 / average_millis
     }
 }
 

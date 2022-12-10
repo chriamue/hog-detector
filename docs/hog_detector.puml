@@ -1,0 +1,18 @@
+@startuml HogDetector
+package HogDetector {
+    node Image
+    node GrayImage
+    node HogFeatureDescriptor
+    node SVM
+    node Predictions
+    node Detector
+    node Objects
+}
+
+Image -> GrayImage
+GrayImage -> HogFeatureDescriptor
+HogFeatureDescriptor -> SVM
+SVM --> Predictions
+Predictions -> Detector
+Detector -> Objects
+@enduml

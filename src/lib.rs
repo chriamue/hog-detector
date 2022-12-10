@@ -45,5 +45,11 @@ pub type Annotation = (bbox::BBox, Class);
 /// the hog_detector prelude
 pub mod prelude {
     pub use crate::bbox::BBox;
+    pub use crate::classifier::Classifier;
+    pub use crate::dataset::DataSet;
     pub use crate::detection::Detection;
+    pub use crate::detector::Detector;
+    pub use crate::feature_descriptor::FeatureDescriptor;
+    pub use crate::predictable::Predictable;
+    pub use crate::trainable::Trainable;
 }
