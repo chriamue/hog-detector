@@ -257,8 +257,8 @@
                 <span class="kw">let </span>(x1, y1) = <span class="self">self</span>.pos;
                 <span class="kw">let </span>x = x1.min(x2);
                 <span class="kw">let </span>y = y1.min(y2);
-                <span class="kw">let </span>w = (x2 - x1).abs();
-                <span class="kw">let </span>h = (y2 - y1).abs();
+                <span class="kw">let </span>w = ((x2 - x1).abs()).max(<span class="number">1</span>);
+                <span class="kw">let </span>h = ((y2 - y1).abs()).max(<span class="number">1</span>);
                 <span class="kw">let </span>class = <span class="self">self
                     </span>.labels
                     .iter()

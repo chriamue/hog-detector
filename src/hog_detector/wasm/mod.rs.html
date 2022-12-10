@@ -48,6 +48,8 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(missing_docs)]
 </span><span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
@@ -80,23 +82,25 @@
 
 <span class="attribute">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>init_annotation_tool(root: web_sys::Element, images: <span class="kw-2">&amp;</span>AnnotatedImagesJS) {
-    yew::start_app_with_props_in_element::&lt;annotation_tool::App&gt;(
+    yew::Renderer::&lt;annotation_tool::App&gt;::with_root_and_props(
         root,
         annotation_tool::Props {
             images: images.clone(),
         },
-    );
+    )
+    .render();
 }
 
 <span class="attribute">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>init_trainer(root: web_sys::Element, images: <span class="kw-2">&amp;</span>AnnotatedImagesJS, detector: <span class="kw-2">&amp;</span>HogDetectorJS) {
-    yew::start_app_with_props_in_element::&lt;trainer::TrainerApp&gt;(
+    yew::Renderer::&lt;trainer::TrainerApp&gt;::with_root_and_props(
         root,
         trainer::Props {
             detector: detector.clone(),
             images: images.clone(),
         },
-    );
+    )
+    .render();
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hog_detector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
