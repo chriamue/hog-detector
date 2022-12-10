@@ -45,6 +45,28 @@ pub fn format_annotations(annotations: &Vec<Annotation>, labels: &Vec<String>) -
         .collect::<Vec<String>>()
 }
 
+impl Editor {
+    fn create_annotation_description(
+        &self,
+        img: &DynamicImage,
+        annotation: &Annotation,
+        labels: &Vec<String>,
+    ) -> Html {
+        let img = img.crop_imm(
+            annotation.0.x as u32,
+            annotation.0.y as u32,
+            annotation.0.w as u32,
+            annotation.0.h as u32,
+        );
+        html!(
+            <div>
+            <img src={image_to_base64_image(&img)} width={24} height={24} />
+            {format_annotation(annotation, labels)}
+            </div>
+        )
+    }
+}
+
 impl Component for Editor {
     type Message = Msg;
     type Properties = Props;
@@ -133,8 +155,8 @@ impl Component for Editor {
             <div id="editor" class="flex w-screen bg-gray-100" { ondrop }>
             <img src={url} {onmousedown} {onmousemove} {onmouseup} />
             <p>
-            { format_annotations(&ctx.props().annotations, &self.labels).iter().map(|annotation| {
-                    html!{<>{annotation}<br/></>}
+            { ctx.props().annotations.iter().map(|annotation| {
+                    self.create_annotation_description(&ctx.props().image, &annotation, &self.labels)
             }).collect::<Html>() }
             </p>
             <button type="button" class="btn btn-success" {onclick}>
