@@ -4,7 +4,7 @@ fn main() {
 }
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
-    use hog_detector::classifier::SVMClassifier;
+    use hog_detector::classifier::BayesClassifier;
     use hog_detector::data_augmentation::DataAugmentation;
     use hog_detector::dataset::{DataGenerator, DataSet, FolderDataSet};
     use hog_detector::HogDetector;
@@ -13,7 +13,7 @@ fn main() {
     const ANNOTATIONS: usize = 42;
     const IMAGES_PER_LABEL: usize = 21;
 
-    let mut model: HogDetector<SVMClassifier> = HogDetector::default();
+    let mut model: HogDetector<BayesClassifier> = HogDetector::default();
 
     let mut dataset = FolderDataSet::new(
         "res/training/".to_string(),

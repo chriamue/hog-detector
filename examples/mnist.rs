@@ -5,10 +5,10 @@ fn main() {
 
 #[cfg(feature = "mnist")]
 fn main() {
-    use hog_detector::classifier::SVMClassifier;
+    use hog_detector::classifier::BayesClassifier;
     use hog_detector::{dataset::MnistDataSet, DataSet, HogDetector, Trainable};
 
-    let mut model = HogDetector::<SVMClassifier>::default();
+    let mut model = HogDetector::<BayesClassifier>::default();
 
     let mut dataset = MnistDataSet::default();
     dataset.load();

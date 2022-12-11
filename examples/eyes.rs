@@ -6,10 +6,10 @@ fn main() {
 #[cfg(feature = "eyes")]
 fn main() {
     use hog_detector::{
-        classifier::SVMClassifier, dataset::EyesDataSet, hogdetector::HogDetectorTrait, DataSet,
+        classifier::BayesClassifier, dataset::EyesDataSet, hogdetector::HogDetectorTrait, DataSet,
         Detector, HogDetector, Trainable,
     };
-    let mut model = HogDetector::<SVMClassifier>::default();
+    let mut model = HogDetector::<BayesClassifier>::default();
 
     let mut dataset = EyesDataSet::default();
     println!("downloading eyes dataset");
@@ -21,7 +21,7 @@ fn main() {
     std::fs::write(eyes_model_file, model.save()).unwrap();
     println!("saving model to {}", eyes_model_file);
     let model = {
-        let mut model = HogDetector::<SVMClassifier>::default();
+        let mut model = HogDetector::<BayesClassifier>::default();
         model.load(&std::fs::read_to_string(eyes_model_file).unwrap());
         model
     };

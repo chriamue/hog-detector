@@ -23,6 +23,7 @@ pub type SVCParametersType = SVCParameters<f32, i32, DenseMatrix<f32>, Vec<i32>>
 pub struct SVMClassifier<'a> {
     /// svc classifier
     pub svc: Option<SVCType<'a>>,
+    class: u32,
 }
 
 impl Classifier for SVMClassifier<'_> {}
@@ -75,6 +76,7 @@ impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
             serde_json::from_str(&serde_json::to_string(&svc).unwrap()).unwrap();
         let classifier = SVMClassifier {
             svc: Some(deserialized_svc),
+            class: 1,
         };
         self.classifier = Some(classifier);
     }
@@ -84,17 +86,17 @@ impl<'a> Trainable for HogDetector<SVMClassifier<'a>> {
         let x_train = self.preprocess_matrix(x_train);
         let y_train = y_train
             .iter()
-            .map(|y| if *y as u32 == class { *y } else { 0u32 })
+            .map(|y| if *y as u32 == class { 1 } else { 0u32 })
             .collect();
         self.train(x_train, y_train);
     }
 
-    fn evaluate(&mut self, dataset: &dyn DataSet, class: u32) -> f32 {
+    fn evaluate(&mut self, dataset: &dyn DataSet, _class: u32) -> f32 {
         let mut i = 0;
         let (x_train, y_train, _, _) = dataset.get();
         x_train.iter().zip(y_train).for_each(|(img, y)| {
             let pred = self.predict(img);
-            if (pred == y && y == class) || (pred == 0 && y != class) {
+            if (pred == y && y == 1) || (pred == 0 && y != 1) {
                 i += 1;
             }
         });
