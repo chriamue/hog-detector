@@ -51,3 +51,24 @@ impl Component for Labels {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use wasm_bindgen_test::*;
+
+    #[wasm_bindgen_test]
+    async fn test_render() {
+        let label = "none".to_string();
+        let labels: Vec<String> = vec!["none".to_string(), "some".to_string()];
+        let onchange = Callback::default();
+        let rendered = yew::LocalServerRenderer::<Labels>::with_props(
+            Props {
+                label, labels, onchange
+            },
+        )
+        .render().await;
+        assert!(rendered.contains("none"));
+        assert!(rendered.contains("some"));
+    }
+}

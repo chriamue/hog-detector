@@ -55,7 +55,7 @@ web-sys = { version = "0.3.59", features = [
   "ImageData",
 ] }
 js-sys = "0.3.55"
-yew = { version = "0.20.0", features = ["csr"] }
+yew = { version = "0.20.0", features = ["csr", "ssr"] }
 #reqwest = { version = "0.11", features = ["blocking", "json"] }
 
 [profile.release]

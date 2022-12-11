@@ -27,7 +27,7 @@ pub struct HogDetector<C: Classifier> {
 }
 
 /// trait of an hog detector
-pub trait HogDetectorTrait: Trainable + Detector {
+pub trait HogDetectorTrait: Trainable + Detector + Send + Sync {
     /// save to string
     fn save(&self) -> String;
     /// load from string
@@ -35,6 +35,9 @@ pub trait HogDetectorTrait: Trainable + Detector {
     /// reference to detector trait
     fn detector(&self) -> &dyn Detector;
 }
+
+unsafe impl<C: Classifier> Send for HogDetector<C> {}
+unsafe impl<C: Classifier> Sync for HogDetector<C> {}
 
 impl<C: Classifier> PartialEq for HogDetector<C> {
     fn eq(&self, other: &HogDetector<C>) -> bool {

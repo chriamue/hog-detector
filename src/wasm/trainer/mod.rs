@@ -3,6 +3,7 @@ use super::HogDetectorJS;
 use wasm_bindgen_test::console_log;
 use yew::prelude::*;
 
+#[derive(Debug)]
 pub struct TrainerApp {}
 
 pub enum Msg {
@@ -92,7 +93,23 @@ impl Component for TrainerApp {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use wasm_bindgen_test::*;
 
-    #[test]
-    pub fn test() {}
+    #[wasm_bindgen_test]
+    async fn test_render() {
+        let images = AnnotatedImagesJS::new();
+        let detector = HogDetectorJS::new();
+
+        let rendered = yew::LocalServerRenderer::<TrainerApp>::with_props(
+            Props {
+                detector: detector.clone(),
+                images: images.clone(),
+            },
+        )
+        .render().await;
+        assert!(rendered.contains("Train Detector"));
+        assert!(rendered.contains("Train Detector with hard negative samples"));
+        assert!(rendered.contains("Switch to Random Forest Classifier"));
+        assert!(rendered.contains("Switch to Combined Classifier"));
+    }
 }
