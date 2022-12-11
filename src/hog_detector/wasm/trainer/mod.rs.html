@@ -96,12 +96,30 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
 <span class="kw">use </span><span class="kw">super</span>::HogDetectorJS;
 <span class="kw">use </span>wasm_bindgen_test::console_log;
 <span class="kw">use </span>yew::prelude::<span class="kw-2">*</span>;
 
-<span class="kw">pub struct </span>TrainerApp {}
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>TrainerApp {}
 
 <span class="kw">pub enum </span>Msg {
     Train,
@@ -190,9 +208,25 @@
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>wasm_bindgen_test::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[test]
-    </span><span class="kw">pub fn </span>test() {}
+    <span class="attribute">#[wasm_bindgen_test]
+    </span><span class="kw">async fn </span>test_render() {
+        <span class="kw">let </span>images = AnnotatedImagesJS::new();
+        <span class="kw">let </span>detector = HogDetectorJS::new();
+
+        <span class="kw">let </span>rendered = yew::LocalServerRenderer::&lt;TrainerApp&gt;::with_props(
+            Props {
+                detector: detector.clone(),
+                images: images.clone(),
+            },
+        )
+        .render().<span class="kw">await</span>;
+        <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;Train Detector&quot;</span>));
+        <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;Train Detector with hard negative samples&quot;</span>));
+        <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;Switch to Random Forest Classifier&quot;</span>));
+        <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;Switch to Combined Classifier&quot;</span>));
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hog_detector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

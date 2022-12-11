@@ -97,6 +97,9 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     classifier::Classifier,
     feature_descriptor::{FeatureDescriptor, HogFeatureDescriptor},
@@ -126,7 +129,7 @@
 }
 
 <span class="doccomment">/// trait of an hog detector
-</span><span class="kw">pub trait </span>HogDetectorTrait: Trainable + Detector {
+</span><span class="kw">pub trait </span>HogDetectorTrait: Trainable + Detector + Send + Sync {
     <span class="doccomment">/// save to string
     </span><span class="kw">fn </span>save(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String;
     <span class="doccomment">/// load from string
@@ -134,6 +137,9 @@
     <span class="doccomment">/// reference to detector trait
     </span><span class="kw">fn </span>detector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Detector;
 }
+
+<span class="kw">unsafe impl</span>&lt;C: Classifier&gt; Send <span class="kw">for </span>HogDetector&lt;C&gt; {}
+<span class="kw">unsafe impl</span>&lt;C: Classifier&gt; Sync <span class="kw">for </span>HogDetector&lt;C&gt; {}
 
 <span class="kw">impl</span>&lt;C: Classifier&gt; PartialEq <span class="kw">for </span>HogDetector&lt;C&gt; {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>HogDetector&lt;C&gt;) -&gt; bool {

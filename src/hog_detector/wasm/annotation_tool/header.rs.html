@@ -18,6 +18,19 @@
 <span id="18">18</span>
 <span id="19">19</span>
 <span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
 </pre><pre class="rust"><code><span class="kw">use </span>yew::{html, Component, Context, Html};
 
 <span class="kw">pub struct </span>Header;
@@ -36,6 +49,19 @@
                 &lt;h1&gt;{<span class="string">&quot;HOG Detector Annotation Tool&quot;</span>}&lt;/h1&gt;
             &lt;/div&gt;
         }
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>wasm_bindgen_test::<span class="kw-2">*</span>;
+
+    <span class="attribute">#[wasm_bindgen_test]
+    </span><span class="kw">async fn </span>test_render() {
+        <span class="kw">let </span>rendered = yew::LocalServerRenderer::&lt;Header&gt;::new()
+        .render().<span class="kw">await</span>;
+        <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;&lt;h1&gt;HOG Detector Annotation Tool&lt;/h1&gt;&quot;</span>));
     }
 }
 </code></pre></div>
