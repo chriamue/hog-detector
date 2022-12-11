@@ -222,6 +222,8 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::{detect_objects, visualize_detections};
 <span class="kw">use </span><span class="kw">crate</span>::feature_descriptor::HogFeatureDescriptor;
 <span class="kw">use </span><span class="kw">crate</span>::hogdetector::HogDetectorTrait;
@@ -247,6 +249,7 @@
 </span><span class="kw">pub struct </span>SVMClassifier&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// svc classifier
     </span><span class="kw">pub </span>svc: <span class="prelude-ty">Option</span>&lt;SVCType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    class: u32,
 }
 
 <span class="kw">impl </span>Classifier <span class="kw">for </span>SVMClassifier&lt;<span class="lifetime">&#39;_</span>&gt; {}
@@ -299,6 +302,7 @@
             serde_json::from_str(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>svc).unwrap()).unwrap();
         <span class="kw">let </span>classifier = SVMClassifier {
             svc: <span class="prelude-val">Some</span>(deserialized_svc),
+            class: <span class="number">1</span>,
         };
         <span class="self">self</span>.classifier = <span class="prelude-val">Some</span>(classifier);
     }
@@ -308,17 +312,17 @@
         <span class="kw">let </span>x_train = <span class="self">self</span>.preprocess_matrix(x_train);
         <span class="kw">let </span>y_train = y_train
             .iter()
-            .map(|y| <span class="kw">if </span><span class="kw-2">*</span>y <span class="kw">as </span>u32 == class { <span class="kw-2">*</span>y } <span class="kw">else </span>{ <span class="number">0u32 </span>})
+            .map(|y| <span class="kw">if </span><span class="kw-2">*</span>y <span class="kw">as </span>u32 == class { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0u32 </span>})
             .collect();
         <span class="self">self</span>.train(x_train, y_train);
     }
 
-    <span class="kw">fn </span>evaluate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: u32) -&gt; f32 {
+    <span class="kw">fn </span>evaluate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, _class: u32) -&gt; f32 {
         <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
         <span class="kw">let </span>(x_train, y_train, <span class="kw">_</span>, <span class="kw">_</span>) = dataset.get();
         x_train.iter().zip(y_train).for_each(|(img, y)| {
             <span class="kw">let </span>pred = <span class="self">self</span>.predict(img);
-            <span class="kw">if </span>(pred == y &amp;&amp; y == class) || (pred == <span class="number">0 </span>&amp;&amp; y != class) {
+            <span class="kw">if </span>(pred == y &amp;&amp; y == <span class="number">1</span>) || (pred == <span class="number">0 </span>&amp;&amp; y != <span class="number">1</span>) {
                 i += <span class="number">1</span>;
             }
         });
