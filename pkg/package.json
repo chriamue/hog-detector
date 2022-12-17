@@ -17,5 +17,11 @@
   ],
   "module": "hog_detector.js",
   "types": "hog_detector.d.ts",
-  "sideEffects": false
+  "sideEffects": false,
+  "keywords": [
+    "machine-learning",
+    "object-detection",
+    "hog",
+    "svm"
+  ]
 }

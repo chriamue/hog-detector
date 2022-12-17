@@ -4,6 +4,7 @@
 [![Github Pages Build](https://github.com/chriamue/hog-detector/actions/workflows/gh-pages.yml/badge.svg)](https://chriamue.github.io/hog-detector/)
 [![Benchmarks](https://github.com/chriamue/hog-detector/actions/workflows/bench.yml/badge.svg)](https://github.com/chriamue/hog-detector/actions/workflows/bench.yml)
 [![codecov](https://codecov.io/gh/chriamue/hog-detector/branch/main/graph/badge.svg?token=RJ6T5D9DZT)](https://codecov.io/gh/chriamue/hog-detector)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Demo](https://img.shields.io/badge/Demo-online-green.svg)](https://chriamue.github.io/hog-detector/)
 [![Doc](https://img.shields.io/badge/Docs-online-green.svg)](https://chriamue.github.io/hog-detector/hog_detector/)
 
@@ -32,22 +33,22 @@ You can find a [demo here](https://chriamue.github.io/hog-detector)
 
 1. Clone the repository:
 
-```sh
-git clone https://github.com/chriamue/hog-detector
-cd hog-detector
-```
+    ```sh
+    git clone https://github.com/chriamue/hog-detector
+    cd hog-detector
+    ```
 
 2. Compile the code to WASM:
 
-```sh
-wasm-pack build --target web
-```
+    ```sh
+    wasm-pack build --target web
+    ```
 
 3. Run the Web version in your browser
 
-```sh
-python3 -m http.server
-```
+    ```sh
+    python3 -m http.server
+    ```
 
 Open your browser on [Localhost](http://localhost:8000)
 
