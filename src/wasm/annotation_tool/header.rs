@@ -26,8 +26,7 @@ mod tests {
 
     #[wasm_bindgen_test]
     async fn test_render() {
-        let rendered = yew::LocalServerRenderer::<Header>::new()
-        .render().await;
+        let rendered = yew::LocalServerRenderer::<Header>::new().render().await;
         assert!(rendered.contains("<h1>HOG Detector Annotation Tool</h1>"));
     }
 }
