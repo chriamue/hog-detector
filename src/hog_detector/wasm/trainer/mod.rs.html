@@ -112,7 +112,6 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
-<span id="115">115</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
 <span class="kw">use </span><span class="kw">super</span>::HogDetectorJS;
 <span class="kw">use </span>wasm_bindgen_test::console_log;
@@ -215,13 +214,12 @@
         <span class="kw">let </span>images = AnnotatedImagesJS::new();
         <span class="kw">let </span>detector = HogDetectorJS::new();
 
-        <span class="kw">let </span>rendered = yew::LocalServerRenderer::&lt;TrainerApp&gt;::with_props(
-            Props {
-                detector: detector.clone(),
-                images: images.clone(),
-            },
-        )
-        .render().<span class="kw">await</span>;
+        <span class="kw">let </span>rendered = yew::LocalServerRenderer::&lt;TrainerApp&gt;::with_props(Props {
+            detector: detector.clone(),
+            images: images.clone(),
+        })
+        .render()
+        .<span class="kw">await</span>;
         <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;Train Detector&quot;</span>));
         <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;Train Detector with hard negative samples&quot;</span>));
         <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;Switch to Random Forest Classifier&quot;</span>));

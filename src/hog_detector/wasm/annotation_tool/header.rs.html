@@ -30,7 +30,6 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
-<span id="33">33</span>
 </pre><pre class="rust"><code><span class="kw">use </span>yew::{html, Component, Context, Html};
 
 <span class="kw">pub struct </span>Header;
@@ -59,8 +58,7 @@
 
     <span class="attribute">#[wasm_bindgen_test]
     </span><span class="kw">async fn </span>test_render() {
-        <span class="kw">let </span>rendered = yew::LocalServerRenderer::&lt;Header&gt;::new()
-        .render().<span class="kw">await</span>;
+        <span class="kw">let </span>rendered = yew::LocalServerRenderer::&lt;Header&gt;::new().render().<span class="kw">await</span>;
         <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;&lt;h1&gt;HOG Detector Annotation Tool&lt;/h1&gt;&quot;</span>));
     }
 }

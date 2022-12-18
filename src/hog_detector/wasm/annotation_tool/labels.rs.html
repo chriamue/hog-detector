@@ -72,6 +72,7 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Msg;
 <span class="kw">use </span>yew::{html, Callback, Component, Context, Html, Properties};
 
@@ -136,12 +137,13 @@
         <span class="kw">let </span>label = <span class="string">&quot;none&quot;</span>.to_string();
         <span class="kw">let </span>labels: Vec&lt;String&gt; = <span class="macro">vec!</span>[<span class="string">&quot;none&quot;</span>.to_string(), <span class="string">&quot;some&quot;</span>.to_string()];
         <span class="kw">let </span>onchange = Callback::default();
-        <span class="kw">let </span>rendered = yew::LocalServerRenderer::&lt;Labels&gt;::with_props(
-            Props {
-                label, labels, onchange
-            },
-        )
-        .render().<span class="kw">await</span>;
+        <span class="kw">let </span>rendered = yew::LocalServerRenderer::&lt;Labels&gt;::with_props(Props {
+            label,
+            labels,
+            onchange,
+        })
+        .render()
+        .<span class="kw">await</span>;
         <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;none&quot;</span>));
         <span class="macro">assert!</span>(rendered.contains(<span class="string">&quot;some&quot;</span>));
     }
