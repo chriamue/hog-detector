@@ -26,6 +26,7 @@ image = { version = "0.24.3", default-features = false, features = [
   "jpeg",
 ] }
 imageproc = { version = "0.23.0", default-features = false }
+image-label-tool = { git = "https://github.com/chriamue/image-label-tool" }
 instant = { version = "0.1", features = ["wasm-bindgen", "inaccurate"] }
 mnist = { version = "0.5.0", features = ["download"], optional = true }
 ndarray = "0.15.6"
@@ -65,7 +66,6 @@ debug = true
 [dev-dependencies]
 criterion = { version = "0.4", default-features = false }
 mockall = "0.11.3"
-image-label-tool = { git = "https://github.com/chriamue/image-label-tool" }
 
 [[bench]]
 name = "benchmark"

@@ -1,7 +1,11 @@
-use super::annotated_images_js::AnnotatedImagesJS;
+use crate::wasm::trainer::dataset::create_dataset;
+
 use super::HogDetectorJS;
+use image_label_tool::prelude::LabelTool;
 use wasm_bindgen_test::console_log;
 use yew::prelude::*;
+
+mod dataset;
 
 #[derive(Debug)]
 pub struct TrainerApp {}
@@ -17,7 +21,7 @@ pub enum Msg {
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props {
     pub detector: HogDetectorJS,
-    pub images: AnnotatedImagesJS,
+    pub label_tool: LabelTool,
 }
 
 impl Component for TrainerApp {
@@ -32,14 +36,14 @@ impl Component for TrainerApp {
         match msg {
             Msg::Train => {
                 console_log!("training started...");
-                let dataset = ctx.props().images.create_dataset();
+                let dataset = create_dataset(&ctx.props().label_tool);
                 ctx.props().detector.train(dataset);
                 console_log!("training done");
                 true
             }
             Msg::TrainWithHardNegativeSamples => {
                 console_log!("training with hard negative samples started...");
-                let dataset = ctx.props().images.create_dataset();
+                let dataset = create_dataset(&ctx.props().label_tool);
                 ctx.props()
                     .detector
                     .train_with_hard_negative_samples(dataset);
@@ -97,12 +101,12 @@ mod tests {
 
     #[wasm_bindgen_test]
     async fn test_render() {
-        let images = AnnotatedImagesJS::new();
         let detector = HogDetectorJS::new();
+        let label_tool = LabelTool::default();
 
         let rendered = yew::LocalServerRenderer::<TrainerApp>::with_props(Props {
-            detector: detector.clone(),
-            images: images.clone(),
+            detector: detector,
+            label_tool: label_tool,
         })
         .render()
         .await;

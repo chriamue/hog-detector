@@ -54,7 +54,7 @@
       var processCheckbox = document.getElementById("processCheckbox");
       var annotateCheckbox = document.getElementById("annotateCheckbox");
       var fpsInfo = document.getElementById("fps");
-      var annotated_images = null;
+      var label_tool = null;
 
       annotateCheckbox.onclick = function () {
         if (annotateCheckbox.checked) {
@@ -73,19 +73,16 @@
       var processing = false;
 
       import init, {
-        AnnotatedImagesJS,
         HogDetectorJS,
-        init_images,
-        init_annotation_tool,
+        init_image_label_tool,
         init_trainer,
       } from "./pkg/hog_detector.js";
       init().then(async () => {
         try {
-          annotated_images = new AnnotatedImagesJS();
           detector = new HogDetectorJS();
-          await init_images(annotated_images);
-          init_annotation_tool(annotation_tool_element, annotated_images);
-          init_trainer(trainer_element, annotated_images, detector);
+          label_tool = await init_image_label_tool(annotation_tool_element, "canvas");
+          
+          init_trainer(trainer_element, label_tool, detector);
         } catch (e) {
           console.error(e);
         }

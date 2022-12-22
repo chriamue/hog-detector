@@ -1,4 +1,5 @@
 #![allow(missing_docs)]
+use image_label_tool::prelude::*;
 use wasm_bindgen::prelude::*;
 
 pub mod annotated_images_js;
@@ -15,7 +16,9 @@ use hogdetector_js::HogDetectorJS;
 wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
 #[wasm_bindgen]
-pub async fn init_images(images: &AnnotatedImagesJS) {
+/// init label tool and start app on given root html element
+pub async fn init_image_label_tool(root: web_sys::Element, canvas_element_id: String) -> LabelTool {
+    let label_tool = LabelTool::new();
     let data = reqwest::get("https://picsum.photos/640/480/")
         .await
         .unwrap()
@@ -23,29 +26,19 @@ pub async fn init_images(images: &AnnotatedImagesJS) {
         .await
         .unwrap();
     let img = image::load_from_memory(&data).unwrap();
-    let annotations = AnnotationsJS::new();
-    annotations.set_image(img);
-    images.push(annotations);
+    let annotated_image = AnnotatedImage::new();
+    annotated_image.set_image(img);
+    label_tool.push(annotated_image);
+    image_label_tool::init_label_tool(root, Some(label_tool), Some(canvas_element_id))
 }
 
 #[wasm_bindgen]
-pub fn init_annotation_tool(root: web_sys::Element, images: &AnnotatedImagesJS) {
-    yew::Renderer::<annotation_tool::App>::with_root_and_props(
-        root,
-        annotation_tool::Props {
-            images: images.clone(),
-        },
-    )
-    .render();
-}
-
-#[wasm_bindgen]
-pub fn init_trainer(root: web_sys::Element, images: &AnnotatedImagesJS, detector: &HogDetectorJS) {
+pub fn init_trainer(root: web_sys::Element, label_tool: &LabelTool, detector: &HogDetectorJS) {
     yew::Renderer::<trainer::TrainerApp>::with_root_and_props(
         root,
         trainer::Props {
             detector: detector.clone(),
-            images: images.clone(),
+            label_tool: label_tool.clone(),
         },
     )
     .render();
