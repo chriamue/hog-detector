@@ -112,10 +112,18 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::annotated_images_js::AnnotatedImagesJS;
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::wasm::trainer::dataset::create_dataset;
+
 <span class="kw">use </span><span class="kw">super</span>::HogDetectorJS;
+<span class="kw">use </span>image_label_tool::prelude::LabelTool;
 <span class="kw">use </span>wasm_bindgen_test::console_log;
 <span class="kw">use </span>yew::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">mod </span>dataset;
 
 <span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub struct </span>TrainerApp {}
@@ -131,7 +139,7 @@
 <span class="attribute">#[derive(Clone, PartialEq, Properties)]
 </span><span class="kw">pub struct </span>Props {
     <span class="kw">pub </span>detector: HogDetectorJS,
-    <span class="kw">pub </span>images: AnnotatedImagesJS,
+    <span class="kw">pub </span>label_tool: LabelTool,
 }
 
 <span class="kw">impl </span>Component <span class="kw">for </span>TrainerApp {
@@ -146,14 +154,14 @@
         <span class="kw">match </span>msg {
             Msg::Train =&gt; {
                 <span class="macro">console_log!</span>(<span class="string">&quot;training started...&quot;</span>);
-                <span class="kw">let </span>dataset = ctx.props().images.create_dataset();
+                <span class="kw">let </span>dataset = create_dataset(<span class="kw-2">&amp;</span>ctx.props().label_tool);
                 ctx.props().detector.train(dataset);
                 <span class="macro">console_log!</span>(<span class="string">&quot;training done&quot;</span>);
                 <span class="bool-val">true
             </span>}
             Msg::TrainWithHardNegativeSamples =&gt; {
                 <span class="macro">console_log!</span>(<span class="string">&quot;training with hard negative samples started...&quot;</span>);
-                <span class="kw">let </span>dataset = ctx.props().images.create_dataset();
+                <span class="kw">let </span>dataset = create_dataset(<span class="kw-2">&amp;</span>ctx.props().label_tool);
                 ctx.props()
                     .detector
                     .train_with_hard_negative_samples(dataset);
@@ -211,12 +219,12 @@
 
     <span class="attribute">#[wasm_bindgen_test]
     </span><span class="kw">async fn </span>test_render() {
-        <span class="kw">let </span>images = AnnotatedImagesJS::new();
         <span class="kw">let </span>detector = HogDetectorJS::new();
+        <span class="kw">let </span>label_tool = LabelTool::default();
 
         <span class="kw">let </span>rendered = yew::LocalServerRenderer::&lt;TrainerApp&gt;::with_props(Props {
-            detector: detector.clone(),
-            images: images.clone(),
+            detector: detector,
+            label_tool: label_tool,
         })
         .render()
         .<span class="kw">await</span>;
