@@ -1,10 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
-export function __wbg_annotationsjs_free(a: number): void;
-export function annotationsjs_new(): number;
-export function __wbg_annotatedimagesjs_free(a: number): void;
-export function annotatedimagesjs_new(): number;
 export function init_image_label_tool(a: number, b: number, c: number): number;
 export function init_trainer(a: number, b: number, c: number): void;
 export function __wbg_hogdetectorjs_free(a: number): void;

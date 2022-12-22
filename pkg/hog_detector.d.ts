@@ -63,22 +63,6 @@ export class AnnotatedImage {
 }
 /**
 */
-export class AnnotatedImagesJS {
-  free(): void;
-/**
-*/
-  constructor();
-}
-/**
-*/
-export class AnnotationsJS {
-  free(): void;
-/**
-*/
-  constructor();
-}
-/**
-*/
 export class HogDetectorJS {
   free(): void;
 /**
@@ -158,10 +142,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_annotationsjs_free: (a: number) => void;
-  readonly annotationsjs_new: () => number;
-  readonly __wbg_annotatedimagesjs_free: (a: number) => void;
-  readonly annotatedimagesjs_new: () => number;
   readonly init_image_label_tool: (a: number, b: number, c: number) => number;
   readonly init_trainer: (a: number, b: number, c: number) => void;
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
