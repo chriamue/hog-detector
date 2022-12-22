@@ -2,15 +2,9 @@
 use image_label_tool::prelude::*;
 use wasm_bindgen::prelude::*;
 
-pub mod annotated_images_js;
-pub mod annotation_tool;
-pub mod annotations_js;
-pub mod download;
 pub mod hogdetector_js;
 pub mod trainer;
 
-use annotated_images_js::AnnotatedImagesJS;
-use annotations_js::AnnotationsJS;
 use hogdetector_js::HogDetectorJS;
 
 wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
