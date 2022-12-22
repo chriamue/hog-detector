@@ -1,13 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
-export function init_images(a: number): number;
-export function init_annotation_tool(a: number, b: number): void;
-export function init_trainer(a: number, b: number, c: number): void;
 export function __wbg_annotationsjs_free(a: number): void;
 export function annotationsjs_new(): number;
 export function __wbg_annotatedimagesjs_free(a: number): void;
 export function annotatedimagesjs_new(): number;
+export function init_image_label_tool(a: number, b: number, c: number): number;
+export function init_trainer(a: number, b: number, c: number): void;
 export function __wbg_hogdetectorjs_free(a: number): void;
 export function hogdetectorjs_new(): number;
 export function hogdetectorjs_init_random_forest_classifier(a: number): void;
@@ -24,13 +23,18 @@ export function __wbgtest_console_debug(a: number): void;
 export function __wbgtest_console_info(a: number): void;
 export function __wbgtest_console_warn(a: number): void;
 export function __wbgtest_console_error(a: number): void;
+export function __wbg_annotatedimage_free(a: number): void;
+export function annotatedimage_constructor(): number;
+export function __wbg_labeltool_free(a: number): void;
+export function labeltool_new(): number;
+export function init_label_tool(a: number, b: number, c: number, d: number): number;
 export function __wbindgen_malloc(a: number): number;
 export function __wbindgen_realloc(a: number, b: number, c: number): number;
 export const __wbindgen_export_2: WebAssembly.Table;
-export function _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hf3320046cf579e7c(a: number, b: number, c: number): void;
-export function _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hc79fe372f64dc8ab(a: number, b: number, c: number): void;
+export function _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hbdad8d9a33727677(a: number, b: number, c: number): void;
+export function _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h3692d09302fd2c8c(a: number, b: number, c: number): void;
 export function __wbindgen_add_to_stack_pointer(a: number): number;
 export function __wbindgen_free(a: number, b: number): void;
 export function __wbindgen_exn_store(a: number): void;
-export function wasm_bindgen__convert__closures__invoke3_mut__h4a53ba9ca43bb06f(a: number, b: number, c: number, d: number, e: number): void;
-export function wasm_bindgen__convert__closures__invoke2_mut__h2e9172a2589321c5(a: number, b: number, c: number, d: number): void;
+export function wasm_bindgen__convert__closures__invoke3_mut__h34d582c642c645ad(a: number, b: number, c: number, d: number, e: number): void;
+export function wasm_bindgen__convert__closures__invoke2_mut__h50310121bbeca1fa(a: number, b: number, c: number, d: number): void;

@@ -214,14 +214,27 @@ function addBorrowedObject(obj) {
 }
 function __wbg_adapter_30(arg0, arg1, arg2) {
     try {
-        wasm._dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hf3320046cf579e7c(arg0, arg1, addBorrowedObject(arg2));
+        wasm._dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hbdad8d9a33727677(arg0, arg1, addBorrowedObject(arg2));
     } finally {
         heap[stack_pointer++] = undefined;
     }
 }
 
 function __wbg_adapter_33(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hc79fe372f64dc8ab(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h3692d09302fd2c8c(arg0, arg1, addHeapObject(arg2));
+}
+
+/**
+* init label tool and start app on given root html element
+* @param {Element} root
+* @param {string} canvas_element_id
+* @returns {Promise<LabelTool>}
+*/
+export function init_image_label_tool(root, canvas_element_id) {
+    const ptr0 = passStringToWasm0(canvas_element_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.init_image_label_tool(addHeapObject(root), ptr0, len0);
+    return takeObject(ret);
 }
 
 function _assertClass(instance, klass) {
@@ -231,33 +244,14 @@ function _assertClass(instance, klass) {
     return instance.ptr;
 }
 /**
-* @param {AnnotatedImagesJS} images
-* @returns {Promise<void>}
-*/
-export function init_images(images) {
-    _assertClass(images, AnnotatedImagesJS);
-    const ret = wasm.init_images(images.ptr);
-    return takeObject(ret);
-}
-
-/**
 * @param {Element} root
-* @param {AnnotatedImagesJS} images
-*/
-export function init_annotation_tool(root, images) {
-    _assertClass(images, AnnotatedImagesJS);
-    wasm.init_annotation_tool(addHeapObject(root), images.ptr);
-}
-
-/**
-* @param {Element} root
-* @param {AnnotatedImagesJS} images
+* @param {LabelTool} label_tool
 * @param {HogDetectorJS} detector
 */
-export function init_trainer(root, images, detector) {
-    _assertClass(images, AnnotatedImagesJS);
+export function init_trainer(root, label_tool, detector) {
+    _assertClass(label_tool, LabelTool);
     _assertClass(detector, HogDetectorJS);
-    wasm.init_trainer(addHeapObject(root), images.ptr, detector.ptr);
+    wasm.init_trainer(addHeapObject(root), label_tool.ptr, detector.ptr);
 }
 
 function passArray8ToWasm0(arg, malloc) {
@@ -354,6 +348,26 @@ export function __wbgtest_console_error(args) {
     }
 }
 
+/**
+* init label tool and start app on given root html element
+* @param {Element} root
+* @param {LabelTool | undefined} label_tool
+* @param {string | undefined} canvas_element_id
+* @returns {LabelTool}
+*/
+export function init_label_tool(root, label_tool, canvas_element_id) {
+    let ptr0 = 0;
+    if (!isLikeNone(label_tool)) {
+        _assertClass(label_tool, LabelTool);
+        ptr0 = label_tool.ptr;
+        label_tool.ptr = 0;
+    }
+    var ptr1 = isLikeNone(canvas_element_id) ? 0 : passStringToWasm0(canvas_element_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len1 = WASM_VECTOR_LEN;
+    const ret = wasm.init_label_tool(addHeapObject(root), ptr0, ptr1, len1);
+    return LabelTool.__wrap(ret);
+}
+
 function getArrayJsValueFromWasm0(ptr, len) {
     const mem = getUint32Memory0();
     const slice = mem.subarray(ptr / 4, ptr / 4 + len);
@@ -371,14 +385,45 @@ function handleError(f, args) {
         wasm.__wbindgen_exn_store(addHeapObject(e));
     }
 }
-function __wbg_adapter_255(arg0, arg1, arg2, arg3, arg4) {
-    wasm.wasm_bindgen__convert__closures__invoke3_mut__h4a53ba9ca43bb06f(arg0, arg1, addHeapObject(arg2), arg3, addHeapObject(arg4));
+function __wbg_adapter_259(arg0, arg1, arg2, arg3, arg4) {
+    wasm.wasm_bindgen__convert__closures__invoke3_mut__h34d582c642c645ad(arg0, arg1, addHeapObject(arg2), arg3, addHeapObject(arg4));
 }
 
-function __wbg_adapter_288(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen__convert__closures__invoke2_mut__h2e9172a2589321c5(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+function __wbg_adapter_292(arg0, arg1, arg2, arg3) {
+    wasm.wasm_bindgen__convert__closures__invoke2_mut__h50310121bbeca1fa(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
+/**
+* Image with Annotations
+*/
+export class AnnotatedImage {
+
+    static __wrap(ptr) {
+        const obj = Object.create(AnnotatedImage.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    __destroy_into_raw() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_annotatedimage_free(ptr);
+    }
+    /**
+    * constructor of AnnotatedImages for wasm
+    */
+    constructor() {
+        const ret = wasm.annotatedimage_constructor();
+        return AnnotatedImage.__wrap(ret);
+    }
+}
 /**
 */
 export class AnnotatedImagesJS {
@@ -505,6 +550,37 @@ export class HogDetectorJS {
     fps() {
         const ret = wasm.hogdetectorjs_fps(this.ptr);
         return ret;
+    }
+}
+/**
+* struct of label tool that manages annotated images
+*/
+export class LabelTool {
+
+    static __wrap(ptr) {
+        const obj = Object.create(LabelTool.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    __destroy_into_raw() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_labeltool_free(ptr);
+    }
+    /**
+    * constructor of new label tool
+    */
+    constructor() {
+        const ret = wasm.labeltool_new();
+        return LabelTool.__wrap(ret);
     }
 }
 /**
@@ -694,6 +770,10 @@ function getImports() {
     imports.wbg.__wbindgen_jsval_eq = function(arg0, arg1) {
         const ret = getObject(arg0) === getObject(arg1);
         return ret;
+    };
+    imports.wbg.__wbg_labeltool_new = function(arg0) {
+        const ret = LabelTool.__wrap(arg0);
+        return addHeapObject(ret);
     };
     imports.wbg.__wbg_cachekey_b61393159c57fd7b = function(arg0, arg1) {
         const ret = getObject(arg1).__yew_subtree_cache_key;
@@ -1203,7 +1283,7 @@ function getImports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_255(a, state0.b, arg0, arg1, arg2);
+                    return __wbg_adapter_259(a, state0.b, arg0, arg1, arg2);
                 } finally {
                     state0.a = a;
                 }
@@ -1250,7 +1330,7 @@ function getImports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_288(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_292(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -1326,12 +1406,12 @@ function getImports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1583 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 723, __wbg_adapter_30);
+    imports.wbg.__wbindgen_closure_wrapper1724 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 766, __wbg_adapter_30);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2053 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 918, __wbg_adapter_33);
+    imports.wbg.__wbindgen_closure_wrapper2194 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 960, __wbg_adapter_33);
         return addHeapObject(ret);
     };
 

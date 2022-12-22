@@ -1,21 +1,18 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {AnnotatedImagesJS} images
-* @returns {Promise<void>}
+* init label tool and start app on given root html element
+* @param {Element} root
+* @param {string} canvas_element_id
+* @returns {Promise<LabelTool>}
 */
-export function init_images(images: AnnotatedImagesJS): Promise<void>;
+export function init_image_label_tool(root: Element, canvas_element_id: string): Promise<LabelTool>;
 /**
 * @param {Element} root
-* @param {AnnotatedImagesJS} images
-*/
-export function init_annotation_tool(root: Element, images: AnnotatedImagesJS): void;
-/**
-* @param {Element} root
-* @param {AnnotatedImagesJS} images
+* @param {LabelTool} label_tool
 * @param {HogDetectorJS} detector
 */
-export function init_trainer(root: Element, images: AnnotatedImagesJS, detector: HogDetectorJS): void;
+export function init_trainer(root: Element, label_tool: LabelTool, detector: HogDetectorJS): void;
 /**
 * Handler for `console.log` invocations.
 *
@@ -46,6 +43,24 @@ export function __wbgtest_console_warn(args: Array<any>): void;
 * @param {Array<any>} args
 */
 export function __wbgtest_console_error(args: Array<any>): void;
+/**
+* init label tool and start app on given root html element
+* @param {Element} root
+* @param {LabelTool | undefined} label_tool
+* @param {string | undefined} canvas_element_id
+* @returns {LabelTool}
+*/
+export function init_label_tool(root: Element, label_tool?: LabelTool, canvas_element_id?: string): LabelTool;
+/**
+* Image with Annotations
+*/
+export class AnnotatedImage {
+  free(): void;
+/**
+* constructor of AnnotatedImages for wasm
+*/
+  constructor();
+}
 /**
 */
 export class AnnotatedImagesJS {
@@ -87,6 +102,16 @@ export class HogDetectorJS {
 * @returns {number}
 */
   fps(): number;
+}
+/**
+* struct of label tool that manages annotated images
+*/
+export class LabelTool {
+  free(): void;
+/**
+* constructor of new label tool
+*/
+  constructor();
 }
 /**
 * Runtime test harness support instantiated in JS.
@@ -133,13 +158,12 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly init_images: (a: number) => number;
-  readonly init_annotation_tool: (a: number, b: number) => void;
-  readonly init_trainer: (a: number, b: number, c: number) => void;
   readonly __wbg_annotationsjs_free: (a: number) => void;
   readonly annotationsjs_new: () => number;
   readonly __wbg_annotatedimagesjs_free: (a: number) => void;
   readonly annotatedimagesjs_new: () => number;
+  readonly init_image_label_tool: (a: number, b: number, c: number) => number;
+  readonly init_trainer: (a: number, b: number, c: number) => void;
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
   readonly hogdetectorjs_new: () => number;
   readonly hogdetectorjs_init_random_forest_classifier: (a: number) => void;
@@ -156,16 +180,21 @@ export interface InitOutput {
   readonly __wbgtest_console_info: (a: number) => void;
   readonly __wbgtest_console_warn: (a: number) => void;
   readonly __wbgtest_console_error: (a: number) => void;
+  readonly __wbg_annotatedimage_free: (a: number) => void;
+  readonly annotatedimage_constructor: () => number;
+  readonly __wbg_labeltool_free: (a: number) => void;
+  readonly labeltool_new: () => number;
+  readonly init_label_tool: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hf3320046cf579e7c: (a: number, b: number, c: number) => void;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hc79fe372f64dc8ab: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hbdad8d9a33727677: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h3692d09302fd2c8c: (a: number, b: number, c: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke3_mut__h4a53ba9ca43bb06f: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke2_mut__h2e9172a2589321c5: (a: number, b: number, c: number, d: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke3_mut__h34d582c642c645ad: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke2_mut__h50310121bbeca1fa: (a: number, b: number, c: number, d: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
