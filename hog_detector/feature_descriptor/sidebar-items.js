@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["HogFeatureDescriptor","A Histogram of Oriented Features Descriptor"]],"trait":[["FeatureDescriptor","trait for a feature descriptor"]]};
+window.SIDEBAR_ITEMS = {"struct":[["BriefFeatureDescriptor","Defines a struct to represent the BRIEF descriptor"],["HogFeatureDescriptor","A Histogram of Oriented Features Descriptor"]],"trait":[["FeatureDescriptor","trait for a feature descriptor"]]};
