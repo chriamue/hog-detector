@@ -13,11 +13,13 @@ keywords = ["machine-learning", "object-detection", "hog", "svm"]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["reqwest"]
+default = ["reqwest", "brief"]
+brief = ["dep:brief-rs"]
 mnist = ["dep:mnist"]
 eyes = ["reqwest", "zip"]
 
 [dependencies]
+brief-rs = { git = "https://github.com/chriamue/brief-rs", optional = true }
 bytes = "1.2.1"
 getrandom = { version = "0.2", features = ["js"] }
 float-ord = "0.3.2"

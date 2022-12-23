@@ -1,7 +1,12 @@
 use image::DynamicImage;
 use std::fmt::Debug;
 
+#[cfg(feature = "brief")]
+mod brief_feature_descriptor;
 mod hog_feature_descriptor;
+
+#[cfg(feature = "brief")]
+pub use brief_feature_descriptor::BriefFeatureDescriptor;
 pub use hog_feature_descriptor::HogFeatureDescriptor;
 
 /// trait for a feature descriptor
