@@ -14,15 +14,19 @@
 <span id="14">14</span>
 <span id="15">15</span>
 <span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
 </pre><pre class="rust"><code><span class="kw">use </span>image::DynamicImage;
 <span class="kw">use </span>std::fmt::Debug;
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;brief&quot;</span>)]
 </span><span class="kw">mod </span>brief_feature_descriptor;
+<span class="kw">mod </span>combined_feature_descriptor;
 <span class="kw">mod </span>hog_feature_descriptor;
 
 <span class="attribute">#[cfg(feature = <span class="string">&quot;brief&quot;</span>)]
 </span><span class="kw">pub use </span>brief_feature_descriptor::BriefFeatureDescriptor;
+<span class="kw">pub use </span>combined_feature_descriptor::CombinedFeatureDescriptor;
 <span class="kw">pub use </span>hog_feature_descriptor::HogFeatureDescriptor;
 
 <span class="doccomment">/// trait for a feature descriptor
