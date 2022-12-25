@@ -108,6 +108,7 @@ pub use mnist_dataset::MnistDataSet;
 mod tests {
     use super::*;
     use crate::bbox::BBox;
+    use crate::Predictable;
 
     #[test]
     fn test_hard_negative_samples() {
@@ -116,6 +117,11 @@ mod tests {
 
         mock! {
             HogDetector {}
+            impl Predictable for HogDetector {
+                fn predict(&self, image: &DynamicImage) -> u32 {
+                    0
+                }
+            }
             impl Detector for HogDetector {
                 fn detect_objects(&self, image: &image::DynamicImage) -> Vec<crate::prelude::Detection>;
                 fn visualize_detections(&self, image: &image::DynamicImage) -> image::DynamicImage;

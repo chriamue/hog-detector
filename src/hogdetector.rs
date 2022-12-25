@@ -1,7 +1,7 @@
 use crate::{
     classifier::Classifier,
     feature_descriptor::{FeatureDescriptor, HogFeatureDescriptor},
-    Detector, Trainable,
+    Detector, Predictable, Trainable,
 };
 use image::DynamicImage;
 use smartcore::linalg::basic::matrix::DenseMatrix;
@@ -69,6 +69,8 @@ impl<C: Classifier> HogDetector<C> {
         DenseMatrix::from_2d_vec(&descriptors)
     }
 }
+
+impl<C: Classifier> Detector for HogDetector<C> where HogDetector<C>: Predictable {}
 
 #[cfg(test)]
 mod tests {

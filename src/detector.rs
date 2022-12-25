@@ -1,5 +1,7 @@
 use crate::bbox::BBox;
 use crate::detection::{merge, nms_sort, Detection};
+use crate::utils::{pyramid, sliding_window};
+use crate::Predictable;
 use image::{DynamicImage, Rgba};
 use imageproc::drawing::{draw_hollow_rect_mut, draw_text_mut};
 use imageproc::rect::Rect;
@@ -60,11 +62,26 @@ pub fn visualize_detections(image: &DynamicImage, detections: &Vec<Detection>) -
 }
 
 /// detector trait
-pub trait Detector {
+pub trait Detector: Predictable {
     /// detects objects im given image
-    fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection>;
+    fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
+        let step_size = 8;
+        let window_size = 32;
+        let mut windows = sliding_window(image, step_size, window_size);
+        windows.extend(pyramid(image, 1.3, step_size, window_size));
+        windows.extend(pyramid(image, 1.5, step_size, window_size));
+
+        let predictions: Vec<(u32, u32, u32)> = windows
+            .iter()
+            .map(|(x, y, window)| (*x, *y, self.predict(window)))
+            .collect();
+        detect_objects(predictions, window_size)
+    }
     /// visualize detections on image
-    fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage;
+    fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
+        let detections = self.detect_objects(image);
+        visualize_detections(image, &detections)
+    }
 }
 
 #[cfg(test)]

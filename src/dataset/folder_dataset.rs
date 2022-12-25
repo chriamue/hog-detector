@@ -312,9 +312,9 @@ impl DataAugmentation for FolderDataSet {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::test_image;
-
     use super::*;
+    use crate::tests::test_image;
+    use crate::Predictable;
     use image::RgbImage;
 
     const ANNOTATIONS: usize = 42;
@@ -445,6 +445,11 @@ mod tests {
 
         mock! {
             HogDetector {}
+            impl Predictable for HogDetector{
+                fn predict(&self, image: &DynamicImage) -> u32 {
+                    0
+                }
+            }
             impl Detector for HogDetector {
                 fn detect_objects(&self, image: &image::DynamicImage) -> Vec<crate::prelude::Detection>;
                 fn visualize_detections(&self, image: &image::DynamicImage) -> image::DynamicImage;

@@ -1,8 +1,5 @@
-use crate::detector::{detect_objects, visualize_detections};
 use crate::feature_descriptor::HogFeatureDescriptor;
 use crate::hogdetector::HogDetectorTrait;
-use crate::prelude::Detection;
-use crate::utils::{pyramid, sliding_window};
 use crate::{DataSet, Detector, HogDetector, Predictable, Trainable};
 use image::imageops::{resize, FilterType};
 use image::DynamicImage;
@@ -120,27 +117,6 @@ impl<'a> Predictable for HogDetector<SVMClassifier<'a>> {
             .predict(&x)
             .unwrap();
         *y.first().unwrap() as u32
-    }
-}
-
-impl<'a> Detector for HogDetector<SVMClassifier<'a>> {
-    fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
-        let step_size = 8;
-        let window_size = 32;
-        let mut windows = sliding_window(image, step_size, window_size);
-        windows.extend(pyramid(image, 1.3, step_size, window_size));
-        windows.extend(pyramid(image, 1.5, step_size, window_size));
-
-        let predictions: Vec<(u32, u32, u32)> = windows
-            .iter()
-            .map(|(x, y, window)| (*x, *y, self.predict(window)))
-            .collect();
-        detect_objects(predictions, window_size)
-    }
-
-    fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
-        let detections = self.detect_objects(image);
-        visualize_detections(image, &detections)
     }
 }
 

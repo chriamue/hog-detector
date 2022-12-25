@@ -1,10 +1,6 @@
 use crate::{
-    detector::{detect_objects, visualize_detections},
-    feature_descriptor::HogFeatureDescriptor,
-    hogdetector::HogDetectorTrait,
-    prelude::Detection,
-    utils::{pyramid, sliding_window},
-    DataSet, Detector, HogDetector, Predictable, Trainable,
+    feature_descriptor::HogFeatureDescriptor, hogdetector::HogDetectorTrait, DataSet, Detector,
+    HogDetector, Predictable, Trainable,
 };
 use image::{
     imageops::{resize, FilterType},
@@ -126,27 +122,6 @@ impl Predictable for HogDetector<CombinedClassifier> {
         } else {
             0u32
         }
-    }
-}
-
-impl Detector for HogDetector<CombinedClassifier> {
-    fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
-        let step_size = 8;
-        let window_size = 32;
-        let mut windows = sliding_window(image, step_size, window_size);
-        windows.extend(pyramid(image, 1.3, step_size, window_size));
-        windows.extend(pyramid(image, 1.5, step_size, window_size));
-
-        let predictions: Vec<(u32, u32, u32)> = windows
-            .iter()
-            .map(|(x, y, window)| (*x, *y, self.predict(window)))
-            .collect();
-        detect_objects(predictions, window_size)
-    }
-
-    fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
-        let detections = self.detect_objects(image);
-        visualize_detections(image, &detections)
     }
 }
 
