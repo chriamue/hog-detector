@@ -13,12 +13,23 @@ keywords = ["machine-learning", "object-detection", "hog", "svm"]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["reqwest", "brief"]
+default = ["wasm", "brief"]
 brief = ["dep:brief-rs"]
 mnist = ["dep:mnist"]
 eyes = ["reqwest", "zip"]
+wasm = [
+  "reqwest",
+  "console_error_panic_hook",
+  "wasm-bindgen",
+  "wasm-bindgen-test",
+  "wasm-bindgen-futures",
+  "web-sys",
+  "js-sys",
+  "yew",
+]
 
 [dependencies]
+base64 = "0.13.0"
 brief-rs = { git = "https://github.com/chriamue/brief-rs", optional = true }
 bytes = "1.2.1"
 getrandom = { version = "0.2", features = ["js"] }
@@ -46,21 +57,21 @@ zip = { version = "0.6.3", default-features = false, features = [
 ], optional = true }
 
 #[target.wasm32-unknown-unknown.dependencies]
-base64 = "0.13.0"
-console_error_panic_hook = "0.1"
-wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
-wasm-bindgen-test = "0.3.33"
-wasm-bindgen-futures = "0.4.30"
+console_error_panic_hook = { version = "0.1", optional = true }
+wasm-bindgen = { version = "0.2", features = [
+  "serde-serialize",
+], optional = true }
+wasm-bindgen-test = { version = "0.3.33", optional = true }
+wasm-bindgen-futures = { version = "0.4.30", optional = true }
 web-sys = { version = "0.3.59", features = [
   "HtmlAnchorElement",
   "HtmlCanvasElement",
   "CanvasRenderingContext2d",
   "CssStyleDeclaration",
   "ImageData",
-] }
-js-sys = "0.3.55"
-yew = { version = "0.20.0", features = ["csr", "ssr"] }
-#reqwest = { version = "0.11", features = ["blocking", "json"] }
+], optional = true }
+js-sys = { version = "0.3.55", optional = true }
+yew = { version = "0.20.0", features = ["csr", "ssr"], optional = true }
 
 [profile.release]
 debug = true
