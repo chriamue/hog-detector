@@ -1,6 +1,6 @@
 use crate::bbox::BBox;
 use crate::detection::{merge, nms_sort, Detection};
-use crate::utils::{pyramid, sliding_window};
+use crate::utils::{keypoint_windows, pyramid, scaled_frames, sliding_window};
 use crate::Predictable;
 use image::{DynamicImage, Rgba};
 use imageproc::drawing::{draw_hollow_rect_mut, draw_text_mut};
@@ -67,8 +67,11 @@ pub trait Detector: Predictable {
     fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
         let step_size = 8;
         let window_size = 32;
-        let mut windows = sliding_window(image, step_size, window_size);
-        windows.extend(pyramid(image, 1.3, step_size, window_size));
+        let mut windows: Vec<(u32, u32, DynamicImage)> = scaled_frames(image)
+            .map(|image| keypoint_windows(&image, 5, window_size))
+            .flatten()
+            .collect();
+        windows.extend(sliding_window(image, step_size, window_size));
         windows.extend(pyramid(image, 1.5, step_size, window_size));
 
         let predictions: Vec<(u32, u32, u32)> = windows

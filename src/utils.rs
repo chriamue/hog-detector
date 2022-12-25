@@ -1,7 +1,9 @@
 use std::io::Cursor;
 
+use image::imageops::blur;
 use image::{imageops, imageops::resize, imageops::FilterType, DynamicImage, Rgb};
 use image::{GenericImageView, ImageOutputFormat};
+use imageproc::corners::corners_fast9;
 use imageproc::geometric_transformations::{rotate_about_center, warp, Interpolation, Projection};
 use rand::prelude::ThreadRng;
 use rand::Rng;
@@ -40,6 +42,39 @@ pub fn sliding_window(image: &DynamicImage, step_size: usize, window_size: u32) 
                 DynamicImage::from(image.view(x, y, window_size, window_size).to_image()),
             ))
         }
+    }
+    windows
+}
+
+/// calculates keypoints based windows
+pub fn keypoint_windows(image: &DynamicImage, count: usize, window_size: u32) -> Vec<Window> {
+    let mut windows = Vec::new();
+    let (width, height) = image.dimensions();
+    let center = window_size / 2;
+
+    let blurred = blur(&image.to_luma8(), 2.5);
+    let mut keypoints = corners_fast9(&blurred, 10);
+    // sort keypoints by score
+    keypoints.sort_by(|a, b| a.score.partial_cmp(&b.score).unwrap());
+
+    // iterate over count keypoints
+    for keypoint in keypoints.iter().take(count) {
+        let x = keypoint.x + center;
+        let y = keypoint.y + center;
+        windows.push((
+            x,
+            y,
+            DynamicImage::from(
+                image
+                    .view(
+                        x.max(0).min(width - window_size),
+                        y.max(0).min(height - window_size),
+                        window_size,
+                        window_size,
+                    )
+                    .to_image(),
+            ),
+        ))
     }
     windows
 }
@@ -162,6 +197,15 @@ mod tests {
         let window = window_crop(&image, 8, 10, (20, 20));
         assert_eq!(8, window.width());
         assert_eq!(10, window.height());
+    }
+
+    #[test]
+    fn test_keypoint_windows() {
+        let image = DynamicImage::ImageRgb8(rgb_bench_image(100, 100));
+        let count = 2;
+        let window_size = 4;
+        let windows = keypoint_windows(&image, count, window_size);
+        assert!(windows.len() <= count);
     }
 
     #[test]
