@@ -110,9 +110,12 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span><span class="kw">crate</span>::detection::{merge, nms_sort, Detection};
-<span class="kw">use </span><span class="kw">crate</span>::utils::{pyramid, sliding_window};
+<span class="kw">use </span><span class="kw">crate</span>::utils::{keypoint_windows, pyramid, scaled_frames, sliding_window};
 <span class="kw">use </span><span class="kw">crate</span>::Predictable;
 <span class="kw">use </span>image::{DynamicImage, Rgba};
 <span class="kw">use </span>imageproc::drawing::{draw_hollow_rect_mut, draw_text_mut};
@@ -179,8 +182,11 @@
     </span><span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt; {
         <span class="kw">let </span>step_size = <span class="number">8</span>;
         <span class="kw">let </span>window_size = <span class="number">32</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>windows = sliding_window(image, step_size, window_size);
-        windows.extend(pyramid(image, <span class="number">1.3</span>, step_size, window_size));
+        <span class="kw">let </span><span class="kw-2">mut </span>windows: Vec&lt;(u32, u32, DynamicImage)&gt; = scaled_frames(image)
+            .map(|image| keypoint_windows(<span class="kw-2">&amp;</span>image, <span class="number">5</span>, window_size))
+            .flatten()
+            .collect();
+        windows.extend(sliding_window(image, step_size, window_size));
         windows.extend(pyramid(image, <span class="number">1.5</span>, step_size, window_size));
 
         <span class="kw">let </span>predictions: Vec&lt;(u32, u32, u32)&gt; = windows
