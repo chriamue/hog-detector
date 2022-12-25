@@ -476,6 +476,11 @@
 <span id="476">476</span>
 <span id="477">477</span>
 <span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span><span class="kw">crate</span>::data_augmentation::DataAugmentation;
 <span class="kw">use </span><span class="kw">crate</span>::dataset::DataSet;
@@ -790,9 +795,9 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span><span class="kw">crate</span>::tests::test_image;
-
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::tests::test_image;
+    <span class="kw">use </span><span class="kw">crate</span>::Predictable;
     <span class="kw">use </span>image::RgbImage;
 
     <span class="kw">const </span>ANNOTATIONS: usize = <span class="number">42</span>;
@@ -923,6 +928,11 @@
 
         <span class="macro">mock! </span>{
             HogDetector {}
+            <span class="kw">impl </span>Predictable <span class="kw">for </span>HogDetector{
+                <span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; u32 {
+                    <span class="number">0
+                </span>}
+            }
             <span class="kw">impl </span>Detector <span class="kw">for </span>HogDetector {
                 <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>image::DynamicImage) -&gt; Vec&lt;<span class="kw">crate</span>::prelude::Detection&gt;;
                 <span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>image::DynamicImage) -&gt; image::DynamicImage;

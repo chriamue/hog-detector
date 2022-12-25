@@ -100,10 +100,12 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     classifier::Classifier,
     feature_descriptor::{FeatureDescriptor, HogFeatureDescriptor},
-    Detector, Trainable,
+    Detector, Predictable, Trainable,
 };
 <span class="kw">use </span>image::DynamicImage;
 <span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
@@ -171,6 +173,8 @@
         DenseMatrix::from_2d_vec(<span class="kw-2">&amp;</span>descriptors)
     }
 }
+
+<span class="kw">impl</span>&lt;C: Classifier&gt; Detector <span class="kw">for </span>HogDetector&lt;C&gt; <span class="kw">where </span>HogDetector&lt;C&gt;: Predictable {}
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {

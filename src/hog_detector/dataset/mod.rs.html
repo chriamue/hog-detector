@@ -146,6 +146,12 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Annotation;
 <span class="kw">use </span><span class="kw">crate</span>::Detector;
 <span class="kw">use </span>image::DynamicImage;
@@ -256,6 +262,7 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
+    <span class="kw">use </span><span class="kw">crate</span>::Predictable;
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>test_hard_negative_samples() {
@@ -264,6 +271,11 @@
 
         <span class="macro">mock! </span>{
             HogDetector {}
+            <span class="kw">impl </span>Predictable <span class="kw">for </span>HogDetector {
+                <span class="kw">fn </span>predict(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; u32 {
+                    <span class="number">0
+                </span>}
+            }
             <span class="kw">impl </span>Detector <span class="kw">for </span>HogDetector {
                 <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>image::DynamicImage) -&gt; Vec&lt;<span class="kw">crate</span>::prelude::Detection&gt;;
                 <span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>image::DynamicImage) -&gt; image::DynamicImage;

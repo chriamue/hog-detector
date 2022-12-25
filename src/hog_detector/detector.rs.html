@@ -93,8 +93,27 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bbox::BBox;
 <span class="kw">use </span><span class="kw">crate</span>::detection::{merge, nms_sort, Detection};
+<span class="kw">use </span><span class="kw">crate</span>::utils::{pyramid, sliding_window};
+<span class="kw">use </span><span class="kw">crate</span>::Predictable;
 <span class="kw">use </span>image::{DynamicImage, Rgba};
 <span class="kw">use </span>imageproc::drawing::{draw_hollow_rect_mut, draw_text_mut};
 <span class="kw">use </span>imageproc::rect::Rect;
@@ -155,11 +174,26 @@
 }
 
 <span class="doccomment">/// detector trait
-</span><span class="kw">pub trait </span>Detector {
+</span><span class="kw">pub trait </span>Detector: Predictable {
     <span class="doccomment">/// detects objects im given image
-    </span><span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt;;
+    </span><span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt; {
+        <span class="kw">let </span>step_size = <span class="number">8</span>;
+        <span class="kw">let </span>window_size = <span class="number">32</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>windows = sliding_window(image, step_size, window_size);
+        windows.extend(pyramid(image, <span class="number">1.3</span>, step_size, window_size));
+        windows.extend(pyramid(image, <span class="number">1.5</span>, step_size, window_size));
+
+        <span class="kw">let </span>predictions: Vec&lt;(u32, u32, u32)&gt; = windows
+            .iter()
+            .map(|(x, y, window)| (<span class="kw-2">*</span>x, <span class="kw-2">*</span>y, <span class="self">self</span>.predict(window)))
+            .collect();
+        detect_objects(predictions, window_size)
+    }
     <span class="doccomment">/// visualize detections on image
-    </span><span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; DynamicImage;
+    </span><span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; DynamicImage {
+        <span class="kw">let </span>detections = <span class="self">self</span>.detect_objects(image);
+        visualize_detections(image, <span class="kw-2">&amp;</span>detections)
+    }
 }
 
 <span class="attribute">#[cfg(test)]

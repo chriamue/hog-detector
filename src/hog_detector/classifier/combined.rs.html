@@ -183,38 +183,9 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
-    detector::{detect_objects, visualize_detections},
-    feature_descriptor::HogFeatureDescriptor,
-    hogdetector::HogDetectorTrait,
-    prelude::Detection,
-    utils::{pyramid, sliding_window},
-    DataSet, Detector, HogDetector, Predictable, Trainable,
+    feature_descriptor::HogFeatureDescriptor, hogdetector::HogDetectorTrait, DataSet, Detector,
+    HogDetector, Predictable, Trainable,
 };
 <span class="kw">use </span>image::{
     imageops::{resize, FilterType},
@@ -336,27 +307,6 @@
         } <span class="kw">else </span>{
             <span class="number">0u32
         </span>}
-    }
-}
-
-<span class="kw">impl </span>Detector <span class="kw">for </span>HogDetector&lt;CombinedClassifier&gt; {
-    <span class="kw">fn </span>detect_objects(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;Detection&gt; {
-        <span class="kw">let </span>step_size = <span class="number">8</span>;
-        <span class="kw">let </span>window_size = <span class="number">32</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>windows = sliding_window(image, step_size, window_size);
-        windows.extend(pyramid(image, <span class="number">1.3</span>, step_size, window_size));
-        windows.extend(pyramid(image, <span class="number">1.5</span>, step_size, window_size));
-
-        <span class="kw">let </span>predictions: Vec&lt;(u32, u32, u32)&gt; = windows
-            .iter()
-            .map(|(x, y, window)| (<span class="kw-2">*</span>x, <span class="kw-2">*</span>y, <span class="self">self</span>.predict(window)))
-            .collect();
-        detect_objects(predictions, window_size)
-    }
-
-    <span class="kw">fn </span>visualize_detections(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; DynamicImage {
-        <span class="kw">let </span>detections = <span class="self">self</span>.detect_objects(image);
-        visualize_detections(image, <span class="kw-2">&amp;</span>detections)
     }
 }
 
