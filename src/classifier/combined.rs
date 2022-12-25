@@ -199,7 +199,7 @@ mod tests {
         let img = test_image();
         let mut dataset = MemoryDataSet::new_test();
         dataset.load();
-        let mut detector = HogDetector::<BayesClassifier>::default();
+        let mut detector = HogDetector::<CombinedClassifier>::default();
         detector.train_class(&dataset, 1);
         let detections = detector.detect_objects(&img);
         assert!(detections.is_empty());
