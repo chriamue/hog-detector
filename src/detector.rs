@@ -7,7 +7,11 @@ use imageproc::drawing::{draw_hollow_rect_mut, draw_text_mut};
 use imageproc::rect::Rect;
 use rusttype::{Font, Scale};
 
-/// converts list of (x, y, class) into detections
+/// detect_objects() takes in a vector of tuples containing x, y, and class values and a window size as parameters.
+/// It creates a vector of Detection objects with the given x, y, class values and the window size plus 0.01
+/// to generate an overlap on contacting windows.
+/// The detections are then merged and sorted using non-maximum suppression (NMS).
+/// The function returns the sorted vector of Detection objects.
 pub fn detect_objects(predictions: Vec<(u32, u32, u32)>, window_size: u32) -> Vec<Detection> {
     let mut detections: Vec<Detection> = Vec::new();
     predictions.iter().for_each(|(x, y, class)| {

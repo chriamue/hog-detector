@@ -1,19 +1,21 @@
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
-/// bounding box struct and functions
+/// This module provides a struct and functions for working with bounding boxes.
 pub mod bbox;
 /// module for classifiers
 pub mod classifier;
-/// data augmentation trait
+/// This module provides a trait for data augmentation.
+/// Data augmentation is a technique used to increase the size of a dataset by creating modified versions of existing data.
 pub mod data_augmentation;
-/// functionality for loading train datasets
+/// The `dataset` module provides functionality for loading train datasets.
+/// It contains functions and structs that can be used to read and parse data from a variety of sources.
 pub mod dataset;
 /// detection struct module
 pub mod detection;
 /// detector functionality
 pub mod detector;
-/// feature descriptors
+/// Feature descriptors are used in computer vision and image processing to describe the features of an image.
 pub mod feature_descriptor;
 /// hogdetector struct module
 pub mod hogdetector;
@@ -23,7 +25,7 @@ pub mod predictable;
 pub mod tests;
 /// train functions
 pub mod trainable;
-/// some functions for manipulating images
+/// This module provides a collection of functions for manipulating images, such as resizing, cropping, and rotating.
 pub mod utils;
 
 /// web assembly module

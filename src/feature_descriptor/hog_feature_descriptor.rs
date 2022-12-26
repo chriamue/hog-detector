@@ -2,7 +2,8 @@ use super::FeatureDescriptor;
 use image::DynamicImage;
 use imageproc::hog::{hog, HogOptions};
 
-/// A Histogram of Oriented Features Descriptor
+/// This struct is a HogFeatureDescriptor which is used to represent a Histogram of Oriented Features Descriptor.
+/// It contains one field, options, which is of type HogOptions.
 #[derive(Debug)]
 pub struct HogFeatureDescriptor {
     options: HogOptions,

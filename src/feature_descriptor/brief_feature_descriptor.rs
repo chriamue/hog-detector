@@ -2,7 +2,8 @@ use super::FeatureDescriptor;
 use brief::BriefDescriptor;
 use image::DynamicImage;
 
-/// Defines a struct to represent the BRIEF descriptor
+/// This code defines a struct to represent a BRIEF (Binary Robust Independent Elementary Features) descriptor.
+/// The `BriefFeatureDescriptor` struct contains a `BriefDescriptor` struct.
 #[derive(Debug)]
 pub struct BriefFeatureDescriptor {
     descriptor: BriefDescriptor,
