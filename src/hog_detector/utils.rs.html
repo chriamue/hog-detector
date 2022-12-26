@@ -227,6 +227,36 @@
 <span id="227">227</span>
 <span id="228">228</span>
 <span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::io::Cursor;
 
 <span class="kw">use </span>image::imageops::blur;
@@ -241,7 +271,12 @@
 <span class="kw">type </span>Y = u32;
 <span class="kw">type </span>Window&lt;<span class="lifetime">&#39;a</span>&gt; = (X, Y, DynamicImage);
 
-<span class="doccomment">/// calculates pyramid of windows from image
+<span class="doccomment">/// This function calculates a pyramid of windows from an image.
+/// The scale, step size, and window size are all arguments that can be passed in.
+/// The image is resized to the width and height divided by the scale.
+/// A sliding window is then created with the step size and window size arguments.
+/// The windows are then mapped to their original coordinates multiplied by the scale
+/// and collected into a vector of Windows.
 </span><span class="kw">pub fn </span>pyramid(
     image: <span class="kw-2">&amp;</span>DynamicImage,
     scale: f32,
@@ -259,7 +294,9 @@
         .collect()
 }
 
-<span class="doccomment">/// calculates sliding window based windows
+<span class="doccomment">/// This function calculates a sliding window based on an image, a step size and a window size.
+/// It returns a vector of windows, which are composed of the x and y coordinates of the top left corner
+/// of the window, as well as the DynamicImage associated with that window.
 </span><span class="kw">pub fn </span>sliding_window(image: <span class="kw-2">&amp;</span>DynamicImage, step_size: usize, window_size: u32) -&gt; Vec&lt;Window&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>windows = Vec::new();
 
@@ -275,7 +312,16 @@
     windows
 }
 
-<span class="doccomment">/// calculates keypoints based windows
+<span class="doccomment">/// This function calculates keypoints based on windows from an image.
+/// It takes in a DynamicImage, the number of keypoints to be calculated (count),
+/// and the size of each window (window_size).
+/// It first creates an empty vector to store the windows.
+/// It then gets the width and height of the image, and calculates the center of each window.
+/// The image is then blurred with a blur factor of 2.5,
+/// and corners_fast9 is used to calculate keypoints from the blurred image.
+/// The keypoints are sorted by score, and then iterated over until count is reached.
+/// For each keypoint, its x and y coordinates are found along with its window size,
+/// and pushed into the vector of windows. Finally, this vector is returned.
 </span><span class="kw">pub fn </span>keypoint_windows(image: <span class="kw-2">&amp;</span>DynamicImage, count: usize, window_size: u32) -&gt; Vec&lt;Window&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>windows = Vec::new();
     <span class="kw">let </span>(width, height) = image.dimensions();
@@ -308,7 +354,10 @@
     windows
 }
 
-<span class="doccomment">/// returns iterator over rotated windows of given image
+<span class="doccomment">/// rotated_frames() takes in a DynamicImage and returns an iterator over the rotated windows
+/// of the given image. It uses rotate_about_center() to rotate the image by a given radian angle,
+/// and uses Nearest interpolation with a black background.
+/// The radian angles used are 0.02, -0.02, 0.05, -0.05, 0.07, -0.07, 0.09, -0.09, 1.1, -1.1, 1.3, -1.3, 1.5, -1.5 and 2.0,-2.0
 </span><span class="kw">pub fn </span>rotated_frames(frame: <span class="kw-2">&amp;</span>DynamicImage) -&gt; <span class="kw">impl </span>Iterator&lt;Item = DynamicImage&gt; + <span class="lifetime">&#39;_ </span>{
     [
         <span class="number">0.02</span>, -<span class="number">0.02</span>, <span class="number">0.05</span>, -<span class="number">0.05</span>, <span class="number">0.07</span>, -<span class="number">0.07</span>, <span class="number">0.09</span>, -<span class="number">0.09</span>, <span class="number">1.1</span>, -<span class="number">1.1</span>, <span class="number">1.3</span>, -<span class="number">1.3</span>, <span class="number">1.5</span>, -<span class="number">1.5</span>, <span class="number">2.0</span>,
@@ -325,7 +374,10 @@
     })
 }
 
-<span class="doccomment">/// returns iterator over scaled frames of given image
+<span class="doccomment">/// scaled_frames() takes in a DynamicImage and returns an iterator over scaled frames of the given image.
+/// The iterator contains four frames, with scaling factors of 0.8, 0.9, 1.1, and 1.2 respectively.
+/// The warp() function is used to scale the image using nearest neighbor interpolation
+/// and a black background color (Rgb([0, 0, 0])).
 </span><span class="kw">pub fn </span>scaled_frames(frame: <span class="kw-2">&amp;</span>DynamicImage) -&gt; <span class="kw">impl </span>Iterator&lt;Item = DynamicImage&gt; + <span class="lifetime">&#39;_ </span>{
     [<span class="number">0.8</span>, <span class="number">0.9</span>, <span class="number">1.1</span>, <span class="number">1.2</span>].into_iter().map(|scalefactor| {
         <span class="kw">let </span>scale = Projection::scale(scalefactor, scalefactor);
@@ -338,7 +390,10 @@
     })
 }
 
-<span class="doccomment">/// returns crop of image
+<span class="doccomment">/// window_crop() takes in an image, a window width and height, and a center point (x, y) as parameters.
+/// It then crops the image to the size of the window width and height,
+/// with the center point being the center of the cropped image.
+/// It returns a DynamicImage type with the cropped image.
 </span><span class="kw">pub fn </span>window_crop(
     input_frame: <span class="kw-2">&amp;</span>DynamicImage,
     window_width: u32,
@@ -362,7 +417,12 @@
     DynamicImage::ImageRgba8(cropped)
 }
 
-<span class="doccomment">/// generates random subimage of given size
+<span class="doccomment">/// generate_random_subimages() takes in an image, a count,
+/// and two dimensions (width and height) as parameters and returns a vector of DynamicImages.
+/// It creates a ThreadRng to generate random numbers between the width/2 and the image&#39;s width,
+/// and between the height/2 and the image&#39;s height. It then uses window_crop()
+/// to crop the image at those coordinates with the given dimensions,
+/// and pushes it into the vector of DynamicImages.
 </span><span class="kw">pub fn </span>generate_random_subimages(
     image: <span class="kw-2">&amp;</span>DynamicImage,
     count: usize,

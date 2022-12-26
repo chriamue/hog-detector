@@ -54,22 +54,26 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
 </pre><pre class="rust"><code><span class="attribute">#![warn(missing_docs)]
 #![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 
-</span><span class="doccomment">/// bounding box struct and functions
+</span><span class="doccomment">/// This module provides a struct and functions for working with bounding boxes.
 </span><span class="kw">pub mod </span>bbox;
 <span class="doccomment">/// module for classifiers
 </span><span class="kw">pub mod </span>classifier;
-<span class="doccomment">/// data augmentation trait
+<span class="doccomment">/// This module provides a trait for data augmentation.
+/// Data augmentation is a technique used to increase the size of a dataset by creating modified versions of existing data.
 </span><span class="kw">pub mod </span>data_augmentation;
-<span class="doccomment">/// functionality for loading train datasets
+<span class="doccomment">/// The `dataset` module provides functionality for loading train datasets.
+/// It contains functions and structs that can be used to read and parse data from a variety of sources.
 </span><span class="kw">pub mod </span>dataset;
 <span class="doccomment">/// detection struct module
 </span><span class="kw">pub mod </span>detection;
 <span class="doccomment">/// detector functionality
 </span><span class="kw">pub mod </span>detector;
-<span class="doccomment">/// feature descriptors
+<span class="doccomment">/// Feature descriptors are used in computer vision and image processing to describe the features of an image.
 </span><span class="kw">pub mod </span>feature_descriptor;
 <span class="doccomment">/// hogdetector struct module
 </span><span class="kw">pub mod </span>hogdetector;
@@ -79,7 +83,7 @@
 </span><span class="kw">pub mod </span>tests;
 <span class="doccomment">/// train functions
 </span><span class="kw">pub mod </span>trainable;
-<span class="doccomment">/// some functions for manipulating images
+<span class="doccomment">/// This module provides a collection of functions for manipulating images, such as resizing, cropping, and rotating.
 </span><span class="kw">pub mod </span>utils;
 
 <span class="doccomment">/// web assembly module

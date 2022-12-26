@@ -40,11 +40,13 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
+<span id="43">43</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::FeatureDescriptor;
 <span class="kw">use </span>brief::BriefDescriptor;
 <span class="kw">use </span>image::DynamicImage;
 
-<span class="doccomment">/// Defines a struct to represent the BRIEF descriptor
+<span class="doccomment">/// This code defines a struct to represent a BRIEF (Binary Robust Independent Elementary Features) descriptor.
+/// The `BriefFeatureDescriptor` struct contains a `BriefDescriptor` struct.
 </span><span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub struct </span>BriefFeatureDescriptor {
     descriptor: BriefDescriptor,

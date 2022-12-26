@@ -41,11 +41,13 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
+<span id="44">44</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::FeatureDescriptor;
 <span class="kw">use </span>image::DynamicImage;
 <span class="kw">use </span>imageproc::hog::{hog, HogOptions};
 
-<span class="doccomment">/// A Histogram of Oriented Features Descriptor
+<span class="doccomment">/// This struct is a HogFeatureDescriptor which is used to represent a Histogram of Oriented Features Descriptor.
+/// It contains one field, options, which is of type HogOptions.
 </span><span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub struct </span>HogFeatureDescriptor {
     options: HogOptions,
