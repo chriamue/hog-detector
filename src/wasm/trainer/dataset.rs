@@ -1,7 +1,9 @@
-use crate::{bbox::BBox, DataSet};
 use image_label_tool::prelude::LabelTool;
 
-use crate::dataset::{AnnotatedImageSet, MemoryDataSet};
+use object_detector_rust::{
+    dataset::{AnnotatedImageSet, DataSet, MemoryDataSet},
+    prelude::BBox,
+};
 
 /// creates a memory database from images in label tool
 pub fn create_dataset(label_tool: &LabelTool) -> MemoryDataSet {
@@ -17,20 +19,19 @@ pub fn create_dataset(label_tool: &LabelTool) -> MemoryDataSet {
             .map(|(bbox, class)| {
                 (
                     BBox {
-                        x: bbox.x,
-                        y: bbox.y,
-                        w: bbox.w,
-                        h: bbox.h,
+                        x: bbox.x as i32,
+                        y: bbox.y as i32,
+                        width: bbox.w as u32,
+                        height: bbox.h as u32,
                     },
                     *class,
                 )
             })
             .collect();
 
-        dataset.add_annotated_image((img, annotations));
+        dataset.add_annotated_image((img, annotations).into());
     }
     dataset.load();
-    dataset.generate_random_annotations(10);
     dataset
 }
 
@@ -39,7 +40,6 @@ mod tests {
     use image::{DynamicImage, ImageBuffer};
     use image_label_tool::prelude::AnnotatedImage;
 
-    use crate::DataSet;
     use image_label_tool::prelude::BBox;
 
     use super::*;

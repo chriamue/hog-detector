@@ -1,10 +1,12 @@
-use crate::{
-    feature_descriptor::HogFeatureDescriptor, hogdetector::HogDetectorTrait, DataSet, Detector,
-    HogDetector, Predictable, Trainable,
-};
-use image::{
-    imageops::{resize, FilterType},
-    DynamicImage,
+use crate::{hogdetector::HogDetectorTrait, Detector, HogDetector};
+use image::DynamicImage;
+use linfa::Float;
+use linfa::Label;
+use ndarray::{Array1, ArrayView2};
+use object_detector_rust::{
+    prelude::{HOGFeature, Predictable},
+    trainable::Trainable,
+    utils::{SlidingWindow, WindowGenerator},
 };
 use serde::{Deserialize, Serialize};
 use smartcore::linalg::basic::matrix::DenseMatrix;
@@ -20,8 +22,6 @@ pub struct BayesClassifier {
     pub inner: Option<BayesType>,
 }
 
-impl Classifier for BayesClassifier {}
-
 impl PartialEq for BayesClassifier {
     fn eq(&self, other: &BayesClassifier) -> bool {
         self.inner.is_none() && other.inner.is_none()
@@ -29,17 +29,33 @@ impl PartialEq for BayesClassifier {
     }
 }
 
-impl HogDetector<BayesClassifier> {
+impl<X, Y> HogDetector<X, Y, BayesClassifier, SlidingWindow>
+where
+    X: Float,
+    Y: Label,
+{
     /// new default bayes
     pub fn bayes() -> Self {
-        HogDetector::<BayesClassifier> {
+        HogDetector::<X, Y, BayesClassifier, SlidingWindow> {
             classifier: None,
-            feature_descriptor: Box::new(HogFeatureDescriptor::default()),
+            feature_descriptor: Box::new(HOGFeature::default()),
+            window_generator: SlidingWindow {
+                width: 32,
+                height: 32,
+                step_size: 32,
+            },
+            x: std::marker::PhantomData,
+            y: std::marker::PhantomData,
         }
     }
 }
 
-impl HogDetectorTrait for HogDetector<BayesClassifier> {
+impl<X, Y, W> HogDetectorTrait<X, Y> for HogDetector<X, Y, BayesClassifier, W>
+where
+    X: Float,
+    Y: Label,
+    W: WindowGenerator<DynamicImage>,
+{
     fn save(&self) -> String {
         serde_json::to_string(&self.classifier).unwrap()
     }
@@ -53,59 +69,44 @@ impl HogDetectorTrait for HogDetector<BayesClassifier> {
     }
 }
 
-impl Trainable for HogDetector<BayesClassifier> {
-    fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {
-        let nb = GaussianNB::fit(&x_train, &y_train, Default::default()).unwrap();
+impl<X, Y> Trainable<X, Y> for BayesClassifier
+where
+    X: Float,
+    Y: Label,
+{
+    fn fit(
+        &mut self,
+        x: &ndarray::ArrayView2<X>,
+        y: &ndarray::ArrayView1<Y>,
+    ) -> Result<(), String> {
+        let nb = GaussianNB::fit(&x, &y, Default::default()).unwrap();
         let classifier = BayesClassifier { inner: Some(nb) };
         self.classifier = Some(classifier);
-    }
-
-    fn train_class(&mut self, dataset: &dyn DataSet, class: u32) {
-        let (x_train, y_train, _, _) = dataset.get();
-        let x_train = self.preprocess_matrix(x_train);
-        let y_train = y_train
-            .iter()
-            .map(|y| if *y as u32 == class { *y } else { 0u32 })
-            .collect();
-        self.train(x_train, y_train);
-    }
-    fn evaluate(&mut self, dataset: &dyn DataSet, class: u32) -> f32 {
-        let mut i = 0;
-        let (x_train, y_train, _, _) = dataset.get();
-        x_train.iter().zip(y_train).for_each(|(img, y)| {
-            let pred = self.predict(img);
-            if (pred == y && y == class) || (pred == 0 && y != class) {
-                i += 1;
-            }
-        });
-        i as f32 / x_train.len() as f32
+        Ok(())
     }
 }
 
-impl Predictable for HogDetector<BayesClassifier> {
-    fn predict(&self, image: &DynamicImage) -> u32 {
-        let image = resize(image, 32, 32, FilterType::Gaussian);
-        let image = DynamicImage::ImageRgba8(image);
-        let x = vec![self.preprocess(&image)];
-        let x = DenseMatrix::from_2d_vec(&x);
-        let y = self
-            .classifier
-            .as_ref()
-            .unwrap()
-            .inner
-            .as_ref()
-            .unwrap()
-            .predict(&x)
-            .unwrap_or_else(|_| vec![0]);
-        *y.first().unwrap()
+impl<X, Y> Predictable<X, Y> for BayesClassifier
+where
+    X: Float,
+    Y: Label,
+{
+    fn predict(&self, x: &ArrayView2<X>) -> Result<Array1<Y>, String> {
+        Ok(self.model.as_ref().unwrap().predict(x))
     }
+}
+
+impl<X, Y> Classifier<X, Y> for BayesClassifier
+where
+    X: Float,
+    Y: Label,
+{
 }
 
 #[cfg(test)]
 mod tests {
     use image::Rgb;
-
-    use crate::{dataset::MemoryDataSet, tests::test_image};
+    use object_detector_rust::{prelude::MemoryDataSet, tests::test_image};
 
     use super::*;
 

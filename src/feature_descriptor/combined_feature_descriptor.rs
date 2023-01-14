@@ -1,33 +1,29 @@
 use image::DynamicImage;
-
-use super::{FeatureDescriptor, HogFeatureDescriptor};
-
-#[cfg(feature = "brief")]
-use super::BriefFeatureDescriptor;
+use object_detector_rust::prelude::{BriefFeature, Feature, HOGFeature};
 
 /// defines a feature descriptor combination
 #[derive(Debug)]
 pub struct CombinedFeatureDescriptor {
-    hog: HogFeatureDescriptor,
+    hog: HOGFeature,
     #[cfg(feature = "brief")]
-    brief: BriefFeatureDescriptor,
+    brief: BriefFeature,
 }
 
 impl Default for CombinedFeatureDescriptor {
     fn default() -> Self {
         CombinedFeatureDescriptor {
-            hog: HogFeatureDescriptor::default(),
+            hog: HOGFeature::default(),
             #[cfg(feature = "brief")]
-            brief: BriefFeatureDescriptor::default(),
+            brief: BriefFeature::default(),
         }
     }
 }
 
-impl FeatureDescriptor for CombinedFeatureDescriptor {
-    fn calculate_feature(&self, image: &DynamicImage) -> Result<Vec<f32>, String> {
-        let data = self.hog.calculate_feature(&image)?;
+impl Feature for CombinedFeatureDescriptor {
+    fn extract(&self, image: &DynamicImage) -> Result<Vec<f32>, String> {
+        let data = self.hog.extract(&image)?;
         #[cfg(feature = "brief")]
-        let data = [self.brief.calculate_feature(&image)?, data].concat();
+        let data = [self.brief.extract(&image)?, data].concat();
         Ok(data)
     }
 }
@@ -36,13 +32,13 @@ impl FeatureDescriptor for CombinedFeatureDescriptor {
 mod tests {
 
     use super::*;
-    use crate::tests::test_image;
+    use object_detector_rust::tests::test_image;
 
     #[test]
     fn test_default() {
         let img = test_image();
         let descriptor = CombinedFeatureDescriptor::default();
-        let features = descriptor.calculate_feature(&img);
+        let features = descriptor.extract(&img);
 
         #[cfg(feature = "brief")]
         assert_eq!(18688, features.unwrap().len());

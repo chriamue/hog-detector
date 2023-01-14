@@ -1,11 +1,11 @@
-use crate::bbox::BBox;
-use crate::detection::{merge, nms_sort, Detection};
-use crate::utils::{keypoint_windows, pyramid, scaled_frames, sliding_window};
-use crate::Predictable;
 use image::{DynamicImage, Rgba};
 use imageproc::drawing::{draw_hollow_rect_mut, draw_text_mut};
 use imageproc::rect::Rect;
+use object_detector_rust::prelude::BBox;
 use rusttype::{Font, Scale};
+
+use object_detector_rust::detection::{merge_overlapping_detections, Detection};
+pub use object_detector_rust::detector::Detector;
 
 /// detect_objects() takes in a vector of tuples containing x, y, and class values and a window size as parameters.
 /// It creates a vector of Detection objects with the given x, y, class values and the window size plus 0.01
@@ -17,22 +17,22 @@ pub fn detect_objects(predictions: Vec<(u32, u32, u32)>, window_size: u32) -> Ve
     predictions.iter().for_each(|(x, y, class)| {
         if *class > 0 {
             // add 0.1 to generate an overlap on contacting windows.
-            let size = 0.01 + window_size as f32;
+            let size = (0.01 + window_size as f32) as u32;
             let bbox = BBox {
-                x: *x as f32,
-                y: *y as f32,
-                w: size,
-                h: size,
+                x: *x as i32,
+                y: *y as i32,
+                width: size,
+                height: size,
             };
             detections.push(Detection {
-                class: *class as usize,
+                class: *class,
                 bbox,
                 confidence: 1.0,
             });
         }
     });
-    let detections = merge(detections);
-    nms_sort(detections)
+    let detections = merge_overlapping_detections(&detections);
+    detections
 }
 
 /// visualizes detections on given image
@@ -43,7 +43,7 @@ pub fn visualize_detections(image: &DynamicImage, detections: &Vec<Detection>) -
         draw_hollow_rect_mut(
             &mut img_copy,
             Rect::at(detection.bbox.x as i32, detection.bbox.y as i32)
-                .of_size(detection.bbox.w as u32, detection.bbox.h as u32),
+                .of_size(detection.bbox.width, detection.bbox.height),
             color,
         );
 
@@ -65,36 +65,9 @@ pub fn visualize_detections(image: &DynamicImage, detections: &Vec<Detection>) -
     DynamicImage::ImageRgba8(img_copy)
 }
 
-/// detector trait
-pub trait Detector: Predictable {
-    /// detects objects im given image
-    fn detect_objects(&self, image: &DynamicImage) -> Vec<Detection> {
-        let step_size = 8;
-        let window_size = 32;
-        let mut windows: Vec<(u32, u32, DynamicImage)> = scaled_frames(image)
-            .map(|image| keypoint_windows(&image, 5, window_size))
-            .flatten()
-            .collect();
-        windows.extend(sliding_window(image, step_size, window_size));
-        windows.extend(pyramid(image, 1.5, step_size, window_size));
-
-        let predictions: Vec<(u32, u32, u32)> = windows
-            .iter()
-            .map(|(x, y, window)| (*x, *y, self.predict(window)))
-            .collect();
-        detect_objects(predictions, window_size)
-    }
-    /// visualize detections on image
-    fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
-        let detections = self.detect_objects(image);
-        visualize_detections(image, &detections)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::test_image;
     use image::Rgb;
 
     #[test]

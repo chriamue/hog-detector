@@ -1,50 +1,73 @@
-use crate::{
-    feature_descriptor::HogFeatureDescriptor, hogdetector::HogDetectorTrait, DataSet, Detector,
-    HogDetector, Predictable, Trainable,
-};
+use crate::{hogdetector::HogDetectorTrait, Detector, HogDetector};
 use image::{
     imageops::{resize, FilterType},
     DynamicImage,
 };
+use linfa::{Dataset, Float, Label};
+use ndarray::{Array1, ArrayView1, ArrayView2};
+use object_detector_rust::{
+    prelude::{HOGFeature, Predictable, RandomForestClassifier},
+    trainable::Trainable,
+    utils::{SlidingWindow, WindowGenerator},
+};
 use serde::{Deserialize, Serialize};
-use smartcore::ensemble::random_forest_classifier::RandomForestClassifier as RFC;
-use smartcore::{linalg::basic::matrix::DenseMatrix, naive_bayes::gaussian::GaussianNB};
+use smartcore::{linalg::basic::matrix::DenseMatrix, numbers::{floatnum::FloatNumber, basenum::Number}};
 
-use super::{BayesClassifier, Classifier, RandomForestClassifier};
+use super::BayesClassifier;
 /// A naive bayes classifier
 #[derive(Default, Serialize, Deserialize, Debug)]
-pub struct CombinedClassifier {
+pub struct CombinedClassifier<X, Y>
+where
+    X: Float + FloatNumber,
+    Y: Label + Number,
+{
     /// inner bayes
     pub bayes: BayesClassifier,
     /// inner random forest
-    pub randomforest: RandomForestClassifier,
+    pub randomforest: RandomForestClassifier<X, Y>,
 }
 
-impl Classifier for CombinedClassifier {}
-
-impl PartialEq for CombinedClassifier {
-    fn eq(&self, other: &CombinedClassifier) -> bool {
+impl<X, Y> PartialEq for CombinedClassifier<X, Y>
+where
+    X: Float + FloatNumber,
+    Y: Label + Number,
+{
+    fn eq(&self, other: &CombinedClassifier<X, Y>) -> bool {
         self.bayes.eq(&other.bayes) && self.randomforest.eq(&other.randomforest)
     }
 }
 
-impl HogDetector<CombinedClassifier> {
+impl<X, Y> HogDetector<X, Y, CombinedClassifier<X, Y>, SlidingWindow>
+where
+    X: Float,
+    Y: Label,
+{
     /// new default combined
     pub fn combined() -> Self {
-        HogDetector::<CombinedClassifier> {
+        HogDetector::<CombinedClassifier<X, Y>, SlidingWindow> {
             classifier: None,
-            feature_descriptor: Box::new(HogFeatureDescriptor::default()),
+            feature_descriptor: Box::new(HOGFeature::default()),
+            window_generator: SlidingWindow {
+                width: 32,
+                height: 32,
+                step_size: 32,
+            },
         }
     }
 }
 
-impl HogDetectorTrait for HogDetector<CombinedClassifier> {
+impl<X, Y, W> HogDetectorTrait<X, Y> for HogDetector<X, Y, CombinedClassifier<X, Y>, W>
+where
+    X: Float,
+    Y: Label,
+    W: WindowGenerator<DynamicImage>,
+{
     fn save(&self) -> String {
         serde_json::to_string(&self.classifier).unwrap()
     }
 
     fn load(&mut self, model: &str) {
-        self.classifier = Some(serde_json::from_str::<CombinedClassifier>(model).unwrap());
+        self.classifier = Some(serde_json::from_str::<CombinedClassifier<X, Y>>(model).unwrap());
     }
 
     fn detector(&self) -> &dyn Detector {
@@ -52,86 +75,66 @@ impl HogDetectorTrait for HogDetector<CombinedClassifier> {
     }
 }
 
-impl Trainable for HogDetector<CombinedClassifier> {
-    fn train(&mut self, x_train: DenseMatrix<f32>, y_train: Vec<u32>) {
-        let nb = GaussianNB::fit(&x_train, &y_train, Default::default()).unwrap();
-        let bayes = BayesClassifier { inner: Some(nb) };
-        let rfc = RFC::fit(&x_train, &y_train, Default::default()).unwrap();
-        let randomforest = RandomForestClassifier { inner: Some(rfc) };
+impl<X, Y, W> Trainable<X, Y> for HogDetector<X, Y, CombinedClassifier<X, Y>, W>
+where
+    X: Float,
+    Y: Label,
+    W: WindowGenerator<DynamicImage>,
+{
+    fn fit(&mut self, x: &ArrayView2<X>, y: &ArrayView1<Y>) -> Result<(), String> {
+        let dataset = Dataset::new(x.to_owned(), y.to_owned());
+        let mut bayes = BayesClassifier::default();
+        bayes.fit(&x, &y);
+        let mut randomforest = RandomForestClassifier::<X, Y>::default();
+        randomforest.fit(&x, &y).unwrap();
         let classifier = CombinedClassifier {
             bayes,
             randomforest,
         };
         self.classifier = Some(classifier);
-    }
-
-    fn train_class(&mut self, dataset: &dyn DataSet, class: u32) {
-        let (x_train, y_train, _, _) = dataset.get();
-        let x_train = self.preprocess_matrix(x_train);
-        let y_train = y_train
-            .iter()
-            .map(|y| if *y as u32 == class { *y } else { 0u32 })
-            .collect();
-        self.train(x_train, y_train);
-    }
-    fn evaluate(&mut self, dataset: &dyn DataSet, class: u32) -> f32 {
-        let mut i = 0;
-        let (x_train, y_train, _, _) = dataset.get();
-        x_train.iter().zip(y_train).for_each(|(img, y)| {
-            let pred = self.predict(img);
-            if (pred == y && y == class) || (pred == 0 && y != class) {
-                i += 1;
-            }
-        });
-        i as f32 / x_train.len() as f32
+        Ok(())
     }
 }
 
-impl Predictable for HogDetector<CombinedClassifier> {
-    fn predict(&self, image: &DynamicImage) -> u32 {
-        let image = resize(image, 32, 32, FilterType::Gaussian);
-        let image = DynamicImage::ImageRgba8(image);
-        let x = vec![self.preprocess(&image)];
-        let x = DenseMatrix::from_2d_vec(&x);
-        let bayes_y = *self
+impl<X, Y, W> Predictable<X, Y> for HogDetector<X, Y, CombinedClassifier<X, Y>, W>
+where
+    X: Float + FloatNumber,
+    Y: Label + Number,
+    W: WindowGenerator<DynamicImage>,
+{
+    fn predict(&self, x: &ArrayView2<X>) -> Result<Array1<Y>, String> {
+        let bayes_y = self
             .classifier
             .as_ref()
             .unwrap()
             .bayes
-            .inner
             .as_ref()
             .unwrap()
             .predict(&x)
-            .unwrap_or_else(|_| vec![0])
-            .first()
             .unwrap();
-        let randomforest_y = *self
+        let randomforest_y = self
             .classifier
             .as_ref()
             .unwrap()
             .randomforest
-            .inner
             .as_ref()
             .unwrap()
             .predict(&x)
-            .unwrap_or_else(|_| vec![0])
-            .first()
             .unwrap();
-        if bayes_y.eq(&randomforest_y) {
-            bayes_y
-        } else {
-            0u32
-        }
+        let combined = bayes_y
+            .into_iter()
+            .zip(randomforest_y)
+            .map(|(a, b)| if a == b { a } else { 0 })
+            .collect();
+        Ok(combined)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use image::Rgb;
-
-    use crate::{dataset::MemoryDataSet, tests::test_image};
-
     use super::*;
+    use image::Rgb;
+    use object_detector_rust::{prelude::MemoryDataSet, tests::test_image};
 
     #[test]
     fn test_default() {

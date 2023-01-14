@@ -1,12 +1,16 @@
 use crate::classifier::BayesClassifier;
 use crate::classifier::CombinedClassifier;
-use crate::classifier::RandomForestClassifier;
 use crate::dataset::DataGenerator;
 use crate::dataset::DataSet;
-use crate::dataset::MemoryDataSet;
+use crate::detector::visualize_detections;
 use crate::hogdetector::HogDetectorTrait;
 use crate::HogDetector;
 use instant::Instant;
+use ndarray::Array1;
+use ndarray::Array2;
+use object_detector_rust::prelude::MemoryDataSet;
+use object_detector_rust::prelude::RandomForestClassifier;
+use object_detector_rust::utils::SlidingWindow;
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
@@ -14,7 +18,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct HogDetectorJS {
-    hog: Arc<Mutex<Box<dyn HogDetectorTrait>>>,
+    hog: Arc<Mutex<Box<dyn HogDetectorTrait<Array2<f32>, Array1<u32>>>>>,
     timestamps: Arc<Mutex<VecDeque<u128>>>,
 }
 
@@ -41,7 +45,7 @@ impl HogDetectorJS {
         use console_error_panic_hook;
         console_error_panic_hook::set_once();
 
-        let mut hog = HogDetector::<RandomForestClassifier>::default();
+        let mut hog = HogDetector::<RandomForestClassifier, SlidingWindow>::default();
         let model = include_str!("../../res/eyes_random_forest_model.json");
         hog.load(model);
 
@@ -53,7 +57,7 @@ impl HogDetectorJS {
 
     #[wasm_bindgen]
     pub fn init_random_forest_classifier(&self) {
-        let mut hog = HogDetector::<RandomForestClassifier>::default();
+        let mut hog = HogDetector::<RandomForestClassifier, SlidingWindow>::default();
         let model = include_str!("../../res/eyes_random_forest_model.json");
         hog.load(model);
         *self.hog.lock().unwrap() = Box::new(hog);
@@ -61,7 +65,7 @@ impl HogDetectorJS {
 
     #[wasm_bindgen]
     pub fn init_bayes_classifier(&self) {
-        let mut hog = HogDetector::<BayesClassifier>::default();
+        let mut hog = HogDetector::<BayesClassifier, SlidingWindow>::default();
         let model = include_str!("../../res/eyes_bayes_model.json");
         hog.load(model);
         *self.hog.lock().unwrap() = Box::new(hog);
@@ -69,7 +73,7 @@ impl HogDetectorJS {
 
     #[wasm_bindgen]
     pub fn init_combined_classifier(&self) {
-        let mut hog = HogDetector::<CombinedClassifier>::default();
+        let mut hog = HogDetector::<CombinedClassifier, SlidingWindow>::default();
         let model = include_str!("../../res/eyes_combined_model.json");
         hog.load(model);
         *self.hog.lock().unwrap() = Box::new(hog);
@@ -80,8 +84,7 @@ impl HogDetectorJS {
         let start = Instant::now();
         let mut img =
             image::load_from_memory_with_format(img_data, image::ImageFormat::Png).unwrap();
-
-        img = self.hog.lock().unwrap().visualize_detections(&img);
+        img = visualize_detections(&img, &self.hog.lock().unwrap().detect(&img));
 
         let mut image_data: Vec<u8> = Vec::new();
         img.write_to(

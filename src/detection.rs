@@ -1,6 +1,6 @@
 // source: https://github.com/12101111/yolo-rs/blob/master/src/yolo.rs
-use crate::bbox::BBox;
 use float_ord::FloatOrd;
+use object_detector_rust::bbox::BBox;
 
 /// representation of a detection
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
@@ -18,13 +18,15 @@ const NMS_THRESH: f32 = 0.45;
 impl Detection {
     /// merge other detection into this detection
     pub fn merge(&mut self, other: &Detection) {
-        if self.class == other.class && self.bbox.overlay(&other.bbox) > 0.0 {
-            self.bbox.w =
-                0.5 * self.bbox.w + 0.5 * other.bbox.w + (self.bbox.x - other.bbox.x).abs();
-            self.bbox.h =
-                0.5 * self.bbox.h + 0.5 * other.bbox.h + (self.bbox.y - other.bbox.y).abs();
-            self.bbox.x = (self.bbox.x + other.bbox.x) / 2.0;
-            self.bbox.y = (self.bbox.y + other.bbox.y) / 2.0;
+        if self.class == other.class && self.bbox.overlap(&other.bbox) > 0.0 {
+            self.bbox.width = (0.5 * self.bbox.width as f32
+                + 0.5 * other.bbox.width as f32
+                + (self.bbox.x - other.bbox.x).abs() as f32) as u32;
+            self.bbox.height = (0.5 * self.bbox.height as f32
+                + 0.5 * other.bbox.height as f32
+                + (self.bbox.y - other.bbox.y).abs() as f32) as u32;
+            self.bbox.x = ((self.bbox.x + other.bbox.x) as f32 / 2.0) as i32;
+            self.bbox.y = ((self.bbox.y + other.bbox.y) as f32 / 2.0) as i32;
         }
     }
 }
@@ -48,7 +50,7 @@ pub fn nms_sort(mut dets: Vec<Detection>) -> Vec<Detection> {
         ans.push(dets.pop().unwrap());
         dets = dets
             .into_iter()
-            .filter(|d| d.bbox.iou(&ans.last().unwrap().bbox) < NMS_THRESH)
+            .filter(|d| d.bbox.overlap(&ans.last().unwrap().bbox) < NMS_THRESH)
             .collect();
     }
     ans
