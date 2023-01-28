@@ -2,6 +2,7 @@ use crate::dataset::DataSet;
 use image::{imageops::resize, imageops::FilterType, DynamicImage, ImageBuffer, RgbImage};
 use mnist::*;
 use ndarray::prelude::*;
+use std::error::Error;
 
 /// the well known mnist dataset
 pub struct MnistDataSet {
@@ -36,7 +37,11 @@ fn bw_ndarray2_to_rgb_image(arr: Array2<f32>) -> DynamicImage {
 }
 
 impl DataSet for MnistDataSet {
-    fn load(&mut self) {
+    fn len(&self) -> usize {
+        self.data_len
+    }
+
+    fn load(&mut self) -> Result<(), Box<dyn Error>> {
         self.mnist = Some(
             MnistBuilder::new()
                 .label_format_digit()
@@ -47,16 +52,12 @@ impl DataSet for MnistDataSet {
                 .download_and_extract()
                 .finalize(),
         );
+        Ok(())
     }
 
-    fn generate_random_annotations(&mut self, _count_each: usize) {}
-
-    fn get(&self) -> (Vec<DynamicImage>, Vec<u32>, Vec<DynamicImage>, Vec<u32>) {
+    fn get_data(&self) -> (Vec<DynamicImage>, Vec<u32>) {
         let mut train_x = Vec::new();
         let mut train_y = Vec::new();
-
-        let mut test_x = Vec::new();
-        let mut test_y = Vec::new();
 
         let Mnist {
             trn_img,
@@ -70,25 +71,13 @@ impl DataSet for MnistDataSet {
             .expect("Error converting images to Array3 struct")
             .mapv(|x| x as f32 / 256.);
 
-        let test_data = Array3::from_shape_vec((self.data_len, 28, 28), tst_img.to_vec())
-            .expect("Error converting images to Array3 struct")
-            .mapv(|x| x as f32 / 256.);
-
         for item_num in 0..self.data_len {
             let image = bw_ndarray2_to_rgb_image(train_data.slice(s![item_num, .., ..]).to_owned());
             train_x.push(image);
             train_y.push(trn_lbl[item_num] as u32);
-
-            let image = bw_ndarray2_to_rgb_image(test_data.slice(s![item_num, .., ..]).to_owned());
-            test_x.push(image);
-            test_y.push(tst_lbl[item_num] as u32);
         }
 
-        (train_x, train_y, test_x, test_y)
-    }
-
-    fn samples(&self) -> usize {
-        self.data_len
+        (train_x, train_y)
     }
 }
 
@@ -99,9 +88,9 @@ mod tests {
     #[test]
     fn test_default() {
         let mut dataset = MnistDataSet::default();
-        dataset.load();
-        assert_eq!(dataset.samples(), 100);
-        assert_eq!(dataset.get().0.len(), dataset.samples());
-        assert_eq!(dataset.get().2.len(), dataset.samples());
+        dataset.load().unwrap();
+        assert_eq!(dataset.len(), 100);
+        assert_eq!(dataset.get_data().0.len(), dataset.len());
+        assert_eq!(dataset.get_data().1.len(), dataset.len());
     }
 }
