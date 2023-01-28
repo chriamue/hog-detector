@@ -1,11 +1,13 @@
 use std::marker::PhantomData;
 
+use crate::detector::visualize_detections;
 use crate::Detector;
 use image::{DynamicImage, GenericImageView};
 use linfa::{Float, Label};
 use ndarray::Array2;
-use object_detector_rust::prelude::{Feature, HOGFeature, Predictable};
+use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, Predictable};
 use object_detector_rust::trainable::Trainable;
+use object_detector_rust::utils::extract_data;
 use object_detector_rust::{prelude::Classifier, utils::SlidingWindow};
 use object_detector_rust::{
     prelude::{BBox, Class, Detection},
@@ -81,14 +83,14 @@ where
     }
 }
 
-impl<X, Y, C: Classifier<X, Y>> Default for HogDetector<X, Y, C, SlidingWindow>
+impl<X, Y, C: Classifier<X, Y> + Default> Default for HogDetector<X, Y, C, SlidingWindow>
 where
     X: Float,
     Y: Label,
 {
     fn default() -> Self {
         HogDetector::<X, Y, C, SlidingWindow> {
-            classifier: None,
+            classifier: Some(C::default()),
             feature_descriptor: Box::new(HOGFeature::default()),
             window_generator: SlidingWindow {
                 width: 32,
@@ -117,14 +119,84 @@ where
             images.iter().map(|image| self.preprocess(image)).collect();
         DenseMatrix::from_2d_vec(&descriptors)
     }
+
+    /// evaluate class on dataset
+    pub fn evaluate(&mut self, dataset: &dyn DataSet, class: Class) -> f32 {
+        0.0
+    }
+}
+
+impl<C: Classifier<f32, bool>, W> HogDetector<f32, bool, C, W>
+where
+    W: WindowGenerator<DynamicImage>,
+{
+    /// fit model for class
+    pub fn fit_class(
+        &mut self,
+        x: &Vec<DynamicImage>,
+        y: &Vec<u32>,
+        class: Class,
+    ) -> Result<(), String> {
+        let x: Vec<Vec<f32>> = x
+            .iter()
+            .map(|image| self.feature_descriptor.extract(image).unwrap())
+            .collect();
+        let y = y
+            .iter()
+            .map(|y| if *y == class { true } else { false })
+            .collect();
+        let (x, y) = extract_data(x, y);
+        self.classifier.as_mut().unwrap().fit(&x.view(), &y.view())
+    }
+
+    /// visualizes detections
+    pub fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
+        let detections = self.detect(image);
+        visualize_detections(image, &detections)
+    }
+}
+
+impl<C: Classifier<f32, usize>, W> HogDetector<f32, usize, C, W>
+where
+    W: WindowGenerator<DynamicImage>,
+{
+    /// fit model for class
+    pub fn fit_class(
+        &mut self,
+        x: &Vec<DynamicImage>,
+        y: &Vec<usize>,
+        class: Class,
+    ) -> Result<(), String> {
+        let x: Vec<Vec<f32>> = x
+            .iter()
+            .map(|image| self.feature_descriptor.extract(image).unwrap())
+            .collect();
+        let y = y
+            .iter()
+            .map(|y| {
+                if *y == class as usize {
+                    class as usize
+                } else {
+                    0
+                }
+            })
+            .collect();
+        let (x, y) = extract_data(x, y);
+        self.classifier.as_mut().unwrap().fit(&x.view(), &y.view())
+    }
+
+    /// visualizes detections
+    pub fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
+        let detections = self.detect(image);
+        visualize_detections(image, &detections)
+    }
 }
 
 impl<C: Classifier<f32, usize>, W> Detector for HogDetector<f32, usize, C, W>
 where
-    HogDetector<f32, usize, C, W>: Predictable<f32, usize>,
     W: WindowGenerator<DynamicImage>,
 {
-    fn detect(&self, image: &DynamicImage) -> Vec<object_detector_rust::prelude::Detection> {
+    fn detect(&self, image: &DynamicImage) -> Vec<Detection> {
         let windows = self.window_generator.windows(image);
         let windows_len = windows.len();
         let hog_features: Vec<Vec<f32>> = windows
@@ -169,6 +241,55 @@ where
     }
 }
 
+impl<C: Classifier<f32, bool>, W> Detector for HogDetector<f32, bool, C, W>
+where
+    W: WindowGenerator<DynamicImage>,
+{
+    fn detect(&self, image: &DynamicImage) -> Vec<Detection> {
+        let windows = self.window_generator.windows(image);
+        let windows_len = windows.len();
+        let hog_features: Vec<Vec<f32>> = windows
+            .iter()
+            .flat_map(|window| {
+                self.feature_descriptor
+                    .extract(&DynamicImage::ImageRgba8(window.view.to_image()))
+            })
+            .collect();
+
+        let features_len = match hog_features.first() {
+            Some(features) => features.len(),
+            None => 0,
+        };
+        let hog_features: Vec<f32> = hog_features.into_iter().flatten().collect();
+        let hog_features =
+            Array2::from_shape_vec((windows_len, features_len), hog_features).unwrap();
+        let predictions = self
+            .classifier
+            .as_ref()
+            .unwrap()
+            .predict(&hog_features.view())
+            .unwrap();
+        assert_eq!(windows_len, predictions.len());
+        let mut detections = Vec::new();
+        for (i, &prediction) in predictions.iter().enumerate() {
+            if prediction {
+                let window = windows[i];
+                detections.push(Detection::new(
+                    BBox::new(
+                        window.x as i32,
+                        window.y as i32,
+                        window.view.width(),
+                        window.view.height(),
+                    ),
+                    1 as Class,
+                    1.0,
+                ));
+            }
+        }
+        detections
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -177,14 +298,14 @@ mod tests {
 
     #[test]
     fn test_default() {
-        let model = HogDetector::<SVMClassifier, SlidingWindow>::default();
+        let model = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
         assert!(model.classifier.is_none());
     }
 
     #[test]
     fn test_part_eq() {
-        let model1 = HogDetector::<SVMClassifier, SlidingWindow>::default();
-        let model2 = HogDetector::<SVMClassifier, SlidingWindow>::default();
+        let model1 = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
+        let model2 = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
         assert!(model1.classifier.is_none());
         assert!(model1.eq(&model2));
         assert!(model1.eq(&model1));
@@ -192,7 +313,7 @@ mod tests {
 
     #[test]
     fn test_hog() {
-        let model = HogDetector::<SVMClassifier, SlidingWindow>::default();
+        let model = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
         let loco03 = open("res/loco03.jpg").unwrap().to_rgb8();
         let loco03 = resize(&loco03, 32, 32, FilterType::Nearest);
         let descriptor = model.preprocess(&DynamicImage::ImageRgb8(loco03));

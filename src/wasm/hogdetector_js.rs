@@ -31,8 +31,8 @@ impl HogDetectorJS {
     pub fn train_with_hard_negative_samples(&self, dataset: MemoryDataSet) {
         let mut dataset = dataset;
         let mut hog = self.hog.lock().unwrap();
-        hog.train_class(&dataset, 1);
-        dataset.generate_hard_negative_samples(hog.detector(), 1, Some(50));
+        //hog.train_class(&dataset, 1);
+        //dataset.generate_hard_negative_samples(hog.detector(), 1, Some(50));
         dataset.load();
         hog.train_class(&dataset, 1);
     }

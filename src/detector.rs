@@ -69,6 +69,7 @@ pub fn visualize_detections(image: &DynamicImage, detections: &Vec<Detection>) -
 mod tests {
     use super::*;
     use image::Rgb;
+    use object_detector_rust::tests::test_image;
 
     #[test]
     fn test_detect_objects() {
