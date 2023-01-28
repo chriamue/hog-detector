@@ -5,7 +5,7 @@ use crate::Detector;
 use image::{DynamicImage, GenericImageView};
 use linfa::{Float, Label};
 use ndarray::Array2;
-use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, Predictable};
+use object_detector_rust::prelude::{DataSet, Feature, HOGFeature};
 use object_detector_rust::trainable::Trainable;
 use object_detector_rust::utils::extract_data;
 use object_detector_rust::{prelude::Classifier, utils::SlidingWindow};

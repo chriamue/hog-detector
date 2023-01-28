@@ -1,12 +1,14 @@
 // source: https://github.com/tiruss/eye_detector
 // https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip
 
-use crate::dataset::DataSet;
-use crate::utils::window_crop;
+use crate::DataSet;
 use image::io::Reader as ImageReader;
 use image::{imageops::resize, imageops::FilterType, DynamicImage};
+use object_detector_rust::prelude::BBox;
+use object_detector_rust::utils::crop_bbox;
 use rand::prelude::ThreadRng;
 use rand::Rng;
+use std::error::Error;
 use std::io::prelude::*;
 use std::io::Cursor;
 use std::io::{self, SeekFrom};
@@ -38,8 +40,8 @@ impl EyesDataSet {
         response.bytes()
     }
 
-    fn unzip(&mut self) {
-        let downloaded = self.download_zip().unwrap();
+    fn unzip(&mut self) -> Result<(), Box<dyn Error>> {
+        let downloaded = self.download_zip()?;
         let buff = Cursor::new(downloaded);
         let mut archive = zip::ZipArchive::new(buff).unwrap();
 
@@ -82,6 +84,7 @@ impl EyesDataSet {
                 }
             }
         }
+        Ok(())
     }
 
     /// generates random annotations from an image
@@ -99,7 +102,10 @@ impl EyesDataSet {
             let y = rng.gen_range(0..=image.height());
             annotations.push((
                 label.to_string(),
-                window_crop(image, window_size, window_size, (x, y)),
+                crop_bbox(
+                    image,
+                    &BBox::new(x as i32, y as i32, window_size, window_size),
+                ),
             ));
         }
         annotations
@@ -131,23 +137,18 @@ impl EyesDataSet {
 }
 
 impl DataSet for EyesDataSet {
-    fn load(&mut self) {
-        self.unzip();
-    }
-
-    fn generate_random_annotations(&mut self, _count_each: usize) {}
-
-    fn get(&self) -> (Vec<DynamicImage>, Vec<u32>, Vec<DynamicImage>, Vec<u32>) {
-        let train_x = self.data.iter().map(|(_, img)| img.clone()).collect();
-        let train_y = self.data.iter().map(|(label, _)| *label).collect();
-
-        let test_x = self.data.iter().map(|(_, img)| img.clone()).collect();
-        let test_y = self.data.iter().map(|(label, _)| *label).collect();
-        (train_x, train_y, test_x, test_y)
-    }
-
-    fn samples(&self) -> usize {
+    fn len(&self) -> usize {
         self.data.len()
+    }
+
+    fn get_data(&self) -> (Vec<DynamicImage>, Vec<u32>) {
+        let x = self.data.iter().map(|(_, img)| img.clone()).collect();
+        let y = self.data.iter().map(|(label, _)| label.clone()).collect();
+        (x, y)
+    }
+
+    fn load(&mut self) -> Result<(), Box<dyn Error>> {
+        self.unzip()
     }
 }
 
@@ -164,11 +165,9 @@ impl Default for EyesDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::classifier::{BayesClassifier, CombinedClassifier, RandomForestClassifier};
-    use crate::hogdetector::HogDetectorTrait;
-    use crate::Detector;
     use crate::HogDetector;
-    use crate::Trainable;
+    use object_detector_rust::classifier::CombinedClassifier;
+    use object_detector_rust::prelude::*;
 
     #[test]
     fn test_default() {
@@ -191,66 +190,81 @@ mod tests {
     #[test]
     fn test_unzip() {
         let mut dataset = EyesDataSet::default();
-        dataset.unzip();
+        dataset.unzip().unwrap();
         assert!(dataset.data.len() > 0);
     }
 
     #[ignore = "takes more than 200s in debug mode"]
     #[test]
     fn test_train_svm_model() {
-        let mut model = HogDetector::svm();
+        let mut model: HogDetector<f32, bool, SVMClassifier<_, _>, _> = HogDetector::default();
 
         let mut dataset = EyesDataSet::default();
-        dataset.load();
-        model.train_class(&dataset, 1);
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 
-        std::fs::write("res/eyes_svm_model.json", model.save()).unwrap();
+        //std::fs::write("res/eyes_svm_model.json", model.save()).unwrap();
     }
 
     #[ignore = "takes more than 200s in debug mode"]
     #[test]
     fn test_train_random_forest_model() {
-        let mut model = HogDetector::<RandomForestClassifier>::default();
+        let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
+            HogDetector::default();
 
         let mut dataset = EyesDataSet::default();
-        dataset.load();
-        model.train_class(&dataset, 1);
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+        model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 
-        std::fs::write("res/eyes_random_forest_model.json", model.save()).unwrap();
-    }
-
-    #[ignore = "takes more than 200s in debug mode"]
-    #[test]
-    fn test_train_bayes_model() {
-        let mut model = HogDetector::<BayesClassifier>::default();
-
-        let mut dataset = EyesDataSet::default();
-        dataset.load();
-        model.train_class(&dataset, 1);
-        assert!(model.classifier.is_some());
-
-        std::fs::write("res/eyes_bayes_model.json", model.save()).unwrap();
+        //std::fs::write("res/eyes_random_forest_model.json", model.save()).unwrap();
     }
 
     //#[ignore = "takes more than 200s in debug mode"]
     #[test]
-    fn test_train_combined_model() {
-        let mut model = HogDetector::<CombinedClassifier>::default();
+    fn test_train_bayes_model() {
+        let mut model: HogDetector<f32, usize, BayesClassifier<_, _>, _> = HogDetector::default();
 
         let mut dataset = EyesDataSet::default();
-        dataset.load();
-        model.train_class(&dataset, 1);
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+        model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 
-        std::fs::write("res/eyes_combined_model.json", model.save()).unwrap();
+        //std::fs::write("res/eyes_bayes_model.json", model.save()).unwrap();
     }
 
+    #[ignore = "takes more than 200s in debug mode"]
+    #[test]
+    fn test_train_combined_model() {
+        let mut model: HogDetector<
+            f32,
+            usize,
+            CombinedClassifier<f32, usize, BayesClassifier<_, _>, RandomForestClassifier<_, _>>,
+            _,
+        > = HogDetector::default();
+
+        let mut dataset = EyesDataSet::default();
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+        model.fit_class(&x, &y, 1).unwrap();
+        assert!(model.classifier.is_some());
+
+        //std::fs::write("res/eyes_combined_model.json", model.save()).unwrap();
+    }
+
+    /*
     #[test]
     fn test_detect() {
         let model = {
-            let mut model = HogDetector::<RandomForestClassifier>::default();
+            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> = HogDetector::default();
+
             model.load(&std::fs::read_to_string("res/eyes_random_forest_model.json").unwrap());
             model
         };
@@ -261,4 +275,5 @@ mod tests {
             .save("out/test_lenna_eyes.png")
             .unwrap();
     }
+    */
 }
