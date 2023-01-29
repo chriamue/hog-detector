@@ -63,11 +63,11 @@
 </span><span class="kw">pub mod </span>utils;
 
 <span class="doccomment">/// web assembly module
-</span><span class="comment">//#[cfg(target_arch = &quot;wasm32&quot;)]
-//#[cfg(not(tarpaulin_include))]
+</span><span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+</span><span class="comment">//#[cfg(not(tarpaulin_include))]
 //#[cfg(feature = &quot;wasm&quot;)]
-//pub mod wasm;
-</span><span class="kw">pub use </span>dataset::DataSet;
+</span><span class="kw">pub mod </span>wasm;
+<span class="kw">pub use </span>dataset::DataSet;
 <span class="kw">pub use </span>detector::Detector;
 <span class="kw">pub use </span>hogdetector::HogDetector;
 

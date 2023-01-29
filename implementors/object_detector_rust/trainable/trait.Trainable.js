@@ -1,3 +1,3 @@
 (function() {var implementors = {
-"hog_detector":[]
+"hog_detector":[["impl&lt;X, Y, C:&nbsp;<a class=\"trait\" href=\"hog_detector/prelude/trait.Classifier.html\" title=\"trait hog_detector::prelude::Classifier\">Classifier</a>&lt;X, Y&gt;, WG&gt; <a class=\"trait\" href=\"hog_detector/prelude/trait.Trainable.html\" title=\"trait hog_detector::prelude::Trainable\">Trainable</a>&lt;X, Y&gt; for <a class=\"struct\" href=\"hog_detector/hogdetector/struct.HogDetector.html\" title=\"struct hog_detector::hogdetector::HogDetector\">HogDetector</a>&lt;X, Y, C, WG&gt;<span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;X: Float,<br>&nbsp;&nbsp;&nbsp;&nbsp;Y: Label,<br>&nbsp;&nbsp;&nbsp;&nbsp;WG: WindowGenerator&lt;DynamicImage&gt;,</span>"]]
 };if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
