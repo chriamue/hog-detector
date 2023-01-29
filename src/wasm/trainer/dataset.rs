@@ -31,7 +31,7 @@ pub fn create_dataset(label_tool: &LabelTool) -> MemoryDataSet {
 
         dataset.add_annotated_image((img, annotations).into());
     }
-    dataset.load();
+    dataset.load().unwrap();
     dataset
 }
 

@@ -1,40 +1,41 @@
-use crate::classifier::BayesClassifier;
-use crate::classifier::CombinedClassifier;
-use crate::dataset::DataGenerator;
-use crate::dataset::DataSet;
 use crate::detector::visualize_detections;
 use crate::hogdetector::HogDetectorTrait;
 use crate::HogDetector;
 use instant::Instant;
-use ndarray::Array1;
-use ndarray::Array2;
+use ndarray::{Array1, Array2};
+use object_detector_rust::dataset::DataSet;
+use object_detector_rust::detector::PersistentDetector;
+use object_detector_rust::prelude::Detector;
 use object_detector_rust::prelude::MemoryDataSet;
 use object_detector_rust::prelude::RandomForestClassifier;
-use object_detector_rust::utils::SlidingWindow;
 use std::collections::VecDeque;
+use std::io::Cursor;
 use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct HogDetectorJS {
-    hog: Arc<Mutex<Box<dyn HogDetectorTrait<Array2<f32>, Array1<u32>>>>>,
+    hog: Arc<Mutex<Box<dyn HogDetectorTrait<f32, usize>>>>,
     timestamps: Arc<Mutex<VecDeque<u128>>>,
 }
 
 impl HogDetectorJS {
     pub fn train(&self, dataset: MemoryDataSet) {
         let mut hog = self.hog.lock().unwrap();
-        hog.train_class(&dataset, 1);
+        let (x, y) = dataset.get_data();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+        hog.fit_class(&x, &y, 1).unwrap();
     }
 
     pub fn train_with_hard_negative_samples(&self, dataset: MemoryDataSet) {
         let mut dataset = dataset;
         let mut hog = self.hog.lock().unwrap();
-        //hog.train_class(&dataset, 1);
         //dataset.generate_hard_negative_samples(hog.detector(), 1, Some(50));
-        dataset.load();
-        hog.train_class(&dataset, 1);
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+        hog.fit_class(&x, &y, 1).unwrap();
     }
 }
 
@@ -44,11 +45,13 @@ impl HogDetectorJS {
     pub fn new() -> HogDetectorJS {
         use console_error_panic_hook;
         console_error_panic_hook::set_once();
-
-        let mut hog = HogDetector::<RandomForestClassifier, SlidingWindow>::default();
-        let model = include_str!("../../res/eyes_random_forest_model.json");
-        hog.load(model);
-
+        let hog = {
+            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
+                HogDetector::default();
+            let file = Cursor::new(include_bytes!("../../res/eyes_random_forest_model.json"));
+            model.load(file).unwrap();
+            model
+        };
         HogDetectorJS {
             hog: Arc::new(Mutex::new(Box::new(hog))),
             timestamps: Arc::new(Mutex::new(VecDeque::with_capacity(5))),
@@ -57,25 +60,37 @@ impl HogDetectorJS {
 
     #[wasm_bindgen]
     pub fn init_random_forest_classifier(&self) {
-        let mut hog = HogDetector::<RandomForestClassifier, SlidingWindow>::default();
-        let model = include_str!("../../res/eyes_random_forest_model.json");
-        hog.load(model);
+        let hog = {
+            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
+                HogDetector::default();
+            let mut file = Cursor::new(include_bytes!("../../res/eyes_random_forest_model.json"));
+            model.load(file).unwrap();
+            model
+        };
         *self.hog.lock().unwrap() = Box::new(hog);
     }
 
     #[wasm_bindgen]
     pub fn init_bayes_classifier(&self) {
-        let mut hog = HogDetector::<BayesClassifier, SlidingWindow>::default();
-        let model = include_str!("../../res/eyes_bayes_model.json");
-        hog.load(model);
+        let hog = {
+            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
+                HogDetector::default();
+            let file = Cursor::new(include_bytes!("../../res/eyes_random_forest_model.json"));
+            model.load(file).unwrap();
+            model
+        };
         *self.hog.lock().unwrap() = Box::new(hog);
     }
 
     #[wasm_bindgen]
     pub fn init_combined_classifier(&self) {
-        let mut hog = HogDetector::<CombinedClassifier, SlidingWindow>::default();
-        let model = include_str!("../../res/eyes_combined_model.json");
-        hog.load(model);
+        let hog = {
+            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
+                HogDetector::default();
+            let file = Cursor::new(include_bytes!("../../res/eyes_random_forest_model.json"));
+            model.load(file).unwrap();
+            model
+        };
         *self.hog.lock().unwrap() = Box::new(hog);
     }
 

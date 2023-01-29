@@ -1,8 +1,8 @@
 use crate::detector::visualize_detections;
-use crate::{classifier, Detector};
+use crate::Detector;
 use image::{DynamicImage, GenericImageView};
 use linfa::{Float, Label};
-use ndarray::Array2;
+use ndarray::{Array2, ArrayView1, ArrayView2};
 use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
 use object_detector_rust::trainable::Trainable;
 use object_detector_rust::utils::extract_data;
@@ -12,7 +12,7 @@ use object_detector_rust::{
     utils::WindowGenerator,
 };
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use smartcore::linalg::basic::matrix::DenseMatrix;
 use std::error::Error;
 use std::io::{Read, Write};
@@ -48,11 +48,14 @@ where
 }
 
 /// trait of an hog detector
-pub trait HogDetectorTrait<X, Y>: Trainable<X, Y> + Detector + Send + Sync {
-    /// save to string
-    fn save(&self) -> String;
-    /// load from string
-    fn load(&mut self, model: &str);
+pub trait HogDetectorTrait<X, Y>: Detector + Send + Sync {
+    /// fit model for class
+    fn fit_class(
+        &mut self,
+        x: &Vec<DynamicImage>,
+        y: &Vec<usize>,
+        class: Class,
+    ) -> Result<(), String>;
     /// reference to detector trait
     fn detector(&self) -> &dyn Detector;
 }
@@ -133,25 +136,6 @@ impl<C: Classifier<f32, bool>, W> HogDetector<f32, bool, C, W>
 where
     W: WindowGenerator<DynamicImage>,
 {
-    /// fit model for class
-    pub fn fit_class(
-        &mut self,
-        x: &Vec<DynamicImage>,
-        y: &Vec<u32>,
-        class: Class,
-    ) -> Result<(), String> {
-        let x: Vec<Vec<f32>> = x
-            .iter()
-            .map(|image| self.feature_descriptor.extract(image).unwrap())
-            .collect();
-        let y = y
-            .iter()
-            .map(|y| if *y == class { true } else { false })
-            .collect();
-        let (x, y) = extract_data(x, y);
-        self.classifier.as_mut().unwrap().fit(&x.view(), &y.view())
-    }
-
     /// visualizes detections
     pub fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
         let detections = self.detect(image);
@@ -163,31 +147,6 @@ impl<C: Classifier<f32, usize>, W> HogDetector<f32, usize, C, W>
 where
     W: WindowGenerator<DynamicImage>,
 {
-    /// fit model for class
-    pub fn fit_class(
-        &mut self,
-        x: &Vec<DynamicImage>,
-        y: &Vec<usize>,
-        class: Class,
-    ) -> Result<(), String> {
-        let x: Vec<Vec<f32>> = x
-            .iter()
-            .map(|image| self.feature_descriptor.extract(image).unwrap())
-            .collect();
-        let y = y
-            .iter()
-            .map(|y| {
-                if *y == class as usize {
-                    class as usize
-                } else {
-                    0
-                }
-            })
-            .collect();
-        let (x, y) = extract_data(x, y);
-        self.classifier.as_mut().unwrap().fit(&x.view(), &y.view())
-    }
-
     /// visualizes detections
     pub fn visualize_detections(&self, image: &DynamicImage) -> DynamicImage {
         let detections = self.detect(image);
@@ -346,6 +305,79 @@ where
         self.classifier = Some(classifier);
 
         Ok(())
+    }
+}
+
+impl<X, Y, C: Classifier<X, Y>, WG> Trainable<X, Y> for HogDetector<X, Y, C, WG>
+where
+    X: Float,
+    Y: Label,
+    WG: WindowGenerator<DynamicImage>,
+{
+    fn fit(&mut self, x: &ArrayView2<X>, y: &ArrayView1<Y>) -> Result<(), String> {
+        self.classifier.as_mut().unwrap().fit(&x.view(), &y.view())
+    }
+}
+
+impl<C: Classifier<f32, usize>, WG> HogDetectorTrait<f32, usize> for HogDetector<f32, usize, C, WG>
+where
+    WG: WindowGenerator<DynamicImage>,
+{
+    /// fit model for class
+    fn fit_class(
+        &mut self,
+        x: &Vec<DynamicImage>,
+        y: &Vec<usize>,
+        class: Class,
+    ) -> Result<(), String> {
+        let x: Vec<Vec<f32>> = x
+            .iter()
+            .map(|image| self.feature_descriptor.extract(image).unwrap())
+            .collect();
+        let y = y
+            .iter()
+            .map(|y| {
+                if *y == class as usize {
+                    class as usize
+                } else {
+                    0
+                }
+            })
+            .collect();
+        let (x, y) = extract_data(x, y);
+        self.classifier.as_mut().unwrap().fit(&x.view(), &y.view())
+    }
+
+    fn detector(&self) -> &dyn Detector {
+        self
+    }
+}
+
+impl<C: Classifier<f32, bool>, WG> HogDetectorTrait<f32, bool> for HogDetector<f32, bool, C, WG>
+where
+    WG: WindowGenerator<DynamicImage>,
+{
+    /// fit model for class
+    fn fit_class(
+        &mut self,
+        x: &Vec<DynamicImage>,
+        y: &Vec<usize>,
+        class: Class,
+    ) -> Result<(), String> {
+        let x: Vec<Vec<f32>> = x
+            .iter()
+            .map(|image| self.feature_descriptor.extract(image).unwrap())
+            .collect();
+        let y = y
+            .iter()
+            .map(|y| if *y == class as usize { true } else { false })
+            .collect();
+        let (x, y) = extract_data(x, y);
+        self.classifier.as_mut().unwrap().fit(&x.view(), &y.view())
+    }
+
+    fn detector(&self) -> &dyn Detector {
+        self
     }
 }
 
