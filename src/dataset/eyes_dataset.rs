@@ -166,8 +166,10 @@ impl Default for EyesDataSet {
 mod tests {
     use super::*;
     use crate::HogDetector;
+    use std::fs::File;
     use object_detector_rust::classifier::CombinedClassifier;
     use object_detector_rust::prelude::*;
+    use object_detector_rust::detector::PersistentDetector;
 
     #[test]
     fn test_default() {
@@ -205,8 +207,9 @@ mod tests {
         model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 
-        //std::fs::write("res/eyes_svm_model.json", model.save()).unwrap();
-    }
+        let file_writer = File::create("res/eyes_svm_model.json").unwrap();
+        model.save(file_writer).unwrap();
+   }
 
     #[ignore = "takes more than 200s in debug mode"]
     #[test]
@@ -221,10 +224,11 @@ mod tests {
         model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 
-        //std::fs::write("res/eyes_random_forest_model.json", model.save()).unwrap();
+        let file_writer = File::create("res/eyes_random_forest_model.json").unwrap();
+        model.save(file_writer).unwrap();
     }
 
-    //#[ignore = "takes more than 200s in debug mode"]
+    #[ignore = "takes more than 200s in debug mode"]
     #[test]
     fn test_train_bayes_model() {
         let mut model: HogDetector<f32, usize, BayesClassifier<_, _>, _> = HogDetector::default();
@@ -236,7 +240,8 @@ mod tests {
         model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 
-        //std::fs::write("res/eyes_bayes_model.json", model.save()).unwrap();
+        //let mut file_writer = File::create("res/eyes_bayes_model.json").unwrap();
+        //model.save(file_writer);
     }
 
     #[ignore = "takes more than 200s in debug mode"]
@@ -256,16 +261,16 @@ mod tests {
         model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 
-        //std::fs::write("res/eyes_combined_model.json", model.save()).unwrap();
+        //let file_writer = File::create("res/eyes_combined_model.json").unwrap();
+        //model.save(file_writer).unwrap(); 
     }
 
-    /*
     #[test]
     fn test_detect() {
         let model = {
             let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> = HogDetector::default();
-
-            model.load(&std::fs::read_to_string("res/eyes_random_forest_model.json").unwrap());
+            let file_reader = File::open("res/eyes_random_forest_model.json").unwrap();
+            model.load(file_reader).unwrap();
             model
         };
         assert!(model.classifier.is_some());
@@ -275,5 +280,4 @@ mod tests {
             .save("out/test_lenna_eyes.png")
             .unwrap();
     }
-    */
 }

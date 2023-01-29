@@ -1,11 +1,12 @@
+use std::error::Error;
+use std::io::{Read, Write};
 use std::marker::PhantomData;
-
 use crate::detector::visualize_detections;
-use crate::Detector;
+use crate::{Detector, classifier};
 use image::{DynamicImage, GenericImageView};
 use linfa::{Float, Label};
 use ndarray::Array2;
-use object_detector_rust::prelude::{DataSet, Feature, HOGFeature};
+use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
 use object_detector_rust::trainable::Trainable;
 use object_detector_rust::utils::extract_data;
 use object_detector_rust::{prelude::Classifier, utils::SlidingWindow};
@@ -13,6 +14,8 @@ use object_detector_rust::{
     prelude::{BBox, Class, Detection},
     utils::WindowGenerator,
 };
+use serde::de::DeserializeOwned;
+use serde::{Serialize, Deserialize};
 use smartcore::linalg::basic::matrix::DenseMatrix;
 
 /// Hog Detector struct
@@ -287,6 +290,60 @@ where
             }
         }
         detections
+    }
+}
+
+impl<C: Classifier<f32, bool> + Serialize + DeserializeOwned, WG> PersistentDetector for HogDetector<f32, bool, C, WG>
+where
+    WG: WindowGenerator<DynamicImage>,
+{
+    fn save<W: Write>(&self, mut writer: W) -> Result<(), Box<dyn Error>> {
+        // Serialize the SVMClassifier using the `bincode` crate
+        let svm_classifier_bytes = bincode::serialize(&self.classifier.as_ref().unwrap())?;
+
+        // Write the serialized bytes to the writer
+        writer.write_all(&svm_classifier_bytes)?;
+
+        Ok(())
+    }
+
+    fn load<R: Read>(&mut self, mut reader: R) -> Result<(), Box<dyn Error>> {
+        // Read the serialized bytes from the reader
+        let mut classifier_bytes = Vec::new();
+        reader.read_to_end(&mut classifier_bytes)?;
+
+        // Deserialize the bytes using the `bincode` crate
+        let classifier = bincode::deserialize(&classifier_bytes)?;
+        self.classifier = Some(classifier);
+
+        Ok(())
+    }
+}
+
+impl<C: Classifier<f32, usize> + Serialize + DeserializeOwned, WG> PersistentDetector for HogDetector<f32, usize, C, WG>
+where
+    WG: WindowGenerator<DynamicImage>,
+{
+    fn save<W: Write>(&self, mut writer: W) -> Result<(), Box<dyn Error>> {
+        // Serialize the SVMClassifier using the `bincode` crate
+        let svm_classifier_bytes = bincode::serialize(&self.classifier.as_ref().unwrap())?;
+
+        // Write the serialized bytes to the writer
+        writer.write_all(&svm_classifier_bytes)?;
+
+        Ok(())
+    }
+
+    fn load<R: Read>(&mut self, mut reader: R) -> Result<(), Box<dyn Error>> {
+        // Read the serialized bytes from the reader
+        let mut classifier_bytes = Vec::new();
+        reader.read_to_end(&mut classifier_bytes)?;
+
+        // Deserialize the bytes using the `bincode` crate
+        let classifier = bincode::deserialize(&classifier_bytes)?;
+        self.classifier = Some(classifier);
+
+        Ok(())
     }
 }
 
