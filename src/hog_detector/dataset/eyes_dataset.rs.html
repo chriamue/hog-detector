@@ -281,6 +281,7 @@
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
 </pre><pre class="rust"><code><span class="comment">// source: https://github.com/tiruss/eye_detector
 // https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip
 
@@ -449,10 +450,10 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::HogDetector;
-    <span class="kw">use </span>std::fs::File;
     <span class="kw">use </span>object_detector_rust::classifier::CombinedClassifier;
-    <span class="kw">use </span>object_detector_rust::prelude::<span class="kw-2">*</span>;
     <span class="kw">use </span>object_detector_rust::detector::PersistentDetector;
+    <span class="kw">use </span>object_detector_rust::prelude::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::fs::File;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_default() {
@@ -492,7 +493,7 @@
 
         <span class="kw">let </span>file_writer = File::create(<span class="string">&quot;res/eyes_svm_model.json&quot;</span>).unwrap();
         model.save(file_writer).unwrap();
-   }
+    }
 
     <span class="attr">#[ignore = <span class="string">&quot;takes more than 200s in debug mode&quot;</span>]
     #[test]
@@ -545,13 +546,14 @@
         <span class="macro">assert!</span>(model.classifier.is_some());
 
         <span class="comment">//let file_writer = File::create(&quot;res/eyes_combined_model.json&quot;).unwrap();
-        //model.save(file_writer).unwrap(); 
+        //model.save(file_writer).unwrap();
     </span>}
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_detect() {
         <span class="kw">let </span>model = {
-            <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, RandomForestClassifier&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;, <span class="kw">_</span>&gt; = HogDetector::default();
+            <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, RandomForestClassifier&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;, <span class="kw">_</span>&gt; =
+                HogDetector::default();
             <span class="kw">let </span>file_reader = File::open(<span class="string">&quot;res/eyes_random_forest_model.json&quot;</span>).unwrap();
             model.load(file_reader).unwrap();
             model

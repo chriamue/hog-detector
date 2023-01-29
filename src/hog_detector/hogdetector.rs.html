@@ -377,11 +377,10 @@
 <a href="#377" id="377">377</a>
 <a href="#378" id="378">378</a>
 <a href="#379" id="379">379</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::error::Error;
-<span class="kw">use </span>std::io::{Read, Write};
-<span class="kw">use </span>std::marker::PhantomData;
-<span class="kw">use </span><span class="kw">crate</span>::detector::visualize_detections;
-<span class="kw">use crate</span>::{Detector, classifier};
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::visualize_detections;
+<span class="kw">use crate</span>::{classifier, Detector};
 <span class="kw">use </span>image::{DynamicImage, GenericImageView};
 <span class="kw">use </span>linfa::{Float, Label};
 <span class="kw">use </span>ndarray::Array2;
@@ -394,8 +393,11 @@
     utils::WindowGenerator,
 };
 <span class="kw">use </span>serde::de::DeserializeOwned;
-<span class="kw">use </span>serde::{Serialize, Deserialize};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::io::{Read, Write};
+<span class="kw">use </span>std::marker::PhantomData;
 
 <span class="doccomment">/// Hog Detector struct
 /// ,-----.  ,---------.   ,--------------------.   ,---.                             
@@ -672,7 +674,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;C: Classifier&lt;f32, bool&gt; + Serialize + DeserializeOwned, WG&gt; PersistentDetector <span class="kw">for </span>HogDetector&lt;f32, bool, C, WG&gt;
+<span class="kw">impl</span>&lt;C: Classifier&lt;f32, bool&gt; + Serialize + DeserializeOwned, WG&gt; PersistentDetector
+    <span class="kw">for </span>HogDetector&lt;f32, bool, C, WG&gt;
 <span class="kw">where
     </span>WG: WindowGenerator&lt;DynamicImage&gt;,
 {
@@ -699,7 +702,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;C: Classifier&lt;f32, usize&gt; + Serialize + DeserializeOwned, WG&gt; PersistentDetector <span class="kw">for </span>HogDetector&lt;f32, usize, C, WG&gt;
+<span class="kw">impl</span>&lt;C: Classifier&lt;f32, usize&gt; + Serialize + DeserializeOwned, WG&gt; PersistentDetector
+    <span class="kw">for </span>HogDetector&lt;f32, usize, C, WG&gt;
 <span class="kw">where
     </span>WG: WindowGenerator&lt;DynamicImage&gt;,
 {
@@ -735,14 +739,14 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_default() {
         <span class="kw">let </span>model = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, SlidingWindow&gt;::default();
-        <span class="macro">assert!</span>(model.classifier.is_none());
+        <span class="macro">assert!</span>(model.classifier.is_some());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_part_eq() {
         <span class="kw">let </span>model1 = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, SlidingWindow&gt;::default();
         <span class="kw">let </span>model2 = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, SlidingWindow&gt;::default();
-        <span class="macro">assert!</span>(model1.classifier.is_none());
+        <span class="macro">assert!</span>(model1.classifier.is_some());
         <span class="macro">assert!</span>(model1.eq(<span class="kw-2">&amp;</span>model2));
         <span class="macro">assert!</span>(model1.eq(<span class="kw-2">&amp;</span>model1));
     }
@@ -753,7 +757,7 @@
         <span class="kw">let </span>loco03 = open(<span class="string">&quot;res/loco03.jpg&quot;</span>).unwrap().to_rgb8();
         <span class="kw">let </span>loco03 = resize(<span class="kw-2">&amp;</span>loco03, <span class="number">32</span>, <span class="number">32</span>, FilterType::Nearest);
         <span class="kw">let </span>descriptor = model.preprocess(<span class="kw-2">&amp;</span>DynamicImage::ImageRgb8(loco03));
-        <span class="macro">assert_eq!</span>(descriptor.len(), <span class="number">1568</span>);
+        <span class="macro">assert_eq!</span>(descriptor.len(), <span class="number">324</span>);
     }
 }
 </code></pre></div>
