@@ -277,6 +277,10 @@
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
 </pre><pre class="rust"><code><span class="comment">// source: https://github.com/tiruss/eye_detector
 // https://github.com/tiruss/eye_detector/archive/refs/heads/master.zip
 
@@ -445,8 +449,10 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::HogDetector;
+    <span class="kw">use </span>std::fs::File;
     <span class="kw">use </span>object_detector_rust::classifier::CombinedClassifier;
     <span class="kw">use </span>object_detector_rust::prelude::<span class="kw-2">*</span>;
+    <span class="kw">use </span>object_detector_rust::detector::PersistentDetector;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_default() {
@@ -484,8 +490,9 @@
         model.fit_class(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>y, <span class="number">1</span>).unwrap();
         <span class="macro">assert!</span>(model.classifier.is_some());
 
-        <span class="comment">//std::fs::write(&quot;res/eyes_svm_model.json&quot;, model.save()).unwrap();
-    </span>}
+        <span class="kw">let </span>file_writer = File::create(<span class="string">&quot;res/eyes_svm_model.json&quot;</span>).unwrap();
+        model.save(file_writer).unwrap();
+   }
 
     <span class="attr">#[ignore = <span class="string">&quot;takes more than 200s in debug mode&quot;</span>]
     #[test]
@@ -500,11 +507,12 @@
         model.fit_class(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>y, <span class="number">1</span>).unwrap();
         <span class="macro">assert!</span>(model.classifier.is_some());
 
-        <span class="comment">//std::fs::write(&quot;res/eyes_random_forest_model.json&quot;, model.save()).unwrap();
-    </span>}
+        <span class="kw">let </span>file_writer = File::create(<span class="string">&quot;res/eyes_random_forest_model.json&quot;</span>).unwrap();
+        model.save(file_writer).unwrap();
+    }
 
-    <span class="comment">//#[ignore = &quot;takes more than 200s in debug mode&quot;]
-    </span><span class="attr">#[test]
+    <span class="attr">#[ignore = <span class="string">&quot;takes more than 200s in debug mode&quot;</span>]
+    #[test]
     </span><span class="kw">fn </span>test_train_bayes_model() {
         <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, BayesClassifier&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;, <span class="kw">_</span>&gt; = HogDetector::default();
 
@@ -515,7 +523,8 @@
         model.fit_class(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>y, <span class="number">1</span>).unwrap();
         <span class="macro">assert!</span>(model.classifier.is_some());
 
-        <span class="comment">//std::fs::write(&quot;res/eyes_bayes_model.json&quot;, model.save()).unwrap();
+        <span class="comment">//let mut file_writer = File::create(&quot;res/eyes_bayes_model.json&quot;).unwrap();
+        //model.save(file_writer);
     </span>}
 
     <span class="attr">#[ignore = <span class="string">&quot;takes more than 200s in debug mode&quot;</span>]
@@ -535,26 +544,25 @@
         model.fit_class(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>y, <span class="number">1</span>).unwrap();
         <span class="macro">assert!</span>(model.classifier.is_some());
 
-        <span class="comment">//std::fs::write(&quot;res/eyes_combined_model.json&quot;, model.save()).unwrap();
+        <span class="comment">//let file_writer = File::create(&quot;res/eyes_combined_model.json&quot;).unwrap();
+        //model.save(file_writer).unwrap(); 
     </span>}
 
-    <span class="comment">/*
-    #[test]
-    fn test_detect() {
-        let model = {
-            let mut model: HogDetector&lt;f32, usize, RandomForestClassifier&lt;_, _&gt;, _&gt; = HogDetector::default();
-
-            model.load(&amp;std::fs::read_to_string(&quot;res/eyes_random_forest_model.json&quot;).unwrap());
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_detect() {
+        <span class="kw">let </span>model = {
+            <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, RandomForestClassifier&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;, <span class="kw">_</span>&gt; = HogDetector::default();
+            <span class="kw">let </span>file_reader = File::open(<span class="string">&quot;res/eyes_random_forest_model.json&quot;</span>).unwrap();
+            model.load(file_reader).unwrap();
             model
         };
-        assert!(model.classifier.is_some());
-        let lenna = image::open(&quot;res/lenna.png&quot;).unwrap();
+        <span class="macro">assert!</span>(model.classifier.is_some());
+        <span class="kw">let </span>lenna = image::open(<span class="string">&quot;res/lenna.png&quot;</span>).unwrap();
         model
-            .visualize_detections(&amp;lenna)
-            .save(&quot;out/test_lenna_eyes.png&quot;)
+            .visualize_detections(<span class="kw-2">&amp;</span>lenna)
+            .save(<span class="string">&quot;out/test_lenna_eyes.png&quot;</span>)
             .unwrap();
     }
-    */
-</span>}
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="hog_detector" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
