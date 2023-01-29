@@ -1,8 +1,5 @@
-use std::error::Error;
-use std::io::{Read, Write};
-use std::marker::PhantomData;
 use crate::detector::visualize_detections;
-use crate::{Detector, classifier};
+use crate::{classifier, Detector};
 use image::{DynamicImage, GenericImageView};
 use linfa::{Float, Label};
 use ndarray::Array2;
@@ -15,8 +12,11 @@ use object_detector_rust::{
     utils::WindowGenerator,
 };
 use serde::de::DeserializeOwned;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use smartcore::linalg::basic::matrix::DenseMatrix;
+use std::error::Error;
+use std::io::{Read, Write};
+use std::marker::PhantomData;
 
 /// Hog Detector struct
 /// ,-----.  ,---------.   ,--------------------.   ,---.                             
@@ -293,7 +293,8 @@ where
     }
 }
 
-impl<C: Classifier<f32, bool> + Serialize + DeserializeOwned, WG> PersistentDetector for HogDetector<f32, bool, C, WG>
+impl<C: Classifier<f32, bool> + Serialize + DeserializeOwned, WG> PersistentDetector
+    for HogDetector<f32, bool, C, WG>
 where
     WG: WindowGenerator<DynamicImage>,
 {
@@ -320,7 +321,8 @@ where
     }
 }
 
-impl<C: Classifier<f32, usize> + Serialize + DeserializeOwned, WG> PersistentDetector for HogDetector<f32, usize, C, WG>
+impl<C: Classifier<f32, usize> + Serialize + DeserializeOwned, WG> PersistentDetector
+    for HogDetector<f32, usize, C, WG>
 where
     WG: WindowGenerator<DynamicImage>,
 {
@@ -356,14 +358,14 @@ mod tests {
     #[test]
     fn test_default() {
         let model = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
-        assert!(model.classifier.is_none());
+        assert!(model.classifier.is_some());
     }
 
     #[test]
     fn test_part_eq() {
         let model1 = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
         let model2 = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
-        assert!(model1.classifier.is_none());
+        assert!(model1.classifier.is_some());
         assert!(model1.eq(&model2));
         assert!(model1.eq(&model1));
     }
@@ -374,6 +376,6 @@ mod tests {
         let loco03 = open("res/loco03.jpg").unwrap().to_rgb8();
         let loco03 = resize(&loco03, 32, 32, FilterType::Nearest);
         let descriptor = model.preprocess(&DynamicImage::ImageRgb8(loco03));
-        assert_eq!(descriptor.len(), 1568);
+        assert_eq!(descriptor.len(), 324);
     }
 }

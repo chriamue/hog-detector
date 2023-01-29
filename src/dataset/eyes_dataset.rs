@@ -166,10 +166,10 @@ impl Default for EyesDataSet {
 mod tests {
     use super::*;
     use crate::HogDetector;
-    use std::fs::File;
     use object_detector_rust::classifier::CombinedClassifier;
-    use object_detector_rust::prelude::*;
     use object_detector_rust::detector::PersistentDetector;
+    use object_detector_rust::prelude::*;
+    use std::fs::File;
 
     #[test]
     fn test_default() {
@@ -209,7 +209,7 @@ mod tests {
 
         let file_writer = File::create("res/eyes_svm_model.json").unwrap();
         model.save(file_writer).unwrap();
-   }
+    }
 
     #[ignore = "takes more than 200s in debug mode"]
     #[test]
@@ -262,13 +262,14 @@ mod tests {
         assert!(model.classifier.is_some());
 
         //let file_writer = File::create("res/eyes_combined_model.json").unwrap();
-        //model.save(file_writer).unwrap(); 
+        //model.save(file_writer).unwrap();
     }
 
     #[test]
     fn test_detect() {
         let model = {
-            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> = HogDetector::default();
+            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
+                HogDetector::default();
             let file_reader = File::open("res/eyes_random_forest_model.json").unwrap();
             model.load(file_reader).unwrap();
             model

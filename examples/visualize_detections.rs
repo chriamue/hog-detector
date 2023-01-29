@@ -5,9 +5,7 @@ fn main() {
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
     use hog_detector::{DataSet, HogDetector};
-    use object_detector_rust::{
-        dataset::FolderDataSet, prelude::BayesClassifier, prelude::Predictable,
-    };
+    use object_detector_rust::{dataset::FolderDataSet, prelude::BayesClassifier};
 
     let mut model: HogDetector<f32, bool, BayesClassifier<f32, bool>, _> = HogDetector::default();
 

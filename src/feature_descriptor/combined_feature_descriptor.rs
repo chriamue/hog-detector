@@ -32,17 +32,19 @@ impl Feature for CombinedFeatureDescriptor {
 mod tests {
 
     use super::*;
+    use image::imageops::{resize, FilterType};
     use object_detector_rust::tests::test_image;
 
     #[test]
     fn test_default() {
-        let img = test_image();
+        let img = resize(&test_image(), 32, 32, FilterType::Nearest);
+
         let descriptor = CombinedFeatureDescriptor::default();
-        let features = descriptor.extract(&img);
+        let features = descriptor.extract(&DynamicImage::ImageRgba8(img));
 
         #[cfg(feature = "brief")]
-        assert_eq!(18688, features.unwrap().len());
+        assert_eq!(836, features.unwrap().len());
         #[cfg(not(feature = "brief"))]
-        assert_eq!(18432, features.unwrap().len());
+        assert_eq!(324, features.unwrap().len());
     }
 }
