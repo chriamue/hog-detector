@@ -101,7 +101,7 @@ where
             window_generator: SlidingWindow {
                 width: 32,
                 height: 32,
-                step_size: 32,
+                step_size: 24,
             },
             x: PhantomData,
             y: PhantomData,

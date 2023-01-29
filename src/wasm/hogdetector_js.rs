@@ -63,7 +63,7 @@ impl HogDetectorJS {
         let hog = {
             let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
                 HogDetector::default();
-            let mut file = Cursor::new(include_bytes!("../../res/eyes_random_forest_model.json"));
+            let file = Cursor::new(include_bytes!("../../res/eyes_random_forest_model.json"));
             model.load(file).unwrap();
             model
         };
