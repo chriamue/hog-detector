@@ -232,7 +232,7 @@ mod tests {
         model.save(file_writer).unwrap();
     }
 
-    //#[ignore = "takes more than 200s in debug mode"]
+    #[ignore = "takes more than 200s in debug mode"]
     #[test]
     fn test_train_bayes_model() {
         let mut model: HogDetector<f32, usize, BayesClassifier<f32, usize>, _> =
@@ -266,8 +266,8 @@ mod tests {
         model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 
-        //let file_writer = File::create("res/eyes_combined_model.json").unwrap();
-        //model.save(file_writer).unwrap();
+        let file_writer = File::create("res/eyes_combined_model.json").unwrap();
+        model.save(file_writer).unwrap();
     }
 
     #[test]

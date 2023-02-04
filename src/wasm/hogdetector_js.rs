@@ -4,6 +4,7 @@ use crate::hogdetector::HogDetectorTrait;
 use crate::HogDetector;
 use instant::Instant;
 use ndarray::{Array1, Array2};
+use object_detector_rust::classifier::CombinedClassifier;
 use object_detector_rust::dataset::DataSet;
 use object_detector_rust::detector::PersistentDetector;
 use object_detector_rust::prelude::Detector;
@@ -86,9 +87,13 @@ impl HogDetectorJS {
     #[wasm_bindgen]
     pub fn init_combined_classifier(&self) {
         let hog = {
-            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
-                HogDetector::default();
-            let file = Cursor::new(include_bytes!("../../res/eyes_random_forest_model.json"));
+            let mut model: HogDetector<
+                f32,
+                usize,
+                CombinedClassifier<f32, usize, BayesClassifier<_, _>, RandomForestClassifier<_, _>>,
+                _,
+            > = HogDetector::default();
+            let file = Cursor::new(include_bytes!("../../res/eyes_combined_model.json"));
             model.load(file).unwrap();
             model
         };
