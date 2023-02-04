@@ -130,6 +130,13 @@ where
     }
 }
 
+impl<X, Y> Classifier<X, Y> for CombinedClassifier<X, Y>
+where
+    X: Float + Number + RealNumber,
+    Y: Label + Number + Ord + Unsigned,
+{
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

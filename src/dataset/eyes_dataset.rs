@@ -165,11 +165,13 @@ impl Default for EyesDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::classifier::bayes::BayesClassifier;
     use crate::hogdetector::HogDetectorTrait;
     use crate::HogDetector;
     use object_detector_rust::classifier::CombinedClassifier;
     use object_detector_rust::detector::PersistentDetector;
-    use object_detector_rust::prelude::*;
+    use object_detector_rust::prelude::RandomForestClassifier;
+    use object_detector_rust::prelude::SVMClassifier;
     use std::fs::File;
 
     #[test]
@@ -230,10 +232,11 @@ mod tests {
         model.save(file_writer).unwrap();
     }
 
-    #[ignore = "takes more than 200s in debug mode"]
+    //#[ignore = "takes more than 200s in debug mode"]
     #[test]
     fn test_train_bayes_model() {
-        let mut model: HogDetector<f32, usize, BayesClassifier<_, _>, _> = HogDetector::default();
+        let mut model: HogDetector<f32, usize, BayesClassifier<f32, usize>, _> =
+            HogDetector::default();
 
         let mut dataset = EyesDataSet::default();
         dataset.load().unwrap();
@@ -242,8 +245,8 @@ mod tests {
         model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 
-        //let mut file_writer = File::create("res/eyes_bayes_model.json").unwrap();
-        //model.save(file_writer);
+        let file_writer = File::create("res/eyes_bayes_model.json").unwrap();
+        model.save(file_writer).unwrap();
     }
 
     #[ignore = "takes more than 200s in debug mode"]

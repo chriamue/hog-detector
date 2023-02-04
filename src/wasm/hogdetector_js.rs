@@ -1,3 +1,4 @@
+use crate::classifier::BayesClassifier;
 use crate::detector::visualize_detections;
 use crate::hogdetector::HogDetectorTrait;
 use crate::HogDetector;
@@ -73,9 +74,9 @@ impl HogDetectorJS {
     #[wasm_bindgen]
     pub fn init_bayes_classifier(&self) {
         let hog = {
-            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
+            let mut model: HogDetector<f32, usize, BayesClassifier<_, _>, _> =
                 HogDetector::default();
-            let file = Cursor::new(include_bytes!("../../res/eyes_random_forest_model.json"));
+            let file = Cursor::new(include_bytes!("../../res/eyes_bayes_model.json"));
             model.load(file).unwrap();
             model
         };

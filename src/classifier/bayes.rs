@@ -102,7 +102,9 @@ where
 mod tests {
     use crate::hogdetector::HogDetectorTrait;
     use image::Rgb;
-    use object_detector_rust::prelude::*;
+    use object_detector_rust::dataset::DataSet;
+    use object_detector_rust::detector::Detector;
+    use object_detector_rust::detector::PersistentDetector;
     use object_detector_rust::{prelude::MemoryDataSet, tests::test_image};
 
     use super::*;
@@ -141,7 +143,7 @@ mod tests {
 
     #[test]
     fn test_evaluate() {
-        let mut model: HogDetector<f32, usize, super::BayesClassifier<_, _>, _> =
+        let mut model: HogDetector<f32, usize, BayesClassifier<f32, usize>, _> =
             HogDetector::default();
 
         let mut dataset = MemoryDataSet::new_test();
