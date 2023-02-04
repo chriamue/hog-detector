@@ -60,11 +60,7 @@ impl DataSet for MnistDataSet {
         let mut train_y = Vec::new();
 
         let Mnist {
-            trn_img,
-            trn_lbl,
-            tst_img,
-            tst_lbl,
-            ..
+            trn_img, trn_lbl, ..
         } = self.mnist.as_ref().unwrap();
 
         let train_data = Array3::from_shape_vec((self.data_len, 28, 28), trn_img.to_vec())

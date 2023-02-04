@@ -4,6 +4,7 @@ fn main() {
 }
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
+    use hog_detector::hogdetector::HogDetectorTrait;
     use hog_detector::{DataSet, HogDetector};
     use object_detector_rust::{dataset::FolderDataSet, prelude::BayesClassifier};
 
@@ -16,6 +17,7 @@ fn main() {
     dataset.load().unwrap();
     //dataset.generate_random_annotations(10);
     let (x, y) = dataset.get_data();
+    let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
     model.fit_class(&x, &y, 1).unwrap();
     assert!(model.classifier.is_some());
     let webcam01 = image::open("res/training/webcam01.jpg").unwrap();
@@ -24,6 +26,7 @@ fn main() {
         .save("out/test_visualize_detections_1.png")
         .unwrap();
     let (x, y) = dataset.get_data();
+    let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
     model.fit_class(&x, &y, 2).unwrap();
     let webcam06 = image::open("res/training/webcam06.jpg").unwrap();
     model
@@ -31,6 +34,7 @@ fn main() {
         .save("out/test_visualize_detections_2.png")
         .unwrap();
     let (x, y) = dataset.get_data();
+    let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
     model.fit_class(&x, &y, 5).unwrap();
     //dataset.generate_hard_negative_samples(&model, 5, None);
     let webcam10 = image::open("res/training/webcam01.jpg").unwrap();

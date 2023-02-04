@@ -4,6 +4,7 @@ fn main() {
 }
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
+    use hog_detector::hogdetector::HogDetectorTrait;
     use hog_detector::{DataSet, HogDetector};
     use object_detector_rust::{classifier::BayesClassifier, dataset::FolderDataSet};
     let mut model: HogDetector<f32, bool, BayesClassifier<f32, bool>, _> = HogDetector::default();
@@ -16,6 +17,7 @@ fn main() {
     dataset.load().unwrap();
     // dataset.augment();
     let (x, y) = dataset.get_data();
+    let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
     model.fit_class(&x, &y, 5).unwrap();
     // println!("evaluated: {:?} %", model.evaluate(&dataset, 5) * 100.0);
 

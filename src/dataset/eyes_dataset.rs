@@ -165,6 +165,7 @@ impl Default for EyesDataSet {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::hogdetector::HogDetectorTrait;
     use crate::HogDetector;
     use object_detector_rust::classifier::CombinedClassifier;
     use object_detector_rust::detector::PersistentDetector;
@@ -204,6 +205,7 @@ mod tests {
         let mut dataset = EyesDataSet::default();
         dataset.load().unwrap();
         let (x, y) = dataset.get_data();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
         model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
 

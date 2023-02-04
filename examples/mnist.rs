@@ -6,6 +6,7 @@ fn main() {
 #[cfg(feature = "mnist")]
 fn main() {
     use hog_detector::dataset::MnistDataSet;
+    use hog_detector::hogdetector::HogDetectorTrait;
     use hog_detector::DataSet;
     use hog_detector::HogDetector;
     use object_detector_rust::prelude::BayesClassifier;

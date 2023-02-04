@@ -6,6 +6,7 @@ fn main() {
 #[cfg(feature = "eyes")]
 fn main() {
     use hog_detector::dataset::EyesDataSet;
+    use hog_detector::hogdetector::HogDetectorTrait;
     use hog_detector::{DataSet, HogDetector};
     use object_detector_rust::prelude::BayesClassifier;
     let mut model: HogDetector<f32, usize, BayesClassifier<f32, usize>, _> = HogDetector::default();

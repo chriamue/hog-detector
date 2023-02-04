@@ -4,6 +4,7 @@ fn main() {
 }
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
+    use hog_detector::hogdetector::HogDetectorTrait;
     use hog_detector::prelude::Predictable;
     use hog_detector::{prelude::BBox, DataSet, HogDetector};
     use ndarray::{Array1, Array2};
