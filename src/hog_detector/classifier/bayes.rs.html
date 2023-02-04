@@ -174,6 +174,8 @@
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::HogDetector;
 <span class="kw">use </span>linfa::Float;
 <span class="kw">use </span>linfa::Label;
@@ -278,7 +280,9 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span><span class="kw">crate</span>::hogdetector::HogDetectorTrait;
     <span class="kw">use </span>image::Rgb;
-    <span class="kw">use </span>object_detector_rust::prelude::<span class="kw-2">*</span>;
+    <span class="kw">use </span>object_detector_rust::dataset::DataSet;
+    <span class="kw">use </span>object_detector_rust::detector::Detector;
+    <span class="kw">use </span>object_detector_rust::detector::PersistentDetector;
     <span class="kw">use </span>object_detector_rust::{prelude::MemoryDataSet, tests::test_image};
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
@@ -317,7 +321,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_evaluate() {
-        <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, <span class="kw">super</span>::BayesClassifier&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;, <span class="kw">_</span>&gt; =
+        <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, BayesClassifier&lt;f32, usize&gt;, <span class="kw">_</span>&gt; =
             HogDetector::default();
 
         <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
