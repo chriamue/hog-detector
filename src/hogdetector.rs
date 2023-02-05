@@ -2,9 +2,8 @@ use crate::detector::visualize_detections;
 use crate::Detector;
 use image::{DynamicImage, GenericImageView};
 use linfa::{Float, Label};
-use ndarray::{Array2, ArrayView1, ArrayView2};
+use ndarray::Array2;
 use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
-use object_detector_rust::trainable::Trainable;
 use object_detector_rust::utils::{evaluate_precision, extract_data};
 use object_detector_rust::{prelude::Classifier, utils::SlidingWindow};
 use object_detector_rust::{
@@ -308,17 +307,6 @@ where
     }
 }
 
-impl<X, Y, C: Classifier<X, Y>, WG> Trainable<X, Y> for HogDetector<X, Y, C, WG>
-where
-    X: Float,
-    Y: Label,
-    WG: WindowGenerator<DynamicImage>,
-{
-    fn fit(&mut self, x: &ArrayView2<X>, y: &ArrayView1<Y>) -> Result<(), String> {
-        self.classifier.as_mut().unwrap().fit(&x.view(), &y.view())
-    }
-}
-
 impl<C: Classifier<f32, usize>, WG> HogDetectorTrait<f32, usize> for HogDetector<f32, usize, C, WG>
 where
     WG: WindowGenerator<DynamicImage>,
@@ -385,7 +373,11 @@ where
 mod tests {
     use super::*;
     use crate::classifier::BayesClassifier;
-    use object_detector_rust::prelude::{MemoryDataSet, SVMClassifier};
+    use image::Rgb;
+    use object_detector_rust::{
+        prelude::{MemoryDataSet, SVMClassifier},
+        tests::test_image,
+    };
 
     #[test]
     fn test_default() {
@@ -416,5 +408,24 @@ mod tests {
         model.fit_class(&x, &y, 1).unwrap();
         assert!(model.classifier.is_some());
         assert!(model.evaluate(&dataset, 1) > 0.0);
+    }
+
+    #[test]
+    fn test_bool_detector() {
+        let img = test_image();
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        let x = x.into_iter().map(|x| x.thumbnail_exact(32, 32)).collect();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+
+        let mut detector: HogDetector<f32, bool, SVMClassifier<f32, bool>, _> =
+            HogDetector::default();
+        detector.fit_class(&x, &y, 1).unwrap();
+        let detections = detector.detect(&img);
+        assert!(detections.is_empty());
+        let visualization = detector.visualize_detections(&img).to_rgb8();
+        assert_eq!(&Rgb([0, 0, 0]), visualization.get_pixel(55, 0));
+        assert_eq!(&Rgb([255, 0, 0]), visualization.get_pixel(75, 0));
     }
 }
