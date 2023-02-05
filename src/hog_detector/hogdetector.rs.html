@@ -418,13 +418,23 @@
 <a href="#418" id="418">418</a>
 <a href="#419" id="419">419</a>
 <a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::visualize_detections;
 <span class="kw">use </span><span class="kw">crate</span>::Detector;
 <span class="kw">use </span>image::{DynamicImage, GenericImageView};
 <span class="kw">use </span>linfa::{Float, Label};
-<span class="kw">use </span>ndarray::{Array2, ArrayView1, ArrayView2};
+<span class="kw">use </span>ndarray::Array2;
 <span class="kw">use </span>object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
-<span class="kw">use </span>object_detector_rust::trainable::Trainable;
 <span class="kw">use </span>object_detector_rust::utils::{evaluate_precision, extract_data};
 <span class="kw">use </span>object_detector_rust::{prelude::Classifier, utils::SlidingWindow};
 <span class="kw">use </span>object_detector_rust::{
@@ -728,17 +738,6 @@
     }
 }
 
-<span class="kw">impl</span>&lt;X, Y, C: Classifier&lt;X, Y&gt;, WG&gt; Trainable&lt;X, Y&gt; <span class="kw">for </span>HogDetector&lt;X, Y, C, WG&gt;
-<span class="kw">where
-    </span>X: Float,
-    Y: Label,
-    WG: WindowGenerator&lt;DynamicImage&gt;,
-{
-    <span class="kw">fn </span>fit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: <span class="kw-2">&amp;</span>ArrayView2&lt;X&gt;, y: <span class="kw-2">&amp;</span>ArrayView1&lt;Y&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-        <span class="self">self</span>.classifier.as_mut().unwrap().fit(<span class="kw-2">&amp;</span>x.view(), <span class="kw-2">&amp;</span>y.view())
-    }
-}
-
 <span class="kw">impl</span>&lt;C: Classifier&lt;f32, usize&gt;, WG&gt; HogDetectorTrait&lt;f32, usize&gt; <span class="kw">for </span>HogDetector&lt;f32, usize, C, WG&gt;
 <span class="kw">where
     </span>WG: WindowGenerator&lt;DynamicImage&gt;,
@@ -805,7 +804,11 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::classifier::BayesClassifier;
-    <span class="kw">use </span>object_detector_rust::prelude::{MemoryDataSet, SVMClassifier};
+    <span class="kw">use </span>image::Rgb;
+    <span class="kw">use </span>object_detector_rust::{
+        prelude::{MemoryDataSet, SVMClassifier},
+        tests::test_image,
+    };
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_default() {
@@ -836,6 +839,25 @@
         model.fit_class(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>y, <span class="number">1</span>).unwrap();
         <span class="macro">assert!</span>(model.classifier.is_some());
         <span class="macro">assert!</span>(model.evaluate(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>) &gt; <span class="number">0.0</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_bool_detector() {
+        <span class="kw">let </span>img = test_image();
+        <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
+        dataset.load().unwrap();
+        <span class="kw">let </span>(x, y) = dataset.get_data();
+        <span class="kw">let </span>x = x.into_iter().map(|x| x.thumbnail_exact(<span class="number">32</span>, <span class="number">32</span>)).collect();
+        <span class="kw">let </span>y = y.into_iter().map(|y| y <span class="kw">as </span>usize).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>detector: HogDetector&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, <span class="kw">_</span>&gt; =
+            HogDetector::default();
+        detector.fit_class(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>y, <span class="number">1</span>).unwrap();
+        <span class="kw">let </span>detections = detector.detect(<span class="kw-2">&amp;</span>img);
+        <span class="macro">assert!</span>(detections.is_empty());
+        <span class="kw">let </span>visualization = detector.visualize_detections(<span class="kw-2">&amp;</span>img).to_rgb8();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]), visualization.get_pixel(<span class="number">55</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Rgb([<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>]), visualization.get_pixel(<span class="number">75</span>, <span class="number">0</span>));
     }
 }
 </code></pre></div>
