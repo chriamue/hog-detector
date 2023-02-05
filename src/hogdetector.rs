@@ -5,7 +5,7 @@ use linfa::{Float, Label};
 use ndarray::{Array2, ArrayView1, ArrayView2};
 use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
 use object_detector_rust::trainable::Trainable;
-use object_detector_rust::utils::extract_data;
+use object_detector_rust::utils::{evaluate_precision, extract_data};
 use object_detector_rust::{prelude::Classifier, utils::SlidingWindow};
 use object_detector_rust::{
     prelude::{BBox, Class, Detection},
@@ -13,7 +13,6 @@ use object_detector_rust::{
 };
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use smartcore::linalg::basic::matrix::DenseMatrix;
 use std::error::Error;
 use std::io::{Read, Write};
 use std::marker::PhantomData;
@@ -109,26 +108,27 @@ where
     }
 }
 
-impl<X, Y, C: Classifier<X, Y>, W> HogDetector<X, Y, C, W>
+impl<X, Y, C: Classifier<X, Y> + object_detector_rust::predictable::Predictable<f32, usize>, W>
+    HogDetector<X, Y, C, W>
 where
     X: Float,
     Y: Label,
     W: WindowGenerator<DynamicImage>,
 {
-    /// preprocesses image to vector
-    pub fn preprocess(&self, image: &DynamicImage) -> Vec<f32> {
-        self.feature_descriptor.extract(image).unwrap()
-    }
-    /// preprocesses images into dense matrix
-    pub fn preprocess_matrix(&self, images: Vec<DynamicImage>) -> DenseMatrix<f32> {
-        let descriptors: Vec<Vec<f32>> =
-            images.iter().map(|image| self.preprocess(image)).collect();
-        DenseMatrix::from_2d_vec(&descriptors)
-    }
-
     /// evaluate class on dataset
     pub fn evaluate(&mut self, dataset: &dyn DataSet, class: Class) -> f32 {
-        0.0
+        let (x, y) = dataset.get_data();
+        let x: Vec<DynamicImage> = x.into_iter().map(|x| x.thumbnail_exact(32, 32)).collect();
+        let x: Vec<Vec<_>> = x
+            .iter()
+            .map(|image| self.feature_descriptor.extract(image).unwrap())
+            .collect();
+        let y = y
+            .iter()
+            .map(|y| if *y == class { class as usize } else { 0 })
+            .collect();
+        let (x, y) = extract_data(x, y);
+        evaluate_precision::<f32, usize>(self.classifier.as_ref().unwrap(), &x, &y)
     }
 }
 
@@ -384,8 +384,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use image::{imageops::resize, imageops::FilterType, open};
-    use object_detector_rust::prelude::SVMClassifier;
+    use crate::classifier::BayesClassifier;
+    use object_detector_rust::prelude::{MemoryDataSet, SVMClassifier};
 
     #[test]
     fn test_default() {
@@ -403,11 +403,18 @@ mod tests {
     }
 
     #[test]
-    fn test_hog() {
-        let model = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
-        let loco03 = open("res/loco03.jpg").unwrap().to_rgb8();
-        let loco03 = resize(&loco03, 32, 32, FilterType::Nearest);
-        let descriptor = model.preprocess(&DynamicImage::ImageRgb8(loco03));
-        assert_eq!(descriptor.len(), 324);
+    fn test_evaluate() {
+        let mut model: HogDetector<f32, usize, BayesClassifier<f32, usize>, _> =
+            HogDetector::default();
+
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        let x = x.into_iter().map(|x| x.thumbnail_exact(32, 32)).collect();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+
+        model.fit_class(&x, &y, 1).unwrap();
+        assert!(model.classifier.is_some());
+        assert!(model.evaluate(&dataset, 1) > 0.0);
     }
 }

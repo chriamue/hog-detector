@@ -142,22 +142,6 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate() {
-        let mut model: HogDetector<f32, usize, BayesClassifier<f32, usize>, _> =
-            HogDetector::default();
-
-        let mut dataset = MemoryDataSet::new_test();
-        dataset.load().unwrap();
-        let (x, y) = dataset.get_data();
-        let x = x.into_iter().map(|x| x.thumbnail_exact(32, 32)).collect();
-        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
-
-        model.fit_class(&x, &y, 1).unwrap();
-        assert!(model.classifier.is_some());
-        //assert!(model.evaluate(&dataset, 1) > 0.0);
-    }
-
-    #[test]
     fn test_detector() {
         let img = test_image();
         let mut dataset = MemoryDataSet::new_test();
