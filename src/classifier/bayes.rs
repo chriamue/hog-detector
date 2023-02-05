@@ -100,14 +100,12 @@ where
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::hogdetector::HogDetectorTrait;
     use image::Rgb;
     use object_detector_rust::dataset::DataSet;
     use object_detector_rust::detector::Detector;
-    use object_detector_rust::detector::PersistentDetector;
     use object_detector_rust::{prelude::MemoryDataSet, tests::test_image};
-
-    use super::*;
 
     #[test]
     fn test_default() {
@@ -120,25 +118,6 @@ mod tests {
         let detector1 = HogDetector::<f32, usize, super::BayesClassifier<_, _>, _>::default();
         let detector2 = HogDetector::<f32, usize, super::BayesClassifier<_, _>, _>::bayes();
         assert!(detector1.eq(&detector2));
-    }
-
-    #[test]
-    fn test_save_load() {
-        let mut model: HogDetector<f32, usize, super::BayesClassifier<_, _>, _> =
-            HogDetector::default();
-        let mut dataset = MemoryDataSet::new_test();
-        dataset.load().unwrap();
-        let (x, y) = dataset.get_data();
-        let x = x.into_iter().map(|x| x.thumbnail_exact(32, 32)).collect();
-        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
-
-        model.fit_class(&x, &y, 1).unwrap();
-        let mut serialized = Vec::new();
-        model.save(&mut serialized).unwrap();
-        let mut model2: HogDetector<f32, usize, super::BayesClassifier<_, _>, _> =
-            HogDetector::default();
-        model2.load(&mut &serialized[..]).unwrap();
-        assert_eq!(model, model2);
     }
 
     #[test]

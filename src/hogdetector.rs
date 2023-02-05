@@ -428,4 +428,38 @@ mod tests {
         assert_eq!(&Rgb([0, 0, 0]), visualization.get_pixel(55, 0));
         assert_eq!(&Rgb([255, 0, 0]), visualization.get_pixel(75, 0));
     }
+
+    #[test]
+    fn test_save_load_usize() {
+        let mut model: HogDetector<f32, usize, BayesClassifier<_, _>, _> = HogDetector::default();
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        let x = x.into_iter().map(|x| x.thumbnail_exact(32, 32)).collect();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+
+        model.fit_class(&x, &y, 1).unwrap();
+        let mut serialized = Vec::new();
+        model.save(&mut serialized).unwrap();
+        let mut model2: HogDetector<f32, usize, BayesClassifier<_, _>, _> = HogDetector::default();
+        model2.load(&mut &serialized[..]).unwrap();
+        assert_eq!(model, model2);
+    }
+
+    #[test]
+    fn test_save_load_bool() {
+        let mut model: HogDetector<f32, bool, SVMClassifier<_, _>, _> = HogDetector::default();
+        let mut dataset = MemoryDataSet::new_test();
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        let x = x.into_iter().map(|x| x.thumbnail_exact(32, 32)).collect();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+
+        model.fit_class(&x, &y, 1).unwrap();
+        let mut serialized = Vec::new();
+        model.save(&mut serialized).unwrap();
+        let mut model2: HogDetector<f32, bool, SVMClassifier<_, _>, _> = HogDetector::default();
+        model2.load(&mut &serialized[..]).unwrap();
+        assert_eq!(model, model2);
+    }
 }
