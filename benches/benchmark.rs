@@ -1,65 +1,19 @@
 use criterion::{criterion_group, criterion_main, Bencher, Criterion};
-use hog_detector::{
-    classifier::BayesClassifier,
-    dataset::MemoryDataSet,
-    feature_descriptor::{FeatureDescriptor, HogFeatureDescriptor},
-    tests::test_image,
-    DataSet, Detector, HogDetector, Trainable,
-};
-use image::{DynamicImage, RgbImage};
-
-fn rotated_frames(b: &mut Bencher) {
-    let image = DynamicImage::ImageRgb8(RgbImage::new(32, 32));
-    b.iter(|| {
-        let _frames: Vec<DynamicImage> = hog_detector::utils::rotated_frames(&image).collect();
-    })
-}
-
-fn scaled_frames(b: &mut Bencher) {
-    let image = DynamicImage::ImageRgb8(RgbImage::new(32, 32));
-    b.iter(|| {
-        let _frames: Vec<DynamicImage> = hog_detector::utils::scaled_frames(&image).collect();
-    })
-}
-
-fn window_crop(b: &mut Bencher) {
-    let image = DynamicImage::ImageRgb8(RgbImage::new(100, 100));
-    b.iter(|| {
-        let _cropped = hog_detector::utils::window_crop(&image, 32, 32, (20, 20));
-    })
-}
+use object_detector_rust::prelude::{BBox, Feature, HOGFeature};
+use object_detector_rust::tests::test_image;
+use object_detector_rust::utils::crop_bbox;
 
 fn calculate_hog_feature(b: &mut Bencher) {
     let image = test_image();
-    let feature_descriptor = HogFeatureDescriptor::default();
+    let image = crop_bbox(&image, &BBox::new(0, 0, 64, 64));
+    let feature_descriptor = HOGFeature::default();
     b.iter(|| {
-        feature_descriptor.calculate_feature(&image).unwrap();
+        feature_descriptor.extract(&image).unwrap();
     })
 }
 
-fn preprocess_matrix(b: &mut Bencher) {
-    let image = test_image();
-    let images = vec![image.clone(), image.clone(), image.clone(), image.clone()];
-    let hog_detector: HogDetector<BayesClassifier> = HogDetector::default();
-    b.iter(|| hog_detector.preprocess_matrix(images.clone()));
-}
-
-fn detect_objects(b: &mut Bencher) {
-    let image = test_image();
-    let mut hog_detector: HogDetector<BayesClassifier> = HogDetector::default();
-    let mut dataset = MemoryDataSet::new_test();
-    dataset.load();
-    hog_detector.train_class(&dataset, 1);
-    b.iter(|| hog_detector.detect_objects(&image));
-}
-
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("rotated_frames", rotated_frames);
-    c.bench_function("scaled_frames", scaled_frames);
-    c.bench_function("window_crop", window_crop);
     c.bench_function("calculate hog feature", calculate_hog_feature);
-    c.bench_function("preprocess matrix", preprocess_matrix);
-    c.bench_function("detect objects", detect_objects);
 }
 
 criterion_group!(benches, criterion_benchmark);
