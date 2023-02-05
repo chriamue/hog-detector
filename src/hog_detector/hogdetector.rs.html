@@ -411,6 +411,13 @@
 <a href="#411" id="411">411</a>
 <a href="#412" id="412">412</a>
 <a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::visualize_detections;
 <span class="kw">use </span><span class="kw">crate</span>::Detector;
 <span class="kw">use </span>image::{DynamicImage, GenericImageView};
@@ -418,7 +425,7 @@
 <span class="kw">use </span>ndarray::{Array2, ArrayView1, ArrayView2};
 <span class="kw">use </span>object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
 <span class="kw">use </span>object_detector_rust::trainable::Trainable;
-<span class="kw">use </span>object_detector_rust::utils::extract_data;
+<span class="kw">use </span>object_detector_rust::utils::{evaluate_precision, extract_data};
 <span class="kw">use </span>object_detector_rust::{prelude::Classifier, utils::SlidingWindow};
 <span class="kw">use </span>object_detector_rust::{
     prelude::{BBox, Class, Detection},
@@ -426,7 +433,6 @@
 };
 <span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>serde::Serialize;
-<span class="kw">use </span>smartcore::linalg::basic::matrix::DenseMatrix;
 <span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::io::{Read, Write};
 <span class="kw">use </span>std::marker::PhantomData;
@@ -522,27 +528,28 @@
     }
 }
 
-<span class="kw">impl</span>&lt;X, Y, C: Classifier&lt;X, Y&gt;, W&gt; HogDetector&lt;X, Y, C, W&gt;
+<span class="kw">impl</span>&lt;X, Y, C: Classifier&lt;X, Y&gt; + object_detector_rust::predictable::Predictable&lt;f32, usize&gt;, W&gt;
+    HogDetector&lt;X, Y, C, W&gt;
 <span class="kw">where
     </span>X: Float,
     Y: Label,
     W: WindowGenerator&lt;DynamicImage&gt;,
 {
-    <span class="doccomment">/// preprocesses image to vector
-    </span><span class="kw">pub fn </span>preprocess(<span class="kw-2">&amp;</span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>DynamicImage) -&gt; Vec&lt;f32&gt; {
-        <span class="self">self</span>.feature_descriptor.extract(image).unwrap()
-    }
-    <span class="doccomment">/// preprocesses images into dense matrix
-    </span><span class="kw">pub fn </span>preprocess_matrix(<span class="kw-2">&amp;</span><span class="self">self</span>, images: Vec&lt;DynamicImage&gt;) -&gt; DenseMatrix&lt;f32&gt; {
-        <span class="kw">let </span>descriptors: Vec&lt;Vec&lt;f32&gt;&gt; =
-            images.iter().map(|image| <span class="self">self</span>.preprocess(image)).collect();
-        DenseMatrix::from_2d_vec(<span class="kw-2">&amp;</span>descriptors)
-    }
-
     <span class="doccomment">/// evaluate class on dataset
     </span><span class="kw">pub fn </span>evaluate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dataset: <span class="kw-2">&amp;</span><span class="kw">dyn </span>DataSet, class: Class) -&gt; f32 {
-        <span class="number">0.0
-    </span>}
+        <span class="kw">let </span>(x, y) = dataset.get_data();
+        <span class="kw">let </span>x: Vec&lt;DynamicImage&gt; = x.into_iter().map(|x| x.thumbnail_exact(<span class="number">32</span>, <span class="number">32</span>)).collect();
+        <span class="kw">let </span>x: Vec&lt;Vec&lt;<span class="kw">_</span>&gt;&gt; = x
+            .iter()
+            .map(|image| <span class="self">self</span>.feature_descriptor.extract(image).unwrap())
+            .collect();
+        <span class="kw">let </span>y = y
+            .iter()
+            .map(|y| <span class="kw">if </span><span class="kw-2">*</span>y == class { class <span class="kw">as </span>usize } <span class="kw">else </span>{ <span class="number">0 </span>})
+            .collect();
+        <span class="kw">let </span>(x, y) = extract_data(x, y);
+        evaluate_precision::&lt;f32, usize&gt;(<span class="self">self</span>.classifier.as_ref().unwrap(), <span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>y)
+    }
 }
 
 <span class="kw">impl</span>&lt;C: Classifier&lt;f32, bool&gt;, W&gt; HogDetector&lt;f32, bool, C, W&gt;
@@ -797,8 +804,8 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span>image::{imageops::resize, imageops::FilterType, open};
-    <span class="kw">use </span>object_detector_rust::prelude::SVMClassifier;
+    <span class="kw">use </span><span class="kw">crate</span>::classifier::BayesClassifier;
+    <span class="kw">use </span>object_detector_rust::prelude::{MemoryDataSet, SVMClassifier};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_default() {
@@ -816,12 +823,19 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_hog() {
-        <span class="kw">let </span>model = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, SlidingWindow&gt;::default();
-        <span class="kw">let </span>loco03 = open(<span class="string">&quot;res/loco03.jpg&quot;</span>).unwrap().to_rgb8();
-        <span class="kw">let </span>loco03 = resize(<span class="kw-2">&amp;</span>loco03, <span class="number">32</span>, <span class="number">32</span>, FilterType::Nearest);
-        <span class="kw">let </span>descriptor = model.preprocess(<span class="kw-2">&amp;</span>DynamicImage::ImageRgb8(loco03));
-        <span class="macro">assert_eq!</span>(descriptor.len(), <span class="number">324</span>);
+    </span><span class="kw">fn </span>test_evaluate() {
+        <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, BayesClassifier&lt;f32, usize&gt;, <span class="kw">_</span>&gt; =
+            HogDetector::default();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>dataset = MemoryDataSet::new_test();
+        dataset.load().unwrap();
+        <span class="kw">let </span>(x, y) = dataset.get_data();
+        <span class="kw">let </span>x = x.into_iter().map(|x| x.thumbnail_exact(<span class="number">32</span>, <span class="number">32</span>)).collect();
+        <span class="kw">let </span>y = y.into_iter().map(|y| y <span class="kw">as </span>usize).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+
+        model.fit_class(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>y, <span class="number">1</span>).unwrap();
+        <span class="macro">assert!</span>(model.classifier.is_some());
+        <span class="macro">assert!</span>(model.evaluate(<span class="kw-2">&amp;</span>dataset, <span class="number">1</span>) &gt; <span class="number">0.0</span>);
     }
 }
 </code></pre></div>
