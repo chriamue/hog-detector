@@ -8,6 +8,7 @@ use object_detector_rust::dataset::DataSet;
 use object_detector_rust::detector::PersistentDetector;
 use object_detector_rust::prelude::MemoryDataSet;
 use object_detector_rust::prelude::RandomForestClassifier;
+use object_detector_rust::utils::add_hard_negative_samples;
 use std::collections::VecDeque;
 use std::io::Cursor;
 use std::sync::{Arc, Mutex};
@@ -31,7 +32,8 @@ impl HogDetectorJS {
     pub fn train_with_hard_negative_samples(&self, dataset: MemoryDataSet) {
         let mut dataset = dataset;
         let mut hog = self.hog.lock().unwrap();
-        //dataset.generate_hard_negative_samples(hog.detector(), 1, Some(50));
+
+        add_hard_negative_samples(&mut dataset, hog.detector(), 1, Some(50), 32, 32);
         dataset.load().unwrap();
         let (x, y) = dataset.get_data();
         let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
