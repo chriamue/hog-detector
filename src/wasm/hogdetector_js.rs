@@ -1,7 +1,9 @@
 use crate::classifier::BayesClassifier;
 use crate::detector::visualize_detections;
 use crate::hogdetector::HogDetectorTrait;
+use crate::utils::scale_to_32;
 use crate::HogDetector;
+use image::DynamicImage;
 use instant::Instant;
 use object_detector_rust::classifier::CombinedClassifier;
 use object_detector_rust::dataset::DataSet;
@@ -25,6 +27,7 @@ impl HogDetectorJS {
     pub fn train(&self, dataset: MemoryDataSet) {
         let mut hog = self.hog.lock().unwrap();
         let (x, y) = dataset.get_data();
+        let x: Vec<DynamicImage> = x.into_iter().map(scale_to_32).collect();
         let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
         hog.fit_class(&x, &y, 1).unwrap();
     }
@@ -36,6 +39,7 @@ impl HogDetectorJS {
         add_hard_negative_samples(&mut dataset, hog.detector(), 1, Some(50), 32, 32);
         dataset.load().unwrap();
         let (x, y) = dataset.get_data();
+        let x = x.into_iter().map(scale_to_32).collect();
         let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
         hog.fit_class(&x, &y, 1).unwrap();
     }
