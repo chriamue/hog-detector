@@ -460,11 +460,15 @@
 <a href="#460" id="460">460</a>
 <a href="#461" id="461">461</a>
 <a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::visualize_detections;
 <span class="kw">use </span><span class="kw">crate</span>::Detector;
 <span class="kw">use </span>image::{DynamicImage, GenericImageView};
 <span class="kw">use </span>linfa::{Float, Label};
 <span class="kw">use </span>ndarray::Array2;
+<span class="kw">use </span>object_detector_rust::detection::merge_overlapping_detections;
 <span class="kw">use </span>object_detector_rust::prelude::{BBox, Class, Detection, WindowGenerator};
 <span class="kw">use </span>object_detector_rust::prelude::{Classifier, SlidingWindow};
 <span class="kw">use </span>object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
@@ -657,6 +661,7 @@
                 ));
             }
         }
+        <span class="kw">let </span>detections = merge_overlapping_detections(<span class="kw-2">&amp;</span>detections);
         detections
     }
 }
@@ -706,6 +711,7 @@
                 ));
             }
         }
+        <span class="kw">let </span>detections = merge_overlapping_detections(<span class="kw-2">&amp;</span>detections);
         detections
     }
 }
