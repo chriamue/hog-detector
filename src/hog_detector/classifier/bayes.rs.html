@@ -139,6 +139,9 @@
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::HogDetector;
 <span class="kw">use </span>linfa::Float;
 <span class="kw">use </span>linfa::Label;
@@ -146,7 +149,10 @@
 <span class="kw">use </span>ndarray::ArrayView1;
 <span class="kw">use </span>ndarray::{Array1, ArrayView2};
 <span class="kw">use </span>num_traits::Unsigned;
-<span class="kw">use </span>object_detector_rust::{prelude::Predictable, trainable::Trainable, utils::SlidingWindow};
+<span class="kw">use </span>object_detector_rust::{
+    prelude::{Predictable, SlidingWindow},
+    trainable::Trainable,
+};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>smartcore::naive_bayes::gaussian::GaussianNB;
 <span class="kw">use </span>smartcore::numbers::basenum::Number;
