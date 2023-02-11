@@ -1,11 +1,12 @@
 use crate::detector::visualize_detections;
+use crate::utils::scale_to_32;
 use crate::Detector;
 use image::{DynamicImage, GenericImageView};
 use linfa::{Float, Label};
 use ndarray::Array2;
 use object_detector_rust::detection::merge_overlapping_detections;
 use object_detector_rust::prelude::{BBox, Class, Detection, WindowGenerator};
-use object_detector_rust::prelude::{Classifier, SlidingWindow};
+use object_detector_rust::prelude::{Classifier, PyramidWindow};
 use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
 use object_detector_rust::utils::{evaluate_precision, extract_data};
 use serde::de::DeserializeOwned;
@@ -85,19 +86,20 @@ where
     }
 }
 
-impl<X, Y, C: Classifier<X, Y> + Default> Default for HogDetector<X, Y, C, SlidingWindow>
+impl<X, Y, C: Classifier<X, Y> + Default> Default for HogDetector<X, Y, C, PyramidWindow>
 where
     X: Float,
     Y: Label,
 {
     fn default() -> Self {
-        HogDetector::<X, Y, C, SlidingWindow> {
+        HogDetector::<X, Y, C, PyramidWindow> {
             classifier: Some(C::default()),
             feature_descriptor: Box::new(HOGFeature::default()),
-            window_generator: SlidingWindow {
+            window_generator: PyramidWindow {
                 width: 32,
                 height: 32,
                 step_size: 24,
+                layers: 2,
             },
             x: PhantomData,
             y: PhantomData,
@@ -162,7 +164,9 @@ where
             .iter()
             .flat_map(|window| {
                 self.feature_descriptor
-                    .extract(&DynamicImage::ImageRgba8(window.view.to_image()))
+                    .extract(&scale_to_32(DynamicImage::ImageRgba8(
+                        window.view.to_image(),
+                    )))
             })
             .collect();
 
@@ -212,7 +216,9 @@ where
             .iter()
             .flat_map(|window| {
                 self.feature_descriptor
-                    .extract(&DynamicImage::ImageRgba8(window.view.to_image()))
+                    .extract(&scale_to_32(DynamicImage::ImageRgba8(
+                        window.view.to_image(),
+                    )))
             })
             .collect();
 
@@ -381,14 +387,14 @@ mod tests {
 
     #[test]
     fn test_default() {
-        let model = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
+        let model = HogDetector::<f32, bool, SVMClassifier<f32, bool>, _>::default();
         assert!(model.classifier.is_some());
     }
 
     #[test]
     fn test_part_eq() {
-        let model1 = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
-        let model2 = HogDetector::<f32, bool, SVMClassifier<f32, bool>, SlidingWindow>::default();
+        let model1 = HogDetector::<f32, bool, SVMClassifier<f32, bool>, _>::default();
+        let model2 = HogDetector::<f32, bool, SVMClassifier<f32, bool>, _>::default();
         assert!(model1.classifier.is_some());
         assert!(model1.eq(&model2));
         assert!(model1.eq(&model1));

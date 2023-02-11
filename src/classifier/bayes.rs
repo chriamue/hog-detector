@@ -6,7 +6,7 @@ use ndarray::ArrayView1;
 use ndarray::{Array1, ArrayView2};
 use num_traits::Unsigned;
 use object_detector_rust::{
-    prelude::{Predictable, SlidingWindow},
+    prelude::{Predictable, PyramidWindow},
     trainable::Trainable,
 };
 use serde::{Deserialize, Serialize};
@@ -56,14 +56,14 @@ where
     }
 }
 
-impl<X, Y> HogDetector<X, Y, BayesClassifier<X, Y>, SlidingWindow>
+impl<X, Y> HogDetector<X, Y, BayesClassifier<X, Y>, PyramidWindow>
 where
     X: Float + Number + RealNumber,
     Y: Label + Number + Ord + Unsigned,
 {
     /// new default bayes
     pub fn bayes() -> Self {
-        HogDetector::<X, Y, BayesClassifier<X, Y>, SlidingWindow>::default()
+        HogDetector::<X, Y, BayesClassifier<X, Y>, PyramidWindow>::default()
     }
 }
 
