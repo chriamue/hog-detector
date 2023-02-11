@@ -3,6 +3,7 @@ use crate::Detector;
 use image::{DynamicImage, GenericImageView};
 use linfa::{Float, Label};
 use ndarray::Array2;
+use object_detector_rust::detection::merge_overlapping_detections;
 use object_detector_rust::prelude::{BBox, Class, Detection, WindowGenerator};
 use object_detector_rust::prelude::{Classifier, SlidingWindow};
 use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
@@ -195,6 +196,7 @@ where
                 ));
             }
         }
+        let detections = merge_overlapping_detections(&detections);
         detections
     }
 }
@@ -244,6 +246,7 @@ where
                 ));
             }
         }
+        let detections = merge_overlapping_detections(&detections);
         detections
     }
 }
