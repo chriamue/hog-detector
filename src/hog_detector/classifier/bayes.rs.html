@@ -150,7 +150,7 @@
 <span class="kw">use </span>ndarray::{Array1, ArrayView2};
 <span class="kw">use </span>num_traits::Unsigned;
 <span class="kw">use </span>object_detector_rust::{
-    prelude::{Predictable, SlidingWindow},
+    prelude::{Predictable, PyramidWindow},
     trainable::Trainable,
 };
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -200,14 +200,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;X, Y&gt; HogDetector&lt;X, Y, BayesClassifier&lt;X, Y&gt;, SlidingWindow&gt;
+<span class="kw">impl</span>&lt;X, Y&gt; HogDetector&lt;X, Y, BayesClassifier&lt;X, Y&gt;, PyramidWindow&gt;
 <span class="kw">where
     </span>X: Float + Number + RealNumber,
     Y: Label + Number + Ord + Unsigned,
 {
     <span class="doccomment">/// new default bayes
     </span><span class="kw">pub fn </span>bayes() -&gt; <span class="self">Self </span>{
-        HogDetector::&lt;X, Y, BayesClassifier&lt;X, Y&gt;, SlidingWindow&gt;::default()
+        HogDetector::&lt;X, Y, BayesClassifier&lt;X, Y&gt;, PyramidWindow&gt;::default()
     }
 }
 

@@ -463,14 +463,21 @@
 <a href="#463" id="463">463</a>
 <a href="#464" id="464">464</a>
 <a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::detector::visualize_detections;
+<span class="kw">use </span><span class="kw">crate</span>::utils::scale_to_32;
 <span class="kw">use </span><span class="kw">crate</span>::Detector;
 <span class="kw">use </span>image::{DynamicImage, GenericImageView};
 <span class="kw">use </span>linfa::{Float, Label};
 <span class="kw">use </span>ndarray::Array2;
 <span class="kw">use </span>object_detector_rust::detection::merge_overlapping_detections;
 <span class="kw">use </span>object_detector_rust::prelude::{BBox, Class, Detection, WindowGenerator};
-<span class="kw">use </span>object_detector_rust::prelude::{Classifier, SlidingWindow};
+<span class="kw">use </span>object_detector_rust::prelude::{Classifier, PyramidWindow};
 <span class="kw">use </span>object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
 <span class="kw">use </span>object_detector_rust::utils::{evaluate_precision, extract_data};
 <span class="kw">use </span>serde::de::DeserializeOwned;
@@ -550,19 +557,20 @@
     }
 }
 
-<span class="kw">impl</span>&lt;X, Y, C: Classifier&lt;X, Y&gt; + Default&gt; Default <span class="kw">for </span>HogDetector&lt;X, Y, C, SlidingWindow&gt;
+<span class="kw">impl</span>&lt;X, Y, C: Classifier&lt;X, Y&gt; + Default&gt; Default <span class="kw">for </span>HogDetector&lt;X, Y, C, PyramidWindow&gt;
 <span class="kw">where
     </span>X: Float,
     Y: Label,
 {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        HogDetector::&lt;X, Y, C, SlidingWindow&gt; {
+        HogDetector::&lt;X, Y, C, PyramidWindow&gt; {
             classifier: <span class="prelude-val">Some</span>(C::default()),
             feature_descriptor: Box::new(HOGFeature::default()),
-            window_generator: SlidingWindow {
+            window_generator: PyramidWindow {
                 width: <span class="number">32</span>,
                 height: <span class="number">32</span>,
                 step_size: <span class="number">24</span>,
+                layers: <span class="number">2</span>,
             },
             x: PhantomData,
             y: PhantomData,
@@ -627,7 +635,9 @@
             .iter()
             .flat_map(|window| {
                 <span class="self">self</span>.feature_descriptor
-                    .extract(<span class="kw-2">&amp;</span>DynamicImage::ImageRgba8(window.view.to_image()))
+                    .extract(<span class="kw-2">&amp;</span>scale_to_32(DynamicImage::ImageRgba8(
+                        window.view.to_image(),
+                    )))
             })
             .collect();
 
@@ -677,7 +687,9 @@
             .iter()
             .flat_map(|window| {
                 <span class="self">self</span>.feature_descriptor
-                    .extract(<span class="kw-2">&amp;</span>DynamicImage::ImageRgba8(window.view.to_image()))
+                    .extract(<span class="kw-2">&amp;</span>scale_to_32(DynamicImage::ImageRgba8(
+                        window.view.to_image(),
+                    )))
             })
             .collect();
 
@@ -846,14 +858,14 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_default() {
-        <span class="kw">let </span>model = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, SlidingWindow&gt;::default();
+        <span class="kw">let </span>model = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, <span class="kw">_</span>&gt;::default();
         <span class="macro">assert!</span>(model.classifier.is_some());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_part_eq() {
-        <span class="kw">let </span>model1 = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, SlidingWindow&gt;::default();
-        <span class="kw">let </span>model2 = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, SlidingWindow&gt;::default();
+        <span class="kw">let </span>model1 = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, <span class="kw">_</span>&gt;::default();
+        <span class="kw">let </span>model2 = HogDetector::&lt;f32, bool, SVMClassifier&lt;f32, bool&gt;, <span class="kw">_</span>&gt;::default();
         <span class="macro">assert!</span>(model1.classifier.is_some());
         <span class="macro">assert!</span>(model1.eq(<span class="kw-2">&amp;</span>model2));
         <span class="macro">assert!</span>(model1.eq(<span class="kw-2">&amp;</span>model1));
