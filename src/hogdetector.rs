@@ -3,13 +3,10 @@ use crate::Detector;
 use image::{DynamicImage, GenericImageView};
 use linfa::{Float, Label};
 use ndarray::Array2;
+use object_detector_rust::prelude::{BBox, Class, Detection, WindowGenerator};
+use object_detector_rust::prelude::{Classifier, SlidingWindow};
 use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
 use object_detector_rust::utils::{evaluate_precision, extract_data};
-use object_detector_rust::{prelude::Classifier, utils::SlidingWindow};
-use object_detector_rust::{
-    prelude::{BBox, Class, Detection},
-    utils::WindowGenerator,
-};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::error::Error;

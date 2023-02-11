@@ -5,7 +5,10 @@ use ndarray::Array2;
 use ndarray::ArrayView1;
 use ndarray::{Array1, ArrayView2};
 use num_traits::Unsigned;
-use object_detector_rust::{prelude::Predictable, trainable::Trainable, utils::SlidingWindow};
+use object_detector_rust::{
+    prelude::{Predictable, SlidingWindow},
+    trainable::Trainable,
+};
 use serde::{Deserialize, Serialize};
 use smartcore::naive_bayes::gaussian::GaussianNB;
 use smartcore::numbers::basenum::Number;
