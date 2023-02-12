@@ -1,4 +1,8 @@
 //! This module contains filter to eliminate false positive detections.
+use object_detector_rust::prelude::Detection;
+
+mod tracker_filter;
+pub use tracker_filter::TrackerFilter;
 
 /// Defines a trait for filtering detections to eliminate false positive detections.
 pub trait DetectionFilter {
