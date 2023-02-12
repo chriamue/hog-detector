@@ -1,4 +1,5 @@
 use crate::detector::visualize_detections;
+use crate::feature_descriptor::CombinedFeatureDescriptor;
 use crate::utils::scale_to_32;
 use crate::Detector;
 use image::{DynamicImage, GenericImageView};
@@ -7,7 +8,7 @@ use ndarray::Array2;
 use object_detector_rust::detection::merge_overlapping_detections;
 use object_detector_rust::prelude::{BBox, Class, Detection, WindowGenerator};
 use object_detector_rust::prelude::{Classifier, PyramidWindow};
-use object_detector_rust::prelude::{DataSet, Feature, HOGFeature, PersistentDetector};
+use object_detector_rust::prelude::{DataSet, Feature, PersistentDetector};
 use object_detector_rust::utils::{evaluate_precision, extract_data};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -94,7 +95,7 @@ where
     fn default() -> Self {
         HogDetector::<X, Y, C, PyramidWindow> {
             classifier: Some(C::default()),
-            feature_descriptor: Box::new(HOGFeature::default()),
+            feature_descriptor: Box::new(CombinedFeatureDescriptor::default()),
             window_generator: PyramidWindow {
                 width: 32,
                 height: 32,

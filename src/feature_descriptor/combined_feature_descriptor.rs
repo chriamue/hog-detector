@@ -1,5 +1,8 @@
 use image::DynamicImage;
-use object_detector_rust::prelude::{BriefFeature, Feature, HOGFeature};
+use object_detector_rust::prelude::{Feature, HOGFeature};
+
+#[cfg(feature = "brief")]
+use object_detector_rust::prelude::BriefFeature;
 
 /// defines a feature descriptor combination
 #[derive(Debug)]
