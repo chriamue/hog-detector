@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["TrackerFilter","Tracker for filtering and refining object detections."]],"trait":[["DetectionFilter","Defines a trait for filtering detections to eliminate false positive detections."]]};
