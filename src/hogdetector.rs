@@ -100,7 +100,7 @@ where
                 width: 32,
                 height: 32,
                 step_size: 24,
-                layers: 2,
+                layer_scales: vec![1.0, 1.5],
             },
             x: PhantomData,
             y: PhantomData,
