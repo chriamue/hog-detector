@@ -9,6 +9,7 @@ pub mod data_augmentation;
 /// The `dataset` module provides functionality for loading train datasets.
 /// It contains functions and structs that can be used to read and parse data from a variety of sources.
 pub mod dataset;
+pub mod detection_filter;
 /// detector functionality
 pub mod detector;
 /// Feature descriptors are used in computer vision and image processing to describe the features of an image.
@@ -32,6 +33,7 @@ pub use hogdetector::HogDetector;
 pub mod prelude {
     pub use crate::classifier::Classifier;
     pub use crate::dataset::DataSet;
+    pub use crate::detection_filter::DetectionFilter;
     pub use crate::detector::Detector;
     pub use object_detector_rust::bbox::BBox;
     pub use object_detector_rust::prelude::Detection;
