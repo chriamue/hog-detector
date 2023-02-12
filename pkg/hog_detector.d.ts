@@ -142,8 +142,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly init_image_label_tool: (a: number, b: number, c: number) => number;
-  readonly init_trainer: (a: number, b: number, c: number) => void;
   readonly __wbg_hogdetectorjs_free: (a: number) => void;
   readonly hogdetectorjs_new: () => number;
   readonly hogdetectorjs_init_random_forest_classifier: (a: number) => void;
@@ -151,6 +149,8 @@ export interface InitOutput {
   readonly hogdetectorjs_init_combined_classifier: (a: number) => void;
   readonly hogdetectorjs_next: (a: number, b: number, c: number, d: number) => void;
   readonly hogdetectorjs_fps: (a: number) => number;
+  readonly init_image_label_tool: (a: number, b: number, c: number) => number;
+  readonly init_trainer: (a: number, b: number, c: number) => void;
   readonly __wbg_wasmbindgentestcontext_free: (a: number) => void;
   readonly wasmbindgentestcontext_new: () => number;
   readonly wasmbindgentestcontext_args: (a: number, b: number, c: number) => void;
@@ -162,19 +162,19 @@ export interface InitOutput {
   readonly __wbgtest_console_error: (a: number) => void;
   readonly __wbg_annotatedimage_free: (a: number) => void;
   readonly annotatedimage_constructor: () => number;
-  readonly init_label_tool: (a: number, b: number, c: number, d: number) => number;
   readonly __wbg_labeltool_free: (a: number) => void;
   readonly labeltool_new: () => number;
+  readonly init_label_tool: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h569afda5bc8c72a4: (a: number, b: number, c: number) => void;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h3e8f9ba7f6ed3b41: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h425f206cbd0607f2: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h40970ac6a29e74ed: (a: number, b: number, c: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke3_mut__h20401bcd5d91f2b7: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke2_mut__h822835247acc0e36: (a: number, b: number, c: number, d: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke3_mut__h471b02b4917a8ae5: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke2_mut__hc084966eddf09490: (a: number, b: number, c: number, d: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
