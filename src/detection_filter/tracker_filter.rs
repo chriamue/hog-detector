@@ -8,16 +8,18 @@ use crate::prelude::Detection;
 /// # Examples
 ///
 /// ```
-/// use object_detector_rust::{Detection, TrackerFilter};
+/// use object_detector_rust::detection::Detection;
+/// use hog_detector::detection_filter::TrackerFilter;
+/// use hog_detector::detection_filter::DetectionFilter;
 ///
 /// let mut tracker = TrackerFilter {
 ///     previous_detections: Vec::new(),
 ///     overlap_threshold: 0.5,
 /// };
 ///
-/// let current_detections: Vec<Detection> = /* ... */;
+/// let current_detections: Vec<Detection> = Vec::new();
 ///
-/// let refined_detections = tracker.filter_and_update(current_detections);
+/// let refined_detections = tracker.filter_detections(&current_detections);
 /// ```
 ///
 /// This example demonstrates how to create a `TrackerFilter` instance and use it to filter and
