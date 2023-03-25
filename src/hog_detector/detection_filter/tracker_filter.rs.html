@@ -97,6 +97,8 @@
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DetectionFilter;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Detection;
 
@@ -107,16 +109,18 @@
 /// # Examples
 ///
 /// ```
-/// use object_detector_rust::{Detection, TrackerFilter};
+/// use object_detector_rust::detection::Detection;
+/// use hog_detector::detection_filter::TrackerFilter;
+/// use hog_detector::detection_filter::DetectionFilter;
 ///
 /// let mut tracker = TrackerFilter {
 ///     previous_detections: Vec::new(),
 ///     overlap_threshold: 0.5,
 /// };
 ///
-/// let current_detections: Vec&lt;Detection&gt; = /* ... */;
+/// let current_detections: Vec&lt;Detection&gt; = Vec::new();
 ///
-/// let refined_detections = tracker.filter_and_update(current_detections);
+/// let refined_detections = tracker.filter_detections(&amp;current_detections);
 /// ```
 ///
 /// This example demonstrates how to create a `TrackerFilter` instance and use it to filter and
