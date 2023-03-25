@@ -30,6 +30,16 @@ pub struct TrackerFilter {
     pub overlap_threshold: f32,
 }
 
+impl TrackerFilter {
+    /// Create a new `TrackerFilter` instance
+    pub fn new(overlap_threshold: f32) -> Self {
+        TrackerFilter {
+            previous_detections: Vec::new(),
+            overlap_threshold,
+        }
+    }
+}
+
 impl DetectionFilter for TrackerFilter {
     fn filter_detections(&mut self, detections: &Vec<Detection>) -> Vec<Detection> {
         let mut filtered_detections = Vec::new();
@@ -69,5 +79,21 @@ mod tests {
             Detection::new(BBox::new(50, 0, 100, 100), 1, 0.85),
         ];
         assert_eq!(tracker.filter_detections(&new_detections).len(), 2);
+    }
+
+    #[test]
+    fn test_tacker_filter_with_overlap_threshold() {
+        let detections = vec![
+            Detection::new(BBox::new(0, 0, 100, 100), 1, 0.9),
+            Detection::new(BBox::new(50, 0, 100, 100), 1, 0.8),
+        ];
+        let mut tracker = TrackerFilter::new(0.5);
+        assert_eq!(tracker.filter_detections(&detections).len(), 0);
+
+        let new_detections = vec![
+            Detection::new(BBox::new(0, 0, 100, 100), 1, 0.95),
+            Detection::new(BBox::new(50, 0, 200, 100), 1, 0.85),
+        ];
+        assert_eq!(tracker.filter_detections(&new_detections).len(), 1);
     }
 }

@@ -1,4 +1,5 @@
 use crate::classifier::BayesClassifier;
+use crate::detection_filter::{DetectionFilter, TrackerFilter};
 use crate::detector::visualize_detections;
 use crate::hogdetector::HogDetectorTrait;
 use crate::utils::scale_to_32;
@@ -21,6 +22,7 @@ use wasm_bindgen::prelude::*;
 pub struct HogDetectorJS {
     hog: Arc<Mutex<Box<dyn HogDetectorTrait<f32, usize>>>>,
     timestamps: Arc<Mutex<VecDeque<u128>>>,
+    detection_filter: Arc<Mutex<TrackerFilter>>,
 }
 
 impl HogDetectorJS {
@@ -61,6 +63,7 @@ impl HogDetectorJS {
         HogDetectorJS {
             hog: Arc::new(Mutex::new(Box::new(hog))),
             timestamps: Arc::new(Mutex::new(VecDeque::with_capacity(5))),
+            detection_filter: Arc::new(Mutex::new(TrackerFilter::new(0.2))),
         }
     }
 
@@ -109,7 +112,13 @@ impl HogDetectorJS {
         let start = Instant::now();
         let mut img =
             image::load_from_memory_with_format(img_data, image::ImageFormat::Png).unwrap();
-        img = visualize_detections(&img, &self.hog.lock().unwrap().detect(&img));
+        let detections = &self.hog.lock().unwrap().detect(&img);
+        let filtered_detections = &self
+            .detection_filter
+            .lock()
+            .unwrap()
+            .filter_detections(&detections);
+        img = visualize_detections(&img, filtered_detections);
 
         let mut image_data: Vec<u8> = Vec::new();
         img.write_to(
