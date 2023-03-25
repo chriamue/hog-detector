@@ -13,5 +13,5 @@ pub trait DetectionFilter {
     ///
     /// # Returns
     /// A vector of `Detection` objects representing the filtered set of detections, with false positive detections removed.
-    fn filter_detections(&self, detections: &Vec<Detection>) -> Vec<Detection>;
+    fn filter_detections(&mut self, detections: &Vec<Detection>) -> Vec<Detection>;
 }
