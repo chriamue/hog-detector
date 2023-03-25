@@ -17,7 +17,9 @@
   ],
   "module": "hog_detector.js",
   "types": "hog_detector.d.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "./snippets/*"
+  ],
   "keywords": [
     "machine-learning",
     "object-detection",
