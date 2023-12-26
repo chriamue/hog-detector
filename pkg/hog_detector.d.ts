@@ -46,13 +46,13 @@ export function __wbgtest_console_error(args: Array<any>): void;
 /**
 * init label tool and start app on given root html element
 * @param {Element} root
-* @param {LabelTool | undefined} label_tool
-* @param {string | undefined} canvas_element_id
+* @param {LabelTool | undefined} [label_tool]
+* @param {string | undefined} [canvas_element_id]
 * @returns {LabelTool}
 */
 export function init_label_tool(root: Element, label_tool?: LabelTool, canvas_element_id?: string): LabelTool;
 /**
-* Image with Annotations
+* Represents an image with associated annotations.
 */
 export class AnnotatedImage {
   free(): void;
@@ -162,19 +162,19 @@ export interface InitOutput {
   readonly __wbgtest_console_error: (a: number) => void;
   readonly __wbg_labeltool_free: (a: number) => void;
   readonly labeltool_new: () => number;
+  readonly init_label_tool: (a: number, b: number, c: number, d: number) => number;
   readonly __wbg_annotatedimage_free: (a: number) => void;
   readonly annotatedimage_constructor: () => number;
-  readonly init_label_tool: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbindgen_malloc: (a: number) => number;
-  readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
+  readonly __wbindgen_malloc: (a: number, b: number) => number;
+  readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hd761503364d5dbba: (a: number, b: number, c: number) => void;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h3f27e541734e207f: (a: number, b: number, c: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke1_ref__hc45c2cb87381494d: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hc138cc8637049796: (a: number, b: number, c: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
-  readonly __wbindgen_free: (a: number, b: number) => void;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke3_mut__h187add32c4f6d183: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke2_mut__h4f4fcb272a7664c1: (a: number, b: number, c: number, d: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke3_mut__h5161cc2bff91ead7: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke2_mut__h495f586e6d49f625: (a: number, b: number, c: number, d: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
@@ -196,4 +196,4 @@ export function initSync(module: SyncInitInput): InitOutput;
 *
 * @returns {Promise<InitOutput>}
 */
-export default function init (module_or_path?: InitInput | Promise<InitInput>): Promise<InitOutput>;
+export default function __wbg_init (module_or_path?: InitInput | Promise<InitInput>): Promise<InitOutput>;
