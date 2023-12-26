@@ -75,14 +75,14 @@
     <span class="kw">let </span><span class="kw-2">mut </span>image_data: Vec&lt;u8&gt; = Vec::new();
     img.write_to(<span class="kw-2">&amp;mut </span>Cursor::new(<span class="kw-2">&amp;mut </span>image_data), ImageOutputFormat::Png)
         .unwrap();
-    <span class="kw">let </span>res_base64 = general_purpose::STANDARD_NO_PAD.encode(image_data);
+    <span class="kw">let </span>res_base64 = general_purpose::STANDARD.encode(image_data);
     <span class="macro">format!</span>(<span class="string">&quot;data:image/png;base64,{}&quot;</span>, res_base64)
 }
 
 <span class="doccomment">/// decodes base64 encoded image to dynamic image
 </span><span class="kw">pub fn </span>base64_image_to_image(b64img: <span class="kw-2">&amp;</span>str) -&gt; DynamicImage {
     <span class="kw">let </span>b64img = b64img.replace(<span class="string">&quot;data:image/png;base64,&quot;</span>, <span class="string">&quot;&quot;</span>);
-    <span class="kw">let </span>data = general_purpose::STANDARD_NO_PAD.decode(b64img).unwrap();
+    <span class="kw">let </span>data = general_purpose::STANDARD.decode(b64img).unwrap();
     image::load_from_memory(<span class="kw-2">&amp;</span>data).unwrap()
 }
 
