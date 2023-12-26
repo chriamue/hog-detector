@@ -1,3 +1,5 @@
+use base64::engine::general_purpose;
+use base64::Engine;
 use image::{imageops::FilterType, DynamicImage, GenericImageView, ImageOutputFormat};
 use std::io::Cursor;
 
@@ -6,14 +8,14 @@ pub fn image_to_base64_image(img: &DynamicImage) -> String {
     let mut image_data: Vec<u8> = Vec::new();
     img.write_to(&mut Cursor::new(&mut image_data), ImageOutputFormat::Png)
         .unwrap();
-    let res_base64 = base64::encode(image_data);
+    let res_base64 = general_purpose::STANDARD.encode(image_data);
     format!("data:image/png;base64,{}", res_base64)
 }
 
 /// decodes base64 encoded image to dynamic image
 pub fn base64_image_to_image(b64img: &str) -> DynamicImage {
     let b64img = b64img.replace("data:image/png;base64,", "");
-    let data = base64::decode(b64img).unwrap();
+    let data = general_purpose::STANDARD.decode(b64img).unwrap();
     image::load_from_memory(&data).unwrap()
 }
 

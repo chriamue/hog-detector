@@ -8,11 +8,11 @@ use object_detector_rust::{
 /// creates a memory database from images in label tool
 pub fn create_dataset(label_tool: &LabelTool) -> MemoryDataSet {
     // get all images from label tool
-    let images = label_tool.annotated_images().lock().unwrap().clone();
+    let images = label_tool.annotated_images().lock().unwrap().clone().images;
     // create memory dataset
     let mut dataset = MemoryDataSet::default();
-    for image in images.iter() {
-        let img = image.get_image();
+    for image in images.borrow().iter() {
+        let img = image.get_image().clone();
         let annotations: Vec<(BBox, u32)> = image
             .get_annotations()
             .iter()
