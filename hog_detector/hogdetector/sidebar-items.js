@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["HogDetector","Hog Detector struct ,—–.  ,———.   ,––––––––––.   ,—. |Image|  |GrayImage|   |HogFeatureDescriptor|   |SVM| |—–|–|———|—|––––––––––|—|—| `-----'  `———’   `--------------------'   `—’ | | ,———–.   ,––––.   ,—––. |Predictions|   |Detector|   |Objects| |———–|—|––––|—|—––| `-----------'   `––––’   `—––’"]],"trait":[["HogDetectorTrait","trait of an hog detector"]]};
+window.SIDEBAR_ITEMS = {"struct":["HogDetector"],"trait":["HogDetectorTrait"]};

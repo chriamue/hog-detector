@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["CombinedFeatureDescriptor","defines a feature descriptor combination"]]};
+window.SIDEBAR_ITEMS = {"struct":["CombinedFeatureDescriptor"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["EyesDataSet","dataset of eyes images from tiruss/eye_detector"],["MnistDataSet","the well known mnist dataset"]],"trait":[["AnnotatedImageSet","trait of a set of annotated images"],["DataSet","Trait representing a dataset of images and labels for training"]]};
+window.SIDEBAR_ITEMS = {"struct":["EyesDataSet","MnistDataSet"],"trait":["AnnotatedImageSet","DataSet"]};

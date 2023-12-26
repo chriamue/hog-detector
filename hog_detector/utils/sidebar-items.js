@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["base64_image_to_image","decodes base64 encoded image to dynamic image"],["image_to_base64_image","converts dynamic image to base64 encoded png image"],["scale_to_32","scales image to 32 pixels"],["scale_to_multiple_of_8","scales image up to a multiple of 8 pixels"]]};
+window.SIDEBAR_ITEMS = {"fn":["base64_image_to_image","image_to_base64_image","scale_to_32","scale_to_multiple_of_8"]};

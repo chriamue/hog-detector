@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["bayes","naive bayes classifier module"]],"trait":[["Classifier","The Classifier trait defines the behavior of a machine learning model that is capable of classifying data points into one of several categories. This trait is composed of two other traits: Trainable and Predictable."]]};
+window.SIDEBAR_ITEMS = {"mod":["bayes"],"trait":["Classifier"]};
