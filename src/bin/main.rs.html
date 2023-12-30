@@ -100,6 +100,7 @@
     <span class="kw">let </span>video_queue = use_state(|| Arc::new(ImageQueue::new_with_id(<span class="number">1</span>, <span class="number">3</span>)));
     <span class="kw">let </span>processed_queue = use_state(|| Arc::new(ImageQueue::new(<span class="number">3</span>)));
 
+    <span class="kw">let </span>detector = use_state(|| HogDetectorJS::new());
     <span class="kw">let </span>pipeline = use_state(|| {
         Arc::new(Pipeline::new(
             (<span class="kw-2">*</span>video_queue).clone(),
@@ -107,12 +108,11 @@
         ))
     });
 
-    <span class="kw">let </span>detector = use_state(|| HogDetectorJS::new());
     <span class="kw">let </span>label_tool = use_state(|| LabelTool::new());
 
     <span class="kw">let </span>canvas_ref = use_node_ref();
 
-    use_effect(<span class="kw">move </span>|| {
+    use_effect_with(pipeline.clone(), <span class="kw">move </span>|<span class="kw">_</span>| {
         <span class="kw">let </span>pipeline_clone = pipeline.clone();
         <span class="kw">let </span>window: Window = web_sys::window().unwrap_throw();
         <span class="kw">let </span>closure = Closure::wrap(Box::new(<span class="kw">move </span>|| {

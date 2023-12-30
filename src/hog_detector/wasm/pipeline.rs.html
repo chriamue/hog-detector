@@ -87,6 +87,16 @@
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     detection_filter::TrackerFilter, detector::visualize_detections, hogdetector::HogDetectorTrait,
     prelude::DetectionFilter, HogDetector,
@@ -100,11 +110,19 @@
 };
 <span class="kw">use </span>web_sys::ImageData;
 
-<span class="kw">pub struct </span>Pipeline {
+<span class="attr">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Pipeline {
+    id: usize,
     video_queue: Arc&lt;ImageQueue&gt;,
     processed_queue: Arc&lt;ImageQueue&gt;,
     hog: Arc&lt;Mutex&lt;Box&lt;<span class="kw">dyn </span>HogDetectorTrait&lt;f32, usize&gt;&gt;&gt;&gt;,
     detection_filter: Arc&lt;Mutex&lt;TrackerFilter&gt;&gt;,
+}
+
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Pipeline {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.id == other.id
+    }
 }
 
 <span class="kw">impl </span>Pipeline {
@@ -117,6 +135,7 @@
             model
         };
         Pipeline {
+            id: rand::random(),
             video_queue,
             processed_queue,
             hog: Arc::new(Mutex::new(Box::new(hog))),
@@ -150,6 +169,7 @@
         <span class="kw">match </span><span class="self">self</span>.hog.try_lock() {
             <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>processor_guard) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>image_data) = <span class="self">self</span>.video_queue.pop() {
+
                     <span class="kw">let </span>processor = processor_guard.as_mut();
                     <span class="kw">let </span><span class="kw-2">mut </span>image = Pipeline::to_dynamic_image(image_data);
                     <span class="kw">let </span>detections = processor.detect(<span class="kw-2">&amp;mut </span>image);
