@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"hog_detector":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.75.0/core/convert/trait.From.html\" title=\"trait core::convert::From\">From</a>&lt;<a class=\"struct\" href=\"hog_detector/wasm/hogdetector_js/struct.HogDetectorJS.html\" title=\"struct hog_detector::wasm::hogdetector_js::HogDetectorJS\">HogDetectorJS</a>&gt; for <a class=\"struct\" href=\"https://docs.rs/wasm-bindgen/0.2/wasm_bindgen/struct.JsValue.html\" title=\"struct wasm_bindgen::JsValue\">JsValue</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

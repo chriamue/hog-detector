@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["init_image_label_tool","init label tool and start app on given root html element"],["init_trainer",""]],"mod":[["hogdetector_js",""],["trainer",""]]};
+window.SIDEBAR_ITEMS = {"fn":["init_image_label_tool","init_trainer"],"mod":["display_image","hogdetector_js","image_queue","pipeline","trainer","video_producer"]};

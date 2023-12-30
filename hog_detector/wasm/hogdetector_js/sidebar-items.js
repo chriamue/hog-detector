@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["HogDetectorJS",""]]};
+window.SIDEBAR_ITEMS = {"struct":["HogDetectorJS"]};

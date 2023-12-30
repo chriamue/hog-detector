@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["hog_detector"];
+window.ALL_CRATES = ["bin","hog_detector"];

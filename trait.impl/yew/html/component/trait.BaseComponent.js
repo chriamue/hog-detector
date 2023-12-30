@@ -1,0 +1,4 @@
+(function() {var implementors = {
+"bin":[["impl BaseComponent for <a class=\"struct\" href=\"bin/struct.App.html\" title=\"struct bin::App\">App</a><span class=\"where fmt-newline\">where\n    Self: 'static,</span>"]],
+"hog_detector":[["impl BaseComponent for <a class=\"struct\" href=\"hog_detector/wasm/video_producer/struct.VideoProducer.html\" title=\"struct hog_detector::wasm::video_producer::VideoProducer\">VideoProducer</a><span class=\"where fmt-newline\">where\n    Self: 'static,</span>"],["impl BaseComponent for <a class=\"struct\" href=\"hog_detector/wasm/display_image/struct.DisplayImage.html\" title=\"struct hog_detector::wasm::display_image::DisplayImage\">DisplayImage</a><span class=\"where fmt-newline\">where\n    Self: 'static,</span>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

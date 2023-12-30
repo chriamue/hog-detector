@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["classifier","data_augmentation","dataset","detection_filter","detector","feature_descriptor","hogdetector","prelude","utils"],"trait":["DataSet","Detector"]};
+window.SIDEBAR_ITEMS = {"mod":["classifier","data_augmentation","dataset","detection_filter","detector","feature_descriptor","hogdetector","prelude","utils","wasm"],"trait":["DataSet","Detector"]};
