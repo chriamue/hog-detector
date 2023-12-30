@@ -11,11 +11,19 @@ use std::{
 };
 use web_sys::ImageData;
 
+#[derive(Clone)]
 pub struct Pipeline {
+    id: usize,
     video_queue: Arc<ImageQueue>,
     processed_queue: Arc<ImageQueue>,
     hog: Arc<Mutex<Box<dyn HogDetectorTrait<f32, usize>>>>,
     detection_filter: Arc<Mutex<TrackerFilter>>,
+}
+
+impl PartialEq for Pipeline {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
 }
 
 impl Pipeline {
@@ -28,6 +36,7 @@ impl Pipeline {
             model
         };
         Pipeline {
+            id: rand::random(),
             video_queue,
             processed_queue,
             hog: Arc::new(Mutex::new(Box::new(hog))),
@@ -61,6 +70,7 @@ impl Pipeline {
         match self.hog.try_lock() {
             Ok(mut processor_guard) => {
                 if let Some(mut image_data) = self.video_queue.pop() {
+
                     let processor = processor_guard.as_mut();
                     let mut image = Pipeline::to_dynamic_image(image_data);
                     let detections = processor.detect(&mut image);

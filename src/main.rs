@@ -19,6 +19,7 @@ pub fn App() -> Html {
     let video_queue = use_state(|| Arc::new(ImageQueue::new_with_id(1, 3)));
     let processed_queue = use_state(|| Arc::new(ImageQueue::new(3)));
 
+    let detector = use_state(|| HogDetectorJS::new());
     let pipeline = use_state(|| {
         Arc::new(Pipeline::new(
             (*video_queue).clone(),
@@ -26,12 +27,11 @@ pub fn App() -> Html {
         ))
     });
 
-    let detector = use_state(|| HogDetectorJS::new());
     let label_tool = use_state(|| LabelTool::new());
 
     let canvas_ref = use_node_ref();
 
-    use_effect(move || {
+    use_effect_with(pipeline.clone(), move |_| {
         let pipeline_clone = pipeline.clone();
         let window: Window = web_sys::window().unwrap_throw();
         let closure = Closure::wrap(Box::new(move || {
