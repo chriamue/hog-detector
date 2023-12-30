@@ -135,8 +135,6 @@
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>wasm_bindgen::closure::Closure;
@@ -234,7 +232,7 @@
     <span class="kw">let </span>canvas_ref_clone = canvas_ref.clone();
     <span class="kw">let </span>frame_queue_producer = props.image_queue.clone();
 
-    use_effect(<span class="kw">move </span>|| {
+    use_effect_with(frame_queue_producer.clone(), <span class="kw">move </span>|<span class="kw">_</span>| {
         <span class="kw">let </span>video = video_ref_clone.cast::&lt;HtmlVideoElement&gt;().unwrap_throw();
         <span class="kw">let </span>canvas = canvas_ref_clone.cast::&lt;HtmlCanvasElement&gt;().unwrap_throw();
 
@@ -244,8 +242,6 @@
                 <span class="macro">log::error!</span>(<span class="string">&quot;Error initializing webcam: {:?}&quot;</span>, e);
             }
         });
-
-        <span class="kw">let </span>video = video.clone();
 
         <span class="kw">let </span>callback = Closure::wrap(Box::new(<span class="kw">move </span>|| {
             <span class="kw">let </span>frame_queue_producer = frame_queue_producer.clone();
