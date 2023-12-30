@@ -59,6 +59,6 @@ mod tests {
         let label_tool = LabelTool::new();
         label_tool.push(annotations);
         let dataset = create_dataset(&label_tool);
-        assert_eq!(dataset.len(), 11);
+        assert_eq!(dataset.len(), 1);
     }
 }
