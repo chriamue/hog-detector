@@ -19,11 +19,10 @@ jobs:
         with:
           version: "latest"
 
-      - run: wasm-pack build --target web
-      - run: ls
-
-      - name: copy page
-        run: mkdir public && cp index.html ./public && cp index.css ./public && mv pkg ./public && rm ./public/pkg/.gitignore
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo install --locked trunk
+      - run: trunk build --release --public-url /hog-detector
+      - run: cp dist/index.html dist/404.html
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
@@ -31,5 +30,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: ./public
+          publish_dir: ./dist
           keep_files: true

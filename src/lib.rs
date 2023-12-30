@@ -21,7 +21,7 @@ pub mod hogdetector;
 pub mod utils;
 
 /// web assembly module
-#[cfg(target_arch = "wasm32")]
+//#[cfg(target_arch = "wasm32")]
 //#[cfg(not(tarpaulin_include))]
 //#[cfg(feature = "wasm")]
 pub mod wasm;

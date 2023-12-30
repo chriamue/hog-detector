@@ -39,7 +39,6 @@ pub fn create_dataset(label_tool: &LabelTool) -> MemoryDataSet {
 mod tests {
     use image::{DynamicImage, ImageBuffer};
     use image_label_tool::prelude::AnnotatedImage;
-
     use image_label_tool::prelude::BBox;
 
     use super::*;
@@ -60,6 +59,6 @@ mod tests {
         let label_tool = LabelTool::new();
         label_tool.push(annotations);
         let dataset = create_dataset(&label_tool);
-        assert_eq!(dataset.samples(), 11);
+        assert_eq!(dataset.len(), 11);
     }
 }

@@ -2,8 +2,12 @@
 use image_label_tool::prelude::*;
 use wasm_bindgen::prelude::*;
 
+pub mod display_image;
 pub mod hogdetector_js;
+pub mod image_queue;
+pub mod pipeline;
 pub mod trainer;
+pub mod video_producer;
 
 use hogdetector_js::HogDetectorJS;
 

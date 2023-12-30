@@ -52,14 +52,17 @@ impl Component for TrainerApp {
             }
             Msg::SwitchBayesClassifier => {
                 ctx.props().detector.init_bayes_classifier();
+                log::info!("Switched to Bayes Classifier");
                 true
             }
             Msg::SwitchRandomForestClassifier => {
                 ctx.props().detector.init_random_forest_classifier();
+                log::info!("Switched to Random Forest Classifier");
                 true
             }
             Msg::SwitchCombinedClassifier => {
                 ctx.props().detector.init_combined_classifier();
+                log::info!("Switched to Combined Classifier");
                 true
             }
         }
