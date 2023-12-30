@@ -95,7 +95,7 @@ pub fn video_producer(props: &VideoProducerProps) -> Html {
     let canvas_ref_clone = canvas_ref.clone();
     let frame_queue_producer = props.image_queue.clone();
 
-    use_effect(move || {
+    use_effect_with(frame_queue_producer.clone(), move |_| {
         let video = video_ref_clone.cast::<HtmlVideoElement>().unwrap_throw();
         let canvas = canvas_ref_clone.cast::<HtmlCanvasElement>().unwrap_throw();
 
@@ -105,8 +105,6 @@ pub fn video_producer(props: &VideoProducerProps) -> Html {
                 log::error!("Error initializing webcam: {:?}", e);
             }
         });
-
-        let video = video.clone();
 
         let callback = Closure::wrap(Box::new(move || {
             let frame_queue_producer = frame_queue_producer.clone();
