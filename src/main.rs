@@ -24,6 +24,7 @@ pub fn App() -> Html {
         Arc::new(Pipeline::new(
             (*video_queue).clone(),
             (*processed_queue).clone(),
+            detector.get_model().clone(),
         ))
     });
 

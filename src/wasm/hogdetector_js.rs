@@ -45,6 +45,10 @@ impl HogDetectorJS {
         let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
         hog.fit_class(&x, &y, 1).unwrap();
     }
+
+    pub fn get_model(&self) -> &Arc<Mutex<Box<dyn HogDetectorTrait<f32, usize>>>> {
+        &self.hog
+    }
 }
 
 #[wasm_bindgen]

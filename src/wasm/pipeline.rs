@@ -1,14 +1,10 @@
 use crate::{
     detection_filter::TrackerFilter, detector::visualize_detections, hogdetector::HogDetectorTrait,
-    prelude::DetectionFilter, HogDetector,
+    prelude::DetectionFilter,
 };
 
 use super::image_queue::ImageQueue;
-use object_detector_rust::{classifier::RandomForestClassifier, detector::PersistentDetector};
-use std::{
-    io::Cursor,
-    sync::{Arc, Mutex, TryLockError},
-};
+use std::sync::{Arc, Mutex, TryLockError};
 use web_sys::ImageData;
 
 #[derive(Clone)]
@@ -27,19 +23,16 @@ impl PartialEq for Pipeline {
 }
 
 impl Pipeline {
-    pub fn new(video_queue: Arc<ImageQueue>, processed_queue: Arc<ImageQueue>) -> Self {
-        let hog = {
-            let mut model: HogDetector<f32, usize, RandomForestClassifier<_, _>, _> =
-                HogDetector::default();
-            let file = Cursor::new(include_bytes!("../../res/eyes_random_forest_model.json"));
-            model.load(file).unwrap();
-            model
-        };
+    pub fn new(
+        video_queue: Arc<ImageQueue>,
+        processed_queue: Arc<ImageQueue>,
+        hog: Arc<Mutex<Box<dyn HogDetectorTrait<f32, usize>>>>,
+    ) -> Self {
         Pipeline {
             id: rand::random(),
             video_queue,
             processed_queue,
-            hog: Arc::new(Mutex::new(Box::new(hog))),
+            hog,
             detection_filter: Arc::new(Mutex::new(TrackerFilter::new(0.2))),
         }
     }
@@ -70,7 +63,6 @@ impl Pipeline {
         match self.hog.try_lock() {
             Ok(mut processor_guard) => {
                 if let Some(mut image_data) = self.video_queue.pop() {
-
                     let processor = processor_guard.as_mut();
                     let mut image = Pipeline::to_dynamic_image(image_data);
                     let detections = processor.detect(&mut image);
