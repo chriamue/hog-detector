@@ -89,25 +89,13 @@
 <a href="#89" id="89">89</a>
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     detection_filter::TrackerFilter, detector::visualize_detections, hogdetector::HogDetectorTrait,
-    prelude::DetectionFilter, HogDetector,
+    prelude::DetectionFilter,
 };
 
 <span class="kw">use </span><span class="kw">super</span>::image_queue::ImageQueue;
-<span class="kw">use </span>object_detector_rust::{classifier::RandomForestClassifier, detector::PersistentDetector};
-<span class="kw">use </span>std::{
-    io::Cursor,
-    sync::{Arc, Mutex, TryLockError},
-};
+<span class="kw">use </span>std::sync::{Arc, Mutex, TryLockError};
 <span class="kw">use </span>web_sys::ImageData;
 
 <span class="attr">#[derive(Clone)]
@@ -126,19 +114,16 @@
 }
 
 <span class="kw">impl </span>Pipeline {
-    <span class="kw">pub fn </span>new(video_queue: Arc&lt;ImageQueue&gt;, processed_queue: Arc&lt;ImageQueue&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>hog = {
-            <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, RandomForestClassifier&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;, <span class="kw">_</span>&gt; =
-                HogDetector::default();
-            <span class="kw">let </span>file = Cursor::new(<span class="macro">include_bytes!</span>(<span class="string">&quot;../../res/eyes_random_forest_model.json&quot;</span>));
-            model.load(file).unwrap();
-            model
-        };
+    <span class="kw">pub fn </span>new(
+        video_queue: Arc&lt;ImageQueue&gt;,
+        processed_queue: Arc&lt;ImageQueue&gt;,
+        hog: Arc&lt;Mutex&lt;Box&lt;<span class="kw">dyn </span>HogDetectorTrait&lt;f32, usize&gt;&gt;&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
         Pipeline {
             id: rand::random(),
             video_queue,
             processed_queue,
-            hog: Arc::new(Mutex::new(Box::new(hog))),
+            hog,
             detection_filter: Arc::new(Mutex::new(TrackerFilter::new(<span class="number">0.2</span>))),
         }
     }
@@ -169,7 +154,6 @@
         <span class="kw">match </span><span class="self">self</span>.hog.try_lock() {
             <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>processor_guard) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>image_data) = <span class="self">self</span>.video_queue.pop() {
-
                     <span class="kw">let </span>processor = processor_guard.as_mut();
                     <span class="kw">let </span><span class="kw-2">mut </span>image = Pipeline::to_dynamic_image(image_data);
                     <span class="kw">let </span>detections = processor.detect(<span class="kw-2">&amp;mut </span>image);
