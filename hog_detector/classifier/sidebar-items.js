@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["bayes"],"trait":["Classifier"]};
+window.SIDEBAR_ITEMS = {"mod":["bayes","svm"],"trait":["Classifier"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["SVMClassifier","A Support Vector Machine classifier"]],"type":[["SVCParametersType","svc parameters type for float x and unsigned integer y"],["SVCType","svc type for float x and unsigned integer y"]]};
+window.SIDEBAR_ITEMS = {"struct":["SVMClassifier"]};
