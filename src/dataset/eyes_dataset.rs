@@ -171,7 +171,6 @@ mod tests {
     use object_detector_rust::classifier::CombinedClassifier;
     use object_detector_rust::detector::PersistentDetector;
     use object_detector_rust::prelude::RandomForestClassifier;
-    use object_detector_rust::prelude::SVMClassifier;
     use std::fs::File;
 
     #[test]
@@ -202,7 +201,7 @@ mod tests {
     #[ignore = "takes more than 200s in debug mode"]
     #[test]
     fn test_train_svm_model() {
-        let mut model: HogDetector<f32, bool, SVMClassifier<_, _>, _> = HogDetector::default();
+        let mut model: HogDetector<f32, bool, object_detector_rust::prelude::SVMClassifier<_, _>, _> = HogDetector::default();
 
         let mut dataset = EyesDataSet::default();
         dataset.load().unwrap();
@@ -246,6 +245,23 @@ mod tests {
         assert!(model.classifier.is_some());
 
         let file_writer = File::create("res/eyes_bayes_model.json").unwrap();
+        model.save(file_writer).unwrap();
+    }
+
+    #[ignore = "takes more than 200s in debug mode"]
+    #[test]
+    fn test_train_svm_burns_model() {
+        let mut model: HogDetector<f32, usize, crate::classifier::svm::SVMClassifier, _> =
+            HogDetector::default();
+
+        let mut dataset = EyesDataSet::default();
+        dataset.load().unwrap();
+        let (x, y) = dataset.get_data();
+        let y = y.into_iter().map(|y| y as usize).collect::<Vec<_>>();
+        model.fit_class(&x, &y, 1).unwrap();
+        assert!(model.classifier.is_some());
+
+        let file_writer = File::create("res/eyes_svm_burns_model.json").unwrap();
         model.save(file_writer).unwrap();
     }
 

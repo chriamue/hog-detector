@@ -1,6 +1,6 @@
 [package]
 name = "hog-detector"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 description = "Histogram of Oriented Gradients and Object Detection"
 authors = ["Christian <chriamue@gmail.com>"]
@@ -24,8 +24,9 @@ name = "bin"
 path = "src/main.rs"
 
 [features]
-default = ["wasm"]
+default = ["wasm", "svm"]
 brief = ["dep:brief-rs"]
+svm = ["svm-burns"]
 mnist = ["dep:mnist"]
 eyes = ["reqwest", "zip"]
 wasm = [
@@ -68,6 +69,7 @@ smartcore = { version = "0.3.0", features = [
   "ndarray-bindings",
   "serde",
 ], default-features = false, git = "https://github.com/smartcorelib/smartcore", branch = "fix-245" }
+svm-burns = { git = "https://github.com/chriamue/svm-burns", optional = true}
 zip = { version = "0.6.6", default-features = false, features = [
   "deflate",
 ], optional = true }

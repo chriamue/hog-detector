@@ -41,13 +41,13 @@ You can find a [demo here](https://chriamue.github.io/hog-detector)
 2. Compile the code to WASM:
 
     ```sh
-    wasm-pack build --target web
+    trunk build --release
     ```
 
 3. Run the Web version in your browser
 
     ```sh
-    python3 -m http.server
+    trunk serve --release
     ```
 
 Open your browser on [Localhost](http://localhost:8000)

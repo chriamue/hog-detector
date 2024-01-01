@@ -1,4 +1,5 @@
 use crate::classifier::BayesClassifier;
+use crate::classifier::svm::SVMClassifier;
 use crate::detection_filter::{DetectionFilter, TrackerFilter};
 use crate::detector::visualize_detections;
 use crate::hogdetector::HogDetectorTrait;
@@ -89,6 +90,17 @@ impl HogDetectorJS {
             let mut model: HogDetector<f32, usize, BayesClassifier<_, _>, _> =
                 HogDetector::default();
             let file = Cursor::new(include_bytes!("../../res/eyes_bayes_model.json"));
+            model.load(file).unwrap();
+            model
+        };
+        *self.hog.lock().unwrap() = Box::new(hog);
+    }
+
+    pub fn init_svm_classifier(&self) {
+        let hog = {
+            let mut model: HogDetector<f32, usize, SVMClassifier, _> =
+                HogDetector::default();
+            let file = Cursor::new(include_bytes!("../../res/eyes_svm_burns_model.json"));
             model.load(file).unwrap();
             model
         };

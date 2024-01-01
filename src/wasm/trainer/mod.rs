@@ -16,6 +16,7 @@ pub enum Msg {
     SwitchBayesClassifier,
     SwitchRandomForestClassifier,
     SwitchCombinedClassifier,
+    SwitchSVMClassifier,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -65,6 +66,11 @@ impl Component for TrainerApp {
                 log::info!("Switched to Combined Classifier");
                 true
             }
+            Msg::SwitchSVMClassifier => {
+                ctx.props().detector.init_svm_classifier();
+                log::info!("Switched to SVM Classifier");
+                true
+            }
         }
     }
 
@@ -74,6 +80,7 @@ impl Component for TrainerApp {
             ctx.link().callback(|_| Msg::TrainWithHardNegativeSamples);
         let onclick_bayes = ctx.link().callback(|_| Msg::SwitchBayesClassifier);
         let onclick_random_forest = ctx.link().callback(|_| Msg::SwitchRandomForestClassifier);
+        let onclick_svm = ctx.link().callback(|_| Msg::SwitchSVMClassifier);
         let onclick_combined = ctx.link().callback(|_| Msg::SwitchCombinedClassifier);
         html! {
             <div id="train-classifier-buttons">
@@ -88,6 +95,9 @@ impl Component for TrainerApp {
             </button>
             <button type="button" class="btn btn-success" onclick={onclick_random_forest}>
             { "Switch to Random Forest Classifier" }
+            </button>
+            <button type="button" class="btn btn-success" onclick={onclick_svm}>
+            { "Switch to SVM Classifier" }
             </button>
             <button type="button" class="btn btn-success" onclick={onclick_combined}>
             { "Switch to Combined Classifier" }
@@ -116,6 +126,7 @@ mod tests {
         assert!(rendered.contains("Train Detector"));
         assert!(rendered.contains("Train Detector with hard negative samples"));
         assert!(rendered.contains("Switch to Random Forest Classifier"));
+        assert!(rendered.contains("Switch to SVM Classifier"));
         assert!(rendered.contains("Switch to Combined Classifier"));
     }
 }
