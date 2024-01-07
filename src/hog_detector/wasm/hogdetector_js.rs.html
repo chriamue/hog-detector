@@ -176,9 +176,8 @@
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::BayesClassifier;
-<span class="kw">use </span><span class="kw">crate</span>::classifier::svm::SVMClassifier;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::classifier::svm::SVMClassifier;
+<span class="kw">use </span><span class="kw">crate</span>::classifier::BayesClassifier;
 <span class="kw">use </span><span class="kw">crate</span>::detection_filter::{DetectionFilter, TrackerFilter};
 <span class="kw">use </span><span class="kw">crate</span>::detector::visualize_detections;
 <span class="kw">use </span><span class="kw">crate</span>::hogdetector::HogDetectorTrait;
@@ -277,8 +276,7 @@
 
     <span class="kw">pub fn </span>init_svm_classifier(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">let </span>hog = {
-            <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, SVMClassifier, <span class="kw">_</span>&gt; =
-                HogDetector::default();
+            <span class="kw">let </span><span class="kw-2">mut </span>model: HogDetector&lt;f32, usize, SVMClassifier, <span class="kw">_</span>&gt; = HogDetector::default();
             <span class="kw">let </span>file = Cursor::new(<span class="macro">include_bytes!</span>(<span class="string">&quot;../../res/eyes_svm_burns_model.json&quot;</span>));
             model.load(file).unwrap();
             model

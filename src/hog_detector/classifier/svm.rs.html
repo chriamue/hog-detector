@@ -119,6 +119,9 @@
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::Debug;
 
 <span class="kw">use </span>ndarray::{Array1, ArrayView1, ArrayView2};
@@ -126,7 +129,7 @@
     classifier::Classifier, predictable::Predictable, trainable::Trainable,
     window_generator::PyramidWindow,
 };
-<span class="kw">use </span>serde::{Serialize, Deserialize};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>svm_burns::{svm::SVM, Parameters, RBFKernel, SVC};
 
 <span class="kw">use </span><span class="kw">crate</span>::HogDetector;
@@ -171,7 +174,10 @@
             .map(|row| row.iter().map(|<span class="kw-2">&amp;</span>elem| elem <span class="kw">as </span>f64).collect())
             .collect();
 
-        <span class="kw">let </span>y_vec: Vec&lt;i32&gt; = y.iter().map(|<span class="kw-2">&amp;</span>elem| elem <span class="kw">as </span>i32).collect();
+        <span class="kw">let </span>y_vec: Vec&lt;i32&gt; = y
+            .iter()
+            .map(|<span class="kw-2">&amp;</span>elem| <span class="kw">if </span>elem &gt; <span class="number">0 </span>{ <span class="number">1 </span>} <span class="kw">else </span>{ -<span class="number">1 </span>})
+            .collect();
 
         <span class="kw">let </span><span class="kw-2">mut </span>parameters = Parameters::default();
         parameters.with_kernel(Box::new(RBFKernel::new(<span class="number">0.7</span>)));
