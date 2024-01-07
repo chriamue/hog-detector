@@ -5,7 +5,7 @@ use object_detector_rust::{
     classifier::Classifier, predictable::Predictable, trainable::Trainable,
     window_generator::PyramidWindow,
 };
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use svm_burns::{svm::SVM, Parameters, RBFKernel, SVC};
 
 use crate::HogDetector;
@@ -50,7 +50,10 @@ impl Trainable<f32, usize> for SVMClassifier {
             .map(|row| row.iter().map(|&elem| elem as f64).collect())
             .collect();
 
-        let y_vec: Vec<i32> = y.iter().map(|&elem| elem as i32).collect();
+        let y_vec: Vec<i32> = y
+            .iter()
+            .map(|&elem| if elem > 0 { 1 } else { -1 })
+            .collect();
 
         let mut parameters = Parameters::default();
         parameters.with_kernel(Box::new(RBFKernel::new(0.7)));
